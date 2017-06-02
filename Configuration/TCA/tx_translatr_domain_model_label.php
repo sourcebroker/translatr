@@ -164,6 +164,13 @@ return array(
                 'eval' => 'trim',
             ),
         ),
+        'll_file' => array(
+            'exclude' => 1,
+            'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.ll_file',
+            'config' => array(
+                'type' => 'passthrough',
+            ),
+        ),
 
     ),
 );

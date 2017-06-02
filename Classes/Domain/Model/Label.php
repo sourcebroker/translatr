@@ -73,6 +73,11 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $sysLanguageUid;
 
     /**
+     * @var string
+     */
+    protected $llFile = '';
+
+    /**
      * Returns the extension
      *
      * @return string $extension
@@ -191,4 +196,21 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     {
         $this->sysLanguageUid = $sysLanguageUid;
     }
+
+    /**
+     * @return string
+     */
+    public function getLlFile()
+    {
+        return $this->llFile;
+    }
+
+    /**
+     * @param string $llFile
+     */
+    public function setLlFile($llFile)
+    {
+        $this->llFile = $llFile;
+    }
+
 }

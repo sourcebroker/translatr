@@ -18,6 +18,9 @@
 			<trans-unit id="tx_translatr_domain_model_label.description">
 				<source>Description (Not used in FE; Displays additional information about the label in BE)</source>
 			</trans-unit>
+			<trans-unit id="tx_translatr_domain_model_label.ll_file">
+				<source>Locallang file path (relative)</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

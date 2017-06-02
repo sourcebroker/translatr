@@ -18,6 +18,9 @@
 			<trans-unit id="tx_translatr_domain_model_label.description">
 				<source>Description</source>
 			</trans-unit>
+			<trans-unit id="tx_translatr_domain_model_label.ll_file">
+				<source>Locallang File Path</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
