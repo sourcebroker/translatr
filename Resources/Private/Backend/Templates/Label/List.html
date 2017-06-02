@@ -6,15 +6,6 @@
     <f:flashMessages />
     <f:render partial="Label/DemandForm" arguments="{_all}" />
 
-    <f:if condition="{demand.extension}">
-        <div class="form-group">
-            <a href="{sbt:be.actionLink(type: 'new', label: label, options: '{tcadefault: {sys_language_uid: demand.sysLanguageUid, extension: demand.extension}}')}">
-                <span class="t3-icon t3-icon-tcarecords t3-icon-tcarecords-tx_translatr_domain_model_label t3-icon-tx_translatr_domain_model_label-default">&nbsp;</span>
-                New Label
-            </a>
-        </div>
-    </f:if>
-
     <f:if condition="{labels}">
         <table class="table table-hover">
             <thead>
