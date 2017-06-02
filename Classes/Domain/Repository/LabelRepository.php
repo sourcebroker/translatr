@@ -79,12 +79,15 @@ WHERE tx_translatr_domain_model_label.sys_language_uid = 0
   AND tx_translatr_domain_model_label.extension = "{$demand->getExtension()}"
 ) UNION (
 /* select labels for all languages */
+/* temporary disabled @todo implement support for `all languages` (-1) in the future
+/*
 SELECT *
 FROM tx_translatr_domain_model_label
 WHERE tx_translatr_domain_model_label.sys_language_uid = -1 
   AND tx_translatr_domain_model_label.deleted = 0
   AND tx_translatr_domain_model_label.extension = "{$demand->getExtension()}"
 ) UNION (
+*/
 /* select labels for specified language */ 
 SELECT tx_translatr_domain_model_label.* 
 FROM tx_translatr_domain_model_label 
@@ -160,7 +163,7 @@ SQL;
     public function getSysLanguagesItems()
     {
         $languages = [
-            -1 => 'All',
+//            -1 => 'All',
             0 => 'Default'
             /* @todo get default language title here */
         ];
