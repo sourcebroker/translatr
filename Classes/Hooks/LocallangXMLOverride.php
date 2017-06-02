@@ -14,7 +14,7 @@ class LocallangXMLOverride
     /**
      * @var string
      */
-    protected $locallangXMLOverrideFilePath = PATH_site.'typo3temp/tx_translatr/locallangXMLOverride.php';
+    protected $locallangXMLOverrideFilePath = PATH_site.'typo3temp/tx_translatr/locallang_xml_override.php';
 
     /**
      *
