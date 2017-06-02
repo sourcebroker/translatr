@@ -55,7 +55,7 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 
     /**
      * @todo Implement real fallback used in FE (include all settings from sys_language_mode
-     *     https://docs.typo3.org/typo3cms/TyposcriptReference/Setup/Config/Index.html#sys-language-mode)
+     *       https://docs.typo3.org/typo3cms/TyposcriptReference/Setup/Config/Index.html#sys-language-mode)
      *
      * @param BeLabelDemand $demand
      *
@@ -68,7 +68,8 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         }
 
         // NOTICE! Seems that extbase language fallback is not working correctly in BE, so manual fallback has to be done here
-        $query = <<<SQL
+        $query
+            = <<<SQL
 /* select labels from default language */
 (
 SELECT *
@@ -108,8 +109,11 @@ SQL;
 
                 // parent record exists, overwrite it fields
                 foreach ($result as $columnName => $columnValue) {
-                    $l10nMode = isset($GLOBALS['TCA']['tx_translatr_domain_model_label']['columns'][$columnName]['l10n_mode']) ?
-                        $GLOBALS['TCA']['tx_translatr_domain_model_label']['columns'][$columnName]['l10n_mode'] : null;
+                    $l10nMode
+                        = isset($GLOBALS['TCA']['tx_translatr_domain_model_label']['columns'][$columnName]['l10n_mode'])
+                        ?
+                        $GLOBALS['TCA']['tx_translatr_domain_model_label']['columns'][$columnName]['l10n_mode']
+                        : null;
 
                     switch ($l10nMode) {
                         case 'mergeIfNotBlank':
@@ -139,7 +143,9 @@ SQL;
     public function getExtensionsItems()
     {
         $extensions = [''];
-        foreach (ExtensionsUtility::getExtensionsListForTranslate() as $extensionData) {
+        foreach (
+            ExtensionsUtility::getExtensionsListForTranslate() as $extensionData
+        ) {
             if (isset($extensionData[1]) && $extensionData[1]) {
                 $extensions[$extensionData[1]] = $extensionData[0];
             }
@@ -159,9 +165,12 @@ SQL;
             /* @todo get default language title here */
         ];
 
-        foreach (array_filter(
-            (array)$this->getDb()->exec_SELECTgetRows('uid, title', 'sys_language', '1 = 1')
-        ) as $lang) {
+        foreach (
+            array_filter(
+                (array)$this->getDb()
+                    ->exec_SELECTgetRows('uid, title', 'sys_language', '1 = 1')
+            ) as $lang
+        ) {
             $languages[(int)$lang['uid']] = $lang['title'];
         }
 
@@ -169,36 +178,52 @@ SQL;
     }
 
     /**
-     * @todo Implement support for other translation files as currently only the main FE translation file is supported (EXT:{extKey}/Resources/Private/Language/locallang.xlf or EXT:{extKey}/Resources/Private/Language/locallang.xml)
-     * @todo When support for more files will be implemented, then indexing proces should be moved somewhere else to speed up the BE module (currently it's done on every request to keep labels up to date)
+     * @todo Implement support for other translation files as currently only
+     *       the main FE translation file is supported
+     *       (EXT:{extKey}/Resources/Private/Language/locallang.xlf or
+     *       EXT:{extKey}/Resources/Private/Language/locallang.xml)
+     * @todo When support for more files will be implemented, then indexing
+     *       proces should be moved somewhere else to speed up the BE module
+     *       (currently it's done on every request to keep labels up to date)
+     *
      * @param string $extKey
      *
      * @return void
      */
     public function indexExtensionLabels($extKey)
     {
-        $llDirectoryPath = PATH_site.'typo3conf'.DIRECTORY_SEPARATOR.'ext'.DIRECTORY_SEPARATOR.$extKey.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'Private'.DIRECTORY_SEPARATOR.'Language'.DIRECTORY_SEPARATOR;
+        $llDirectoryPath = PATH_site.'typo3conf'.DIRECTORY_SEPARATOR.'ext'
+            .DIRECTORY_SEPARATOR.$extKey.DIRECTORY_SEPARATOR.'Resources'
+            .DIRECTORY_SEPARATOR.'Private'.DIRECTORY_SEPARATOR.'Language'
+            .DIRECTORY_SEPARATOR;
         $llFiles = glob($llDirectoryPath.'locallang.{xlf,xml}', GLOB_BRACE);
 
-        if (!is_array($llFiles) || !isset($llFiles[0]) || !file_exists($llFiles[0])) {
+        if (!is_array($llFiles) || !isset($llFiles[0])
+            || !file_exists($llFiles[0])
+        ) {
             return;
         }
 
         $llFilePath = $llFiles[0];
 
-        $parsedLabels = $this->getLanguageService()->parserFactory->getParsedData($llFilePath, 'default');
+        $parsedLabels
+            = $this->getLanguageService()->parserFactory->getParsedData($llFilePath,
+            'default');
         $labels = [];
 
-        if (!is_array($parsedLabels) || !isset($parsedLabels['default']) || !is_array($parsedLabels['default'])) {
+        if (!is_array($parsedLabels) || !isset($parsedLabels['default'])
+            || !is_array($parsedLabels['default'])
+        ) {
             return;
         }
 
         foreach ($parsedLabels['default'] as $labelKey => $labelData) {
-            $labels[$labelKey] = $labelData[0]['target'] ?: $labelData[0]['source'] ?: null;
+            $labels[$labelKey] = $labelData[0]['target']
+                ?: $labelData[0]['source'] ?: null;
         }
 
         // remove null labels
-        $labels = array_filter($labels, function($label) {
+        $labels = array_filter($labels, function ($label) {
             return !is_null($label);
         });
 
@@ -229,11 +254,11 @@ SQL;
         $query = $this->createQuery();
 
         return $query->matching(
-            $query->logicalAnd([
-                $query->equals('llFile', $label->getLlFile()),
-                $query->equals('ukey', $label->getUkey()),
-            ])
-        )->count() > 0;
+                $query->logicalAnd([
+                    $query->equals('llFile', $label->getLlFile()),
+                    $query->equals('ukey', $label->getUkey()),
+                ])
+            )->count() > 0;
     }
 
     /**

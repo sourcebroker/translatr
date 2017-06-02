@@ -22,7 +22,7 @@ class ExtensionsUtility
         $extensionsWithMetadata = self::getExtensionsWithMetaData();
         ksort($extensionsWithMetadata);
 
-        return array_map(function($extension) {
+        return array_map(function ($extension) {
             return [$extension['title'], $extension['extensionKey']];
         }, self::getExtensionsWithMetaData());
     }
@@ -32,7 +32,7 @@ class ExtensionsUtility
      */
     protected static function getExtensionsWithMetaData()
     {
-        return array_map(function($extKey) {
+        return array_map(function ($extKey) {
             return MiscUtility::getExtensionMetaData($extKey);
         }, ExtensionManagementUtility::getLoadedExtensionListArray());
     }

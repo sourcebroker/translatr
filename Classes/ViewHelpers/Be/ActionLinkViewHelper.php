@@ -12,7 +12,8 @@ use TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList;
  *
  * @package SourceBroker\Translatr\ViewHelpers\Be
  */
-class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
+class ActionLinkViewHelper
+    extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
 {
     const TABLE = 'tx_translatr_domain_model_label';
     const MODULE_NAME = 'web_TranslatrTranslate';
@@ -25,9 +26,12 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
     public function initializeArguments()
     {
         $this->registerArgument('type', 'string',
-            'Type of the action; Possible values: `edit`, `hide`, `show`, `delete`.', true);
-        $this->registerArgument('label', 'array', 'Label on which action should be taken.', false);
-        $this->registerArgument('options', 'array', 'Additional options.', false);
+            'Type of the action; Possible values: `edit`, `hide`, `show`, `delete`.',
+            true);
+        $this->registerArgument('label', 'array',
+            'Label on which action should be taken.', false);
+        $this->registerArgument('options', 'array', 'Additional options.',
+            false);
     }
 
     /**
@@ -45,13 +49,16 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
             case 'new':
                 return $this->renderNewLink($this->arguments['options']);
             case 'edit':
-                return $this->renderEditLink($this->arguments['label'], $this->arguments['options']);
+                return $this->renderEditLink($this->arguments['label'],
+                    $this->arguments['options']);
             case 'localize':
-                return $this->renderLocalizeLink($this->arguments['label'], $this->arguments['options']);
+                return $this->renderLocalizeLink($this->arguments['label'],
+                    $this->arguments['options']);
             case 'localization':
                 return $this->renderLocalization($this->arguments['label']);
             default:
-                throw new InvalidArgumentValueException('Unknown action type `' . $this->arguments['type'] . '`.',
+                throw new InvalidArgumentValueException('Unknown action type `'
+                    .$this->arguments['type'].'`.',
                     1982739543);
         }
     }
@@ -68,17 +75,19 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
         $uriParameters = [
             'edit' => [
                 self::TABLE => [
-                    $pid => 'new'
-                ]
+                    $pid => 'new',
+                ],
             ],
-            'returnUrl' => self::getReturnUrl()
+            'returnUrl' => self::getReturnUrl(),
         ];
 
         if (isset($options['tcadefault']['sys_language_uid'])) {
-            $uriParameters['translatr_tcadefault']['sys_language_uid'] = [$options['tcadefault']['sys_language_uid']];
+            $uriParameters['translatr_tcadefault']['sys_language_uid']
+                = [$options['tcadefault']['sys_language_uid']];
         }
         if (isset($options['tcadefault']['extension'])) {
-            $uriParameters['translatr_tcadefault']['extension'] = [$options['tcadefault']['extension']];
+            $uriParameters['translatr_tcadefault']['extension']
+                = [$options['tcadefault']['extension']];
         }
 
         return BackendUtility::getModuleUrl('record_edit', $uriParameters);
@@ -95,10 +104,10 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
         $uriParameters = [
             'edit' => [
                 self::TABLE => [
-                    $label['uid'] => 'edit'
-                ]
+                    $label['uid'] => 'edit',
+                ],
             ],
-            'returnUrl' => self::getReturnUrl()
+            'returnUrl' => self::getReturnUrl(),
         ];
 
         return BackendUtility::getModuleUrl('record_edit', $uriParameters);
@@ -126,17 +135,18 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
             'cmd' => [
                 self::TABLE => [
                     $label['uid'] => [
-                        'localize' => $targetLanguageUid
-                    ]
-                ]
+                        'localize' => $targetLanguageUid,
+                    ],
+                ],
             ],
             'vC' => $beUser->veriCode(),
             'prErr' => 1,
             'uPT' => 1,
-            'redirect' => GeneralUtility::getIndpEnv('REQUEST_URI')
+            'redirect' => GeneralUtility::getIndpEnv('REQUEST_URI'),
         ];
 
-        $return = '<a href="' . BackendUtility::getModuleUrl('tce_db', $uriParameters) . '">';
+        $return = '<a href="'.BackendUtility::getModuleUrl('tce_db',
+                $uriParameters).'">';
         $return .= $this->getLanguageFlag($targetLanguageUid);
         $return .= '</a>';
 
@@ -199,7 +209,7 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
         $parameters = [];
         $ignoreKeys = [
             'M',
-            'moduleToken'
+            'moduleToken',
         ];
         foreach ($getParameters as $key => $value) {
             if (in_array($key, $ignoreKeys)) {
@@ -207,6 +217,7 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
             }
             $parameters[$key] = $value;
         }
+
         return $parameters;
     }
 }

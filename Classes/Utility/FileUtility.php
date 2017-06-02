@@ -23,7 +23,8 @@ class FileUtility
     {
         if (GeneralUtility::isAbsPath($path)) {
             $replacements = [
-                PATH_site.'typo3conf'.DIRECTORY_SEPARATOR.'ext'.DIRECTORY_SEPARATOR => 'EXT:',
+                PATH_site.'typo3conf'.DIRECTORY_SEPARATOR.'ext'
+                .DIRECTORY_SEPARATOR => 'EXT:',
                 PATH_site.'typo3conf'.DIRECTORY_SEPARATOR => 'typo3conf',
                 PATH_site => '',
             ];

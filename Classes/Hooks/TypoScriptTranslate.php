@@ -23,10 +23,10 @@ class TypoScriptTranslate
     public static $STATUS = false;
 
     /**
-     * @todo implement support for `config.sys_language_mode` fallback order. Currently default langauge is treated as
-     *     fallback
+     * @todo implement support for `config.sys_language_mode` fallback order.
+     *       Currently default langauge is treated as fallback
      *
-     * @param array $params
+     * @param array                                      $params
      * @param \TYPO3\CMS\Core\TypoScript\TemplateService $templateService
      *
      * @return void
@@ -44,9 +44,11 @@ class TypoScriptTranslate
         foreach ($extTranslations as $extKey => $extLangTranslations) {
             // @todo somewhere here support for fallback order from `config.sys_language_mode` should be implemented
             // set labels from default language (sys_language_uid === 0) as fallback for all other languages
-            $this->setLabelForAllLanguages($extKey, $extLangTranslations, 0, $languageMapping, $translationArray);
+            $this->setLabelForAllLanguages($extKey, $extLangTranslations, 0,
+                $languageMapping, $translationArray);
             // set labels from `All languages` (sys_language_uid == -1) as fallback for all other languages
-            $this->setLabelForAllLanguages($extKey, $extLangTranslations, -1, $languageMapping, $translationArray);
+            $this->setLabelForAllLanguages($extKey, $extLangTranslations, -1,
+                $languageMapping, $translationArray);
 
             // remove labels for `All languages`, because they are already supported above
             unset($extLangTranslations[0], $extLangTranslations[-1]);
@@ -54,27 +56,36 @@ class TypoScriptTranslate
             foreach ($extLangTranslations as $languageUid => $labels) {
                 if ($languageIso = $languageMapping[$languageUid]) {
                     foreach ($labels as $labelKey => $label) {
-                        $translationArray['extension']['tx_'.$extKey]['_LOCAL_LANG'][$languageIso][$labelKey] = $label;
+                        $translationArray['extension']['tx_'
+                        .$extKey]['_LOCAL_LANG'][$languageIso][$labelKey]
+                            = $label;
                     }
                 }
             }
         }
 
-        $tsArr = self::getTsService()->convertPlainArrayToTypoScriptArray($translationArray);
+        $tsArr = self::getTsService()
+            ->convertPlainArrayToTypoScriptArray($translationArray);
 
-        $templateService->setup = array_replace_recursive((array)$templateService->setup, $tsArr);
+        $templateService->setup
+            = array_replace_recursive((array)$templateService->setup, $tsArr);
 
         self::$STATUS = true;
     }
 
     /**
-     * @param string $extKey Key of the extension
-     * @param array $extLangTranslations Multidimensional array where keys of the first level are languages uids and
-     *     keys of the second level are labels keys
-     * @param int $sourceLanguageUid ID of the language which should be set for all languages
-     * @param array $languageMapping Language mapping array, where keys are languages UIDs and values are languages ISO
-     *     codes
-     * @param array $translationArray Output array with translations passed as reference
+     * @param string $extKey              Key of the extension
+     * @param array  $extLangTranslations Multidimensional array where keys of
+     *                                    the first level are languages uids
+     *                                    and keys of the second level are
+     *                                    labels keys
+     * @param int    $sourceLanguageUid   ID of the language which should be
+     *                                    set for all languages
+     * @param array  $languageMapping     Language mapping array, where keys
+     *                                    are languages UIDs and values are
+     *                                    languages ISO codes
+     * @param array  $translationArray    Output array with translations passed
+     *                                    as reference
      */
     protected function setLabelForAllLanguages(
         $extKey,
@@ -84,12 +95,18 @@ class TypoScriptTranslate
         array &$translationArray
     ) {
         if (isset($extLangTranslations[$sourceLanguageUid])) {
-            foreach ($extLangTranslations[$sourceLanguageUid] as $labelKey => $label) {
-                $translationArray['extension']['tx_'.$extKey]['_LOCAL_LANG']['default'][$labelKey] = $label;
+            foreach (
+                $extLangTranslations[$sourceLanguageUid] as $labelKey => $label
+            ) {
+                $translationArray['extension']['tx_'
+                .$extKey]['_LOCAL_LANG']['default'][$labelKey]
+                    = $label;
 
                 foreach ($languageMapping as $languageUid => $languageIso) {
                     if ($languageIso) {
-                        $translationArray['extension']['tx_'.$extKey]['_LOCAL_LANG'][$languageIso][$labelKey] = $label;
+                        $translationArray['extension']['tx_'
+                        .$extKey]['_LOCAL_LANG'][$languageIso][$labelKey]
+                            = $label;
                     }
                 }
             }
@@ -116,9 +133,11 @@ class TypoScriptTranslate
                 && !empty($translation['l10n_parent'])
                 && isset($translations[$translation['l10n_parent']])
             ) {
-                $extension = GeneralUtility::trimExplode(',', $translations[$translation['l10n_parent']]['extension']);
+                $extension = GeneralUtility::trimExplode(',',
+                    $translations[$translation['l10n_parent']]['extension']);
             } else {
-                $extension = GeneralUtility::trimExplode(',', $translation['extension']);
+                $extension = GeneralUtility::trimExplode(',',
+                    $translation['extension']);
             }
 
             // get label key from parent record
@@ -133,7 +152,8 @@ class TypoScriptTranslate
             }
 
             foreach ($extension as $ext) {
-                $extTranslations[$ext][$translation['sys_language_uid']][$key] = $translation['text'];
+                $extTranslations[$ext][$translation['sys_language_uid']][$key]
+                    = $translation['text'];
             }
         }
 
@@ -177,9 +197,10 @@ class TypoScriptTranslate
 
         /** @todo Resolve problem with chinese language (ch <=> cn) */
 
-        return array_merge([self::getDefaultLanguageIsoCode()], array_map(function ($sysLanguage) {
-            return $sysLanguage['isocode'];
-        }, $sysLanguages));
+        return array_merge([self::getDefaultLanguageIsoCode()],
+            array_map(function ($sysLanguage) {
+                return $sysLanguage['isocode'];
+            }, $sysLanguages));
     }
 
     /**
@@ -190,7 +211,8 @@ class TypoScriptTranslate
         return array_filter((array)self::getDb()->exec_SELECTgetRows(
             'uid, extension, ukey, text, sys_language_uid, l10n_parent',
             'tx_translatr_domain_model_label ',
-            '1 = 1 '.self::getPageRepository()->enableFields('tx_translatr_domain_model_label')
+            '1 = 1 '.self::getPageRepository()
+                ->enableFields('tx_translatr_domain_model_label')
         ));
     }
 
@@ -211,12 +233,14 @@ class TypoScriptTranslate
     }
 
     /**
-     * Result include additional `isocode` column, which includes isocode of the language.
-     * If `static_info_tables` extension is loaded, then `static_languages.lg_typo3` column is used for it, otherwise
+     * Result include additional `isocode` column, which includes isocode of
+     * the language. If `static_info_tables` extension is loaded, then
+     * `static_languages.lg_typo3` column is used for it, otherwise
      * `sys_language.flag` column is used.
      *
-     * @todo adjust if for TYPO3 7.6. Probably there column `sys_language.language_isocode` can be used to get isocode
-     *     of langauge.
+     * @todo adjust if for TYPO3 7.6. Probably there column
+     *       `sys_language.language_isocode` can be used to get isocode of
+     *       langauge.
      *
      * @return array|NULL
      */

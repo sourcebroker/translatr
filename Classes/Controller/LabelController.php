@@ -60,8 +60,9 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      *
      * @return void
      */
-    public function listAction(\SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand $demand = null)
-    {
+    public function listAction(
+        \SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand $demand = null
+    ) {
         if (is_null($demand)) {
             $demand = $this->objectManager->get(BeLabelDemand::class);
         }
@@ -90,6 +91,7 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      */
     protected function getToken()
     {
-        return FormProtectionFactory::get()->generateToken('moduleCall', 'web_TranslatrTranslate');
+        return FormProtectionFactory::get()
+            ->generateToken('moduleCall', 'web_TranslatrTranslate');
     }
 }

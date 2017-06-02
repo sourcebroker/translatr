@@ -15,14 +15,16 @@ call_user_func(
                 'web',
                 'translate',
                 '',
-                array(
+                [
                     'Label' => 'list',
-                ),
-                array(
+                ],
+                [
                     'access' => 'user,group',
-                    'icon' => 'EXT:'.$extKey.'/Resources/Public/Backend/Icons/translate.svg',
-                    'labels' => 'LLL:EXT:'.$extKey.'/Resources/Private/Language/locallang_translate.xlf',
-                )
+                    'icon' => 'EXT:'.$extKey
+                        .'/Resources/Public/Backend/Icons/translate.svg',
+                    'labels' => 'LLL:EXT:'.$extKey
+                        .'/Resources/Private/Language/locallang_translate.xlf',
+                ]
             );
         }
 
@@ -30,7 +32,8 @@ call_user_func(
             'EXT:translatr/Resources/Private/Language/locallang_csh_tx_translatr_domain_model_label.xlf');
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_translatr_domain_model_label');
 
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['tcaDatabaseRecord'][SourceBroker\Translatr\Backend\FormDataProvider\LabelRowInitializeNew::class] = [
+        $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['tcaDatabaseRecord'][SourceBroker\Translatr\Backend\FormDataProvider\LabelRowInitializeNew::class]
+            = [
             'depends' => [
                 \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRowInitializeNew::class,
             ],
