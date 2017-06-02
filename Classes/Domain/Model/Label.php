@@ -96,7 +96,7 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
      */
     public function setExtension($extension)
     {
-        $this->extension = extension;
+        $this->extension = $extension;
     }
 
     /**

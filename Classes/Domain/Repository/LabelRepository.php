@@ -3,8 +3,12 @@
 namespace SourceBroker\Translatr\Domain\Repository;
 
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
+use SourceBroker\Translatr\Domain\Model\Label;
+use SourceBroker\Translatr\Service\LabelService;
 use SourceBroker\Translatr\Utility\ExtensionsUtility;
+use SourceBroker\Translatr\Utility\FileUtility;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
 /***************************************************************
  *
@@ -36,6 +40,18 @@ use TYPO3\CMS\Core\Database\DatabaseConnection;
  */
 class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 {
+    /**
+     * @var LabelService
+     */
+    protected $labelService = null;
+
+    /**
+     * @param LabelService $labelService
+     */
+    public function injectLabelService(LabelService $labelService)
+    {
+        $this->labelService = $labelService;
+    }
 
     /**
      * @todo Implement real fallback used in FE (include all settings from sys_language_mode
@@ -150,6 +166,74 @@ SQL;
         }
 
         return $languages;
+    }
+
+    /**
+     * @todo Implement support for other translation files as currently only the main FE translation file is supported (EXT:{extKey}/Resources/Private/Language/locallang.xlf or EXT:{extKey}/Resources/Private/Language/locallang.xml)
+     * @todo When support for more files will be implemented, then indexing proces should be moved somewhere else to speed up the BE module (currently it's done on every request to keep labels up to date)
+     * @param string $extKey
+     *
+     * @return void
+     */
+    public function indexExtensionLabels($extKey)
+    {
+        $llDirectoryPath = PATH_site.'typo3conf'.DIRECTORY_SEPARATOR.'ext'.DIRECTORY_SEPARATOR.$extKey.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'Private'.DIRECTORY_SEPARATOR.'Language'.DIRECTORY_SEPARATOR;
+        $llFiles = glob($llDirectoryPath.'locallang.{xlf,xml}', GLOB_BRACE);
+
+        if (!is_array($llFiles) || !isset($llFiles[0]) || !file_exists($llFiles[0])) {
+            return;
+        }
+
+        $llFilePath = $llFiles[0];
+
+        $parsedLabels = $this->getLanguageService()->parserFactory->getParsedData($llFilePath, 'default');
+        $labels = [];
+
+        if (!is_array($parsedLabels) || !isset($parsedLabels['default']) || !is_array($parsedLabels['default'])) {
+            return;
+        }
+
+        foreach ($parsedLabels['default'] as $labelKey => $labelData) {
+            $labels[$labelKey] = $labelData[0]['target'] ?: $labelData[0]['source'] ?: null;
+        }
+
+        // remove null labels
+        $labels = array_filter($labels, function($label) {
+            return !is_null($label);
+        });
+
+        foreach ($labels as $labelKey => $label) {
+            $obj = new Label();
+            $obj->setPid(0);
+            $obj->setSysLanguageUid(0);
+            $obj->setExtension($extKey);
+            $obj->setText($label);
+            $obj->setUkey($labelKey);
+            $obj->setLlFile(FileUtility::getRelativePathFromAbsolute($llFilePath));
+
+            if (!$this->isLabelIndexed($obj)) {
+                $this->add($obj);
+            }
+        }
+
+        $this->objectManager->get(PersistenceManager::class)->persistAll();
+    }
+
+    /**
+     * @param Label $label
+     *
+     * @return bool
+     */
+    protected function isLabelIndexed(Label $label)
+    {
+        $query = $this->createQuery();
+
+        return $query->matching(
+            $query->logicalAnd([
+                $query->equals('llFile', $label->getLlFile()),
+                $query->equals('ukey', $label->getUkey()),
+            ])
+        )->count() > 0;
     }
 
     /**

@@ -66,6 +66,10 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
             $demand = $this->objectManager->get(BeLabelDemand::class);
         }
 
+        if ($demand->getExtension()) {
+            $this->labelRepository->indexExtensionLabels($demand->getExtension());
+        }
+
         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/AjaxDataHandler');
 
