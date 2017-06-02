@@ -54,7 +54,7 @@ class TypoScriptTranslate
             foreach ($extLangTranslations as $languageUid => $labels) {
                 if ($languageIso = $languageMapping[$languageUid]) {
                     foreach ($labels as $labelKey => $label) {
-                        $translationArray['plugin']['tx_'.$extKey]['_LOCAL_LANG'][$languageIso][$labelKey] = $label;
+                        $translationArray['extension']['tx_'.$extKey]['_LOCAL_LANG'][$languageIso][$labelKey] = $label;
                     }
                 }
             }
@@ -85,11 +85,11 @@ class TypoScriptTranslate
     ) {
         if (isset($extLangTranslations[$sourceLanguageUid])) {
             foreach ($extLangTranslations[$sourceLanguageUid] as $labelKey => $label) {
-                $translationArray['plugin']['tx_'.$extKey]['_LOCAL_LANG']['default'][$labelKey] = $label;
+                $translationArray['extension']['tx_'.$extKey]['_LOCAL_LANG']['default'][$labelKey] = $label;
 
                 foreach ($languageMapping as $languageUid => $languageIso) {
                     if ($languageIso) {
-                        $translationArray['plugin']['tx_'.$extKey]['_LOCAL_LANG'][$languageIso][$labelKey] = $label;
+                        $translationArray['extension']['tx_'.$extKey]['_LOCAL_LANG'][$languageIso][$labelKey] = $label;
                     }
                 }
             }
@@ -112,13 +112,13 @@ class TypoScriptTranslate
         foreach ($translations as $translation) {
             // get extension from parent record
             if (
-                empty($translation['plugin'])
+                empty($translation['extension'])
                 && !empty($translation['l10n_parent'])
                 && isset($translations[$translation['l10n_parent']])
             ) {
-                $plugins = GeneralUtility::trimExplode(',', $translations[$translation['l10n_parent']]['plugin']);
+                $extension = GeneralUtility::trimExplode(',', $translations[$translation['l10n_parent']]['extension']);
             } else {
-                $plugins = GeneralUtility::trimExplode(',', $translation['plugin']);
+                $extension = GeneralUtility::trimExplode(',', $translation['extension']);
             }
 
             // get label key from parent record
@@ -132,7 +132,7 @@ class TypoScriptTranslate
                 $key = $translation['ukey'];
             }
 
-            foreach ($plugins as $ext) {
+            foreach ($extension as $ext) {
                 $extTranslations[$ext][$translation['sys_language_uid']][$key] = $translation['text'];
             }
         }
@@ -188,7 +188,7 @@ class TypoScriptTranslate
     protected static function getAllLabels()
     {
         return array_filter((array)self::getDb()->exec_SELECTgetRows(
-            'uid, plugin, ukey, text, sys_language_uid, l10n_parent',
+            'uid, extension, ukey, text, sys_language_uid, l10n_parent',
             'tx_translatr_domain_model_label ',
             '1 = 1 '.self::getPageRepository()->enableFields('tx_translatr_domain_model_label')
         ));

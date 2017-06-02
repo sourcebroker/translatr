@@ -3,7 +3,7 @@
 	<file source-language="en" datatype="plaintext" original="messages" date="2017-01-13T13:10:26Z" product-name="translatr">
 		<header/>
 		<body>
-			<trans-unit id="plugin.description">
+			<trans-unit id="extension.description">
 				<source>Extension from which the labels comes from</source>
 			</trans-unit>
 			<trans-unit id="ukey.description">

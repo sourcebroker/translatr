@@ -77,8 +77,8 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
         if (isset($options['tcadefault']['sys_language_uid'])) {
             $uriParameters['translatr_tcadefault']['sys_language_uid'] = [$options['tcadefault']['sys_language_uid']];
         }
-        if (isset($options['tcadefault']['plugin'])) {
-            $uriParameters['translatr_tcadefault']['plugin'] = [$options['tcadefault']['plugin']];
+        if (isset($options['tcadefault']['extension'])) {
+            $uriParameters['translatr_tcadefault']['extension'] = [$options['tcadefault']['extension']];
         }
 
         return BackendUtility::getModuleUrl('record_edit', $uriParameters);

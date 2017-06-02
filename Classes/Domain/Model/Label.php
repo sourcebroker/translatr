@@ -39,7 +39,7 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
      *
      * @var string
      */
-    protected $plugin = 0;
+    protected $extension = '';
 
     /**
      * Unique key of the translation
@@ -73,25 +73,25 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $sysLanguageUid;
 
     /**
-     * Returns the plugin
+     * Returns the extension
      *
-     * @return string $plugin
+     * @return string $extension
      */
-    public function getPlugin()
+    public function getExtension()
     {
-        return $this->plugin;
+        return $this->extension;
     }
 
     /**
-     * Sets the plugin
+     * Sets the extension
      *
-     * @param string $plugin
+     * @param string $extension
      *
      * @return void
      */
-    public function setPlugin($plugin)
+    public function setExtension($extension)
     {
-        $this->plugin = $plugin;
+        $this->extension = extension;
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace SourceBroker\Translatr\Hooks;
 
-use SourceBroker\Translatr\Utility\PluginsUtility;
+use SourceBroker\Translatr\Utility\ExtensionsUtility;
 
 /**
  * Class ItemsProcFunc
@@ -14,9 +14,9 @@ class ItemsProcFunc
     /**
      * @param array $conf
      */
-    public function getPluginsList(&$conf)
+    public function getExtensionsList(&$conf)
     {
-        $conf['items'] = PluginsUtility::getPluginsListForTranslate();
+        $conf['items'] = ExtensionsUtility::getExtensionsListForTranslate();
     }
 
 }

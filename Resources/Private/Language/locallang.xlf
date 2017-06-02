@@ -6,8 +6,8 @@
 			<trans-unit id="tx_translatr_domain_model_label">
 				<source>Label</source>
 			</trans-unit>
-			<trans-unit id="tx_translatr_domain_model_label.plugin">
-				<source>Plugin</source>
+			<trans-unit id="tx_translatr_domain_model_label.extension">
+				<source>Extension</source>
 			</trans-unit>
 			<trans-unit id="tx_translatr_domain_model_label.ukey">
 				<source>Ukey</source>

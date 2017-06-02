@@ -71,7 +71,7 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 
         $this->view->assignMultiple([
             'labels' => $this->labelRepository->findDemandedForBe($demand),
-            'plugins' => $this->labelRepository->getPluginsItems(),
+            'extensions' => $this->labelRepository->getExtensionsItems(),
             'languages' => $this->labelRepository->getSysLanguagesItems(),
             'demand' => $demand,
             'moduleToken' => $this->getToken(),

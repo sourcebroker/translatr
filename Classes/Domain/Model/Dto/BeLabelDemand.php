@@ -25,7 +25,7 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * @var string
      */
-    protected $plugin = '';
+    protected $extension = '';
 
     /**
      * @var int
@@ -35,17 +35,17 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * @return string
      */
-    public function getPlugin()
+    public function getExtension()
     {
-        return $this->plugin;
+        return $this->extension;
     }
 
     /**
-     * @param string $plugin
+     * @param string $extension
      */
-    public function setPlugin($plugin)
+    public function setExtension($extension)
     {
-        $this->plugin = $plugin;
+        $this->extension = $extension;
     }
 
     /**
@@ -71,7 +71,7 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
      */
     public function isValid()
     {
-        return $this->getPlugin() && null !== $this->getSysLanguageUid();
+        return $this->getExtension() && null !== $this->getSysLanguageUid();
     }
 
 }

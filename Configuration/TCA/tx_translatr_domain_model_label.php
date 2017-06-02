@@ -18,7 +18,7 @@ return array(
             'starttime' => 'starttime',
             'endtime' => 'endtime',
         ),
-        'searchFields' => 'plugin,ukey,text,description,',
+        'searchFields' => 'extension,ukey,text,description,',
         'iconfile' => 'EXT:translatr/Resources/Public/Icons/tx_translatr_domain_model_label.gif',
         'hideTable' => true,
         'rootLevel' => 1,
@@ -27,10 +27,10 @@ return array(
         ],
     ),
     'interface' => array(
-        'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, hidden, plugin, ukey, text, description',
+        'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, hidden, extension, ukey, text, description',
     ),
     'types' => array(
-        '1' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1, plugin, ukey, text, description, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'),
+        '1' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1, extension, ukey, text, description, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'),
     ),
     'palettes' => array(
         '1' => array('showitem' => ''),
@@ -120,14 +120,14 @@ return array(
             ),
         ),
 
-        'plugin' => array(
+        'extension' => array(
             'exclude' => 1,
             'l10n_mode' => 'exclude',
-            'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.plugin',
+            'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.extension',
             'config' => array(
                 'type' => 'select',
                 'renderType' => 'selectSingle',
-                'itemsProcFunc' => 'SourceBroker\Translatr\Hooks\ItemsProcFunc->getPluginsList',
+                'itemsProcFunc' => \SourceBroker\Translatr\Hooks\ItemsProcFunc::class.'->getExtensionsList',
                 'size' => 1,
                 'maxitems' => 1,
                 'eval' => 'required',

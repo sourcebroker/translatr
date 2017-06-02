@@ -6,7 +6,7 @@ CREATE TABLE tx_translatr_domain_model_label (
 	uid int(11) NOT NULL auto_increment,
 	pid int(11) DEFAULT '0' NOT NULL,
 
-	plugin varchar(255) DEFAULT '' NOT NULL,
+	extension varchar(255) DEFAULT '' NOT NULL,
 	ukey varchar(255) DEFAULT '' NOT NULL,
 	text text NOT NULL,
 	description text NOT NULL,

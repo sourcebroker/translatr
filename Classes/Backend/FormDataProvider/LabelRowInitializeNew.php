@@ -70,7 +70,7 @@ class LabelRowInitializeNew implements FormDataProviderInterface
             $this->data['databaseRow'],
             [
                 'sys_language_uid' => $this->getDefaultTcaData('sys_language_uid') ?: $this->data['databaseRow']['sys_language_uid'],
-                'plugin' => $this->getDefaultTcaData('plugin') ?: $this->data['databaseRow']['plugin'],
+                'extension' => $this->getDefaultTcaData('extension') ?: $this->data['databaseRow']['extension'],
             ]
         );
     }

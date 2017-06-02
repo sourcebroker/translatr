@@ -3,7 +3,7 @@
 namespace SourceBroker\Translatr\Domain\Repository;
 
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
-use SourceBroker\Translatr\Utility\PluginsUtility;
+use SourceBroker\Translatr\Utility\ExtensionsUtility;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 
 /***************************************************************
@@ -59,14 +59,14 @@ SELECT *
 FROM tx_translatr_domain_model_label
 WHERE tx_translatr_domain_model_label.sys_language_uid = 0 
   AND tx_translatr_domain_model_label.deleted = 0
-  AND tx_translatr_domain_model_label.plugin = "{$demand->getPlugin()}"
+  AND tx_translatr_domain_model_label.extension = "{$demand->getExtension()}"
 ) UNION (
 /* select labels for all languages */
 SELECT *
 FROM tx_translatr_domain_model_label
 WHERE tx_translatr_domain_model_label.sys_language_uid = -1 
   AND tx_translatr_domain_model_label.deleted = 0
-  AND tx_translatr_domain_model_label.plugin = "{$demand->getPlugin()}"
+  AND tx_translatr_domain_model_label.extension = "{$demand->getExtension()}"
 ) UNION (
 /* select labels for specified language */ 
 SELECT tx_translatr_domain_model_label.* 
@@ -76,7 +76,7 @@ FROM tx_translatr_domain_model_label
 WHERE tx_translatr_domain_model_label.sys_language_uid = {$demand->getSysLanguageUid()} 
   AND tx_translatr_domain_model_label.deleted = 0
   AND parent.deleted = 0
-  AND parent.plugin = "{$demand->getPlugin()}"
+  AND parent.extension = "{$demand->getExtension()}"
 );
 SQL;
 
@@ -120,17 +120,16 @@ SQL;
     /**
      * @return array
      */
-    public function getPluginsItems()
+    public function getExtensionsItems()
     {
-        // first empty element
-        $plugins = [''];
-        foreach (PluginsUtility::getPluginsListForTranslate() as $pluginData) {
-            if (isset($pluginData[1]) && $pluginData[1]) {
-                $plugins[$pluginData[1]] = $pluginData[0];
+        $extensions = [''];
+        foreach (ExtensionsUtility::getExtensionsListForTranslate() as $extensionData) {
+            if (isset($extensionData[1]) && $extensionData[1]) {
+                $extensions[$extensionData[1]] = $extensionData[0];
             }
         }
 
-        return $plugins;
+        return $extensions;
     }
 
     /**
