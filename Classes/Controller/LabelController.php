@@ -74,13 +74,17 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/AjaxDataHandler');
 
+        $languages = $this->labelRepository->getSysLanguagesItems();
+        $currentLanguageTitle = $languages[$demand->getSysLanguageUid()];
+
         $this->view->assignMultiple([
             'labels' => $this->labelRepository->findDemandedForBe($demand),
             'extensions' => $this->labelRepository->getExtensionsItems(),
-            'languages' => $this->labelRepository->getSysLanguagesItems(),
+            'languages' => $languages,
             'demand' => $demand,
             'moduleToken' => $this->getToken(),
             'id' => GeneralUtility::_GET('id'),
+            'currentLanguageTitle' => $currentLanguageTitle,
         ]);
     }
 

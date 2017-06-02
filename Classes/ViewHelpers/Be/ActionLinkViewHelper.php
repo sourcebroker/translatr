@@ -145,12 +145,7 @@ class ActionLinkViewHelper
             'redirect' => GeneralUtility::getIndpEnv('REQUEST_URI'),
         ];
 
-        $return = '<a href="'.BackendUtility::getModuleUrl('tce_db',
-                $uriParameters).'">';
-        $return .= $this->getLanguageFlag($targetLanguageUid);
-        $return .= '</a>';
-
-        return $return;
+        return BackendUtility::getModuleUrl('tce_db', $uriParameters);
     }
 
     /**

@@ -11,10 +11,11 @@
             <thead>
             <tr class="t3-row-header">
                 <th>Key</th>
-                <th>Label</th>
+                <th>Label (Default)</th>
+                <f:if condition="{demand.sysLanguageUid} > 0">
+                    <th>Label ({currentLanguageTitle})</th>
+                </f:if>
                 <th></th>
-                <th>[Localization]</th>
-                <th>Localize to</th>
             </tr>
             </thead>
             <tbody>
@@ -28,76 +29,73 @@
                         </f:if>
                     </td>
                     <td>{label.text}</td>
+                    <f:if condition="{demand.sysLanguageUid} > 0">
+                        <td>{label.text}</td>
+                    </f:if>
                     <td>
-                        <f:if condition="{label.sys_language_uid} == {demand.sysLanguageUid}">
-                            <f:then>
-                                <f:comment><!-- DO NOT ALLOW TO DO ANY OPERATIONS IN FALLBACK MODE --></f:comment>
-                                <div class="btn-group" role="group">
+                        <f:comment><!-- DO NOT ALLOW TO DO ANY OPERATIONS IN FALLBACK MODE --></f:comment>
+                        <div class="btn-group" role="group">
+                            <f:if condition="{label.sys_language_uid} != {demand.sysLanguageUid}">
+                                <f:then>
+                                    <a href="{sbt:be.actionLink(type: 'localize', label: label, options: '{sysLanguageUid: demand.sysLanguageUid}')}"
+                                       class="btn btn-default">
+                                    <span class="t3js-icon icon icon-size-small icon-state-default icon-actions-open"
+                                          data-identifier="actions-open">
+                                        <span class="icon-markup">
+                                            <img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg"
+                                                 width="16" height="16">
+                                        </span>
+                                    </span>
+                                    </a>
+                                </f:then>
+                                <f:else>
                                     <a href="{sbt:be.actionLink(type: 'edit', label: label)}" class="btn btn-default">
-										<span class="t3js-icon icon icon-size-small icon-state-default icon-actions-open"
+                                        <span class="t3js-icon icon icon-size-small icon-state-default icon-actions-open"
                                               data-identifier="actions-open">
-											<span class="icon-markup">
-												<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg"
+                                            <span class="icon-markup">
+                                                <img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg"
                                                      width="16" height="16">
-											</span>
-										</span>
+                                            </span>
+                                        </span>
                                     </a>
-
-                                    <a href="#"
-                                       class="btn btn-default t3js-record-hide"
-                                       data-state="{f:if(condition: label.hidden, then: 'hidden', else: 'visible')}"
-                                       data-params="data[tx_translatr_domain_model_label][{label.uid}][hidden]={f:if(condition: label.hidden, then: '0', else: '1')}"
-                                       title=""
-                                       data-toggle-title="{f:if(condition: label.hidden, then: 'Hide record', else: 'Un-hide record')}"
-                                       data-original-title="{f:if(condition: label.hidden, then: 'Un-hide record', else: 'Hide record')}"
-                                    >
-										<span class="t3js-icon icon icon-size-small icon-state-default icon-actions-edit-hide"
-                                              data-identifier="actions-edit-hide">
-											<span class="icon-markup">
-												<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-edit-{f:if(condition: label.hidden, then: 'unhide', else: 'hide')}.svg"
-                                                     width="16" height="16">
-											</span>
-										</span>
-                                    </a>
-
-                                    <a href="#"
-                                       class="btn btn-default t3js-record-delete"
-                                       data-l10parent="{label.l10n_parent}"
-                                       data-params="cmd[tx_translatr_domain_model_label][{label.uid}][delete]=1"
-                                       data-title="{label.text}"
-                                       data-message='Are you sure you want to delete "{label.text}" record?'
-                                       title=""
-                                       data-original-title="Delete record (!)"
-                                    >
-										<span class="t3js-icon icon icon-size-small icon-state-default icon-actions-edit-delete"
-                                              data-identifier="actions-edit-delete">
-											<span class="icon-markup">
-												<img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-edit-delete.svg"
-                                                     width="16" height="16">
-											</span>
-										</span>
-                                    </a>
-                                </div>
-                            </f:then>
-                            <f:else>
-                                [fallback]
-                            </f:else>
-                        </f:if>
-                    </td>
-                    <td>
-                        {sbt:be.actionLink(type: 'localization', label: label)}
-                    </td>
-                    <td>
-                        <f:if condition="{label.sys_language_uid} != {demand.sysLanguageUid}">
-                            <f:if condition="{label.sys_language_uid} != -1">
-                                <f:comment><!-- Do not allow localize records from `All languages` --></f:comment>
-                                <f:if condition="{demand.sysLanguageUid} != -1">
-                                    <f:comment><!-- Do not allow to localize from `All languages` --></f:comment>
-                                    {sbt:be.actionLink(type: 'localize', label: label, options: '{sysLanguageUid:
-                                    demand.sysLanguageUid}')}
-                                </f:if>
+                                </f:else>
                             </f:if>
-                        </f:if>
+
+                            <a href="#"
+                               class="btn btn-default t3js-record-hide"
+                               data-state="{f:if(condition: label.hidden, then: 'hidden', else: 'visible')}"
+                               data-params="data[tx_translatr_domain_model_label][{label.uid}][hidden]={f:if(condition: label.hidden, then: '0', else: '1')}"
+                               title=""
+                               data-toggle-title="{f:if(condition: label.hidden, then: 'Hide record', else: 'Un-hide record')}"
+                               data-original-title="{f:if(condition: label.hidden, then: 'Un-hide record', else: 'Hide record')}"
+                            >
+                                <span class="t3js-icon icon icon-size-small icon-state-default icon-actions-edit-hide"
+                                      data-identifier="actions-edit-hide">
+                                    <span class="icon-markup">
+                                        <img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-edit-{f:if(condition: label.hidden, then: 'unhide', else: 'hide')}.svg"
+                                             width="16" height="16">
+                                    </span>
+                                </span>
+                            </a>
+
+                            <a href="#"
+                               class="btn btn-default t3js-record-delete"
+                               data-l10parent="{label.l10n_parent}"
+                               data-params="cmd[tx_translatr_domain_model_label][{label.uid}][delete]=1"
+                               data-title="{label.text}"
+                               data-message='Are you sure you want to delete "{label.text}" record?'
+                               title=""
+                               data-original-title="Delete record (!)"
+                            >
+                                <span class="t3js-icon icon icon-size-small icon-state-default icon-actions-edit-delete"
+                                      data-identifier="actions-edit-delete">
+                                    <span class="icon-markup">
+                                        <img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-edit-delete.svg"
+                                             width="16" height="16">
+                                    </span>
+                                </span>
+                            </a>
+                        </div>
                     </td>
                 </tr>
             </f:for>
