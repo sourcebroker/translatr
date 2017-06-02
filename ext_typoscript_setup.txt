@@ -1,0 +1,7 @@
+module.tx_translatr_web_translatrtranslate {
+	view {
+		templateRootPaths.0 = {$module.tx_translatr_translate.view.templateRootPath}
+		partialRootPaths.0 = {$module.tx_translatr_translate.view.partialRootPath}
+		layoutRootPaths.0 = {$module.tx_translatr_translate.view.layoutRootPath}
+	}
+}

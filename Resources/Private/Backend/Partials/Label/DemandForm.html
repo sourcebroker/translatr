@@ -1,0 +1,49 @@
+{namespace sbt=SourceBroker\Translatr\ViewHelpers}
+
+<f:form object="{demand}" name="demand" method="get">
+    <input type="hidden" name="M" value="web_TranslatrTranslate">
+    <input type="hidden" name="moduleToken" value="{moduleToken}">
+    <input type="hidden" name="id" value="{id}">
+
+    <div class="row">
+        <div class="col-sm-6 form-horizontal">
+            <div class="form-group">
+                <label for="field-plugin" class="col-sm-4 control-label">
+                    Plugin
+                </label>
+
+                <div class="col-sm-8">
+                    <f:form.select property="plugin" id="field-plugin" options="{plugins}" class="form-control"
+                                   additionalAttributes="{onchange: 'this.form.submit();'}"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 form-horizontal">
+            <div class="form-group">
+                <label for="field-sys_language_uid" class="col-sm-4 control-label">
+                    Language
+                </label>
+
+                <div class="col-sm-8">
+                    <f:form.select property="sysLanguageUid" id="field-sys_language_uid" options="{languages}" class="form-control"
+                                   additionalAttributes="{onchange: 'this.form.submit();'}"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-4 form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-8">
+                    <f:form.submit value="Submit" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    </div>
+</f:form>

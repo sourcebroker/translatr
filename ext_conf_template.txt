@@ -1,0 +1,5 @@
+# cat=basic; type=string; label=Iso Code of the default language
+defaultLanguageIsoCode = en
+
+# cat=basic; type=user[SourceBroker\Translatr\Configuration\ExtTextarea->render]; label=Custom plugins to display on the list in BE plugin selectbox (each plugin in new line in format {label}|{plugin}, e.g. `Custom|local`)
+customPlugins =
