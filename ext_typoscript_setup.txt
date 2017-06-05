@@ -5,3 +5,15 @@ module.tx_translatr_web_translatrtranslate {
         layoutRootPaths.0 = {$module.tx_translatr_translate.view.layoutRootPath}
     }
 }
+
+config.tx_extbase.persistence.classes {
+    SourceBroker\Translatr\Domain\Model\Language {
+        mapping {
+            tableName = sys_language
+
+            columns {
+                language_isocode.mapOnProperty = isoCode
+            }
+        }
+    }
+}
