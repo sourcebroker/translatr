@@ -24,7 +24,7 @@ class LocallangXMLOverride
     /**
      * @var string
      */
-    protected $locallangXMLOverrideFilePath;
+    protected $overrideFilesLoaderFilePath;
 
     /**
      * @var string
@@ -41,33 +41,33 @@ class LocallangXMLOverride
      */
     public function initialize()
     {
-        $this->setLocallangXMLOverrideFilePath();
+        $this->setOverrideFilesLoaderFilePath();
         $this->setOverrideFilesBaseDirectoryPath();
         $this->setOverrideFilesExtDirectoryPath();
 
-        $this->createLocallangXMLOverrideFileIfNotExists();
+        $this->createOverrideFilesLoaderFileIfNotExists();
 
-        if (!$this->locallangXMLOverrideFileExists()) {
+        if (!$this->overrideFilesLoaderFileExists()) {
             ExceptionUtility::throwException(
                 \RuntimeException::class,
                 'Could not create locallang XML Override file in path '
-                .$this->locallangXMLOverrideFilePath.' due to unknown reason.',
+                .$this->overrideFilesLoaderFilePath.' due to unknown reason.',
                 82347523
             );
 
             return;
         }
 
-        include $this->locallangXMLOverrideFilePath;
+        include $this->overrideFilesLoaderFilePath;
     }
 
     /**
      * @return void
      */
-    protected function setLocallangXMLOverrideFilePath()
+    protected function setOverrideFilesLoaderFilePath()
     {
-        $this->locallangXMLOverrideFilePath = $this->cachePath
-            .'locallangXMLOverride.php';
+        $this->overrideFilesLoaderFilePath = $this->cachePath
+            .'locallangOverrideLoader.php';
     }
 
     /**
@@ -91,29 +91,29 @@ class LocallangXMLOverride
     /**
      * @return bool
      */
-    protected function locallangXMLOverrideFileExists()
+    protected function overrideFilesLoaderFileExists()
     {
-        return file_exists($this->locallangXMLOverrideFilePath);
+        return file_exists($this->overrideFilesLoaderFilePath);
     }
 
     /**
      * @return void
      */
-    protected function createLocallangXMLOverrideFileIfNotExists()
+    protected function createOverrideFilesLoaderFileIfNotExists()
     {
-        if ($this->locallangXMLOverrideFileExists()) {
+        if ($this->overrideFilesLoaderFileExists()) {
             return;
         }
 
-        $this->createLocallangXMLOverrideFile();
+        $this->createOverrideFilesLoaderFile();
     }
 
     /**
      * @return void
      */
-    protected function createLocallangXMLOverrideFile()
+    protected function createOverrideFilesLoaderFile()
     {
-        $this->createLocallangXMLOverrideFileDirectoryIfNotExists();
+        $this->createOverrideFilesLoaderFileDirectoryIfNotExists();
         $this->createOverrideFilesDirectories();
 
         $code = '<?php'.PHP_EOL;
@@ -124,9 +124,9 @@ class LocallangXMLOverride
                 .$overriddenFile.'\'][] = \''.$filePath.'\';'.PHP_EOL;
         }
 
-        if (!file_put_contents($this->locallangXMLOverrideFilePath, $code)) {
+        if (!file_put_contents($this->overrideFilesLoaderFilePath, $code)) {
             ExceptionUtility::throwException(\RuntimeException::class,
-                'Could not write file in '.$this->locallangXMLOverrideFilePath,
+                'Could not write file in '.$this->overrideFilesLoaderFilePath,
                 390847534);
         }
     }
@@ -134,9 +134,9 @@ class LocallangXMLOverride
     /**
      * @return void
      */
-    protected function createLocallangXMLOverrideFileDirectoryIfNotExists()
+    protected function createOverrideFilesLoaderFileDirectoryIfNotExists()
     {
-        $dir = dirname($this->locallangXMLOverrideFilePath);
+        $dir = dirname($this->overrideFilesLoaderFilePath);
 
         if (!is_dir($dir)) {
             if (!mkdir($dir, 0777, true)) {
