@@ -7,7 +7,9 @@
 <f:layout name="Default" />
 
 <f:section name="content">
+
     <f:flashMessages />
+
     <f:render partial="Label/DemandForm" arguments="{_all}" />
 
     <f:if condition="{labels}">
@@ -27,14 +29,13 @@
                     <td>
                         {label.ukey}
                         <f:if condition="{label.description}">
-                            <span class="t3-icon t3-icon-actions t3-icon-actions-document t3-icon-document-info t3-help-teaser"
-                                  title="{label.description}"></span>
+                            <span class="t3-help-teaser" title="{label.description}">
+                                <core:icon identifier="status-dialog-information" size="small" />
+                            </span>
                         </f:if>
                     </td>
                     <td>
-                        <f:render section="actionButtons" arguments="{
-                            label: label
-                        }" />
+                        <f:render partial="Label/ActionButtons" arguments="{label: label}" />
 
                         {label.text}
                     </td>
@@ -42,10 +43,7 @@
                         <td>
                             <f:for each="{label.language_childs}" as="childLabel">
                                 <f:if condition="{childLabel.sys_language_uid} == {demand.sysLanguageUid}">
-                                    <f:render section="actionButtons" arguments="{
-                                        label: childLabel,
-                                        parentLabel: label
-                                    }" />
+                                    <f:render partial="Label/ActionButtons" arguments="{label: childLabel, parentLabel: label}" />
 
                                     {childLabel.text}
                                 </f:if>
@@ -57,60 +55,6 @@
             </tbody>
         </table>
     </f:if>
-</f:section>
-
-<f:section name="actionButtons">
-    <div class="btn-group" role="group">
-        <f:render section="actionButtonEdit" arguments="{label: label}" />
-        <f:render section="actionButtonHide" arguments="{label: label}" />
-        <f:render section="actionButtonRemove" arguments="{label: label}" />
-        <f:if condition="{parentLabel}">
-            <f:if condition="{label}">
-                <f:else>
-                    <f:render section="actionButtonLocalize" arguments="{label: parentLabel}" />
-                </f:else>
-            </f:if>
-        </f:if>
-    </div>
-</f:section>
-
-<f:section name="actionButtonHide">
-    <a href="#"
-       class="btn btn-default t3js-record-hide"
-       data-state="{f:if(condition: label.hidden, then: 'hidden', else: 'visible')}"
-       data-params="data[tx_translatr_domain_model_label][{label.uid}][hidden]={f:if(condition: label.hidden, then: '0', else: '1')}"
-       title=""
-       data-toggle-title="{f:if(condition: label.hidden, then: 'Hide record', else: 'Un-hide record')}"
-       data-original-title="{f:if(condition: label.hidden, then: 'Un-hide record', else: 'Hide record')}"
-    >
-        <core:icon identifier="actions-edit-{f:if(condition: label.hidden, then: 'unhide', else: 'hide')}" size="small" />
-    </a>
-</f:section>
-
-<f:section name="actionButtonEdit">
-    <a href="{sbt:be.actionLink(type: 'edit', label: label)}" class="btn btn-default">
-        <core:icon identifier="actions-open" size="small" />
-    </a>
-</f:section>
-
-<f:section name="actionButtonRemove">
-    <a href="#"
-       class="btn btn-default t3js-record-delete"
-       data-l10parent="{label.l10n_parent}"
-       data-params="cmd[tx_translatr_domain_model_label][{label.uid}][delete]=1"
-       data-title="{label.text}"
-       data-message='Are you sure you want to delete "{label.text}" record?'
-       title=""
-       data-original-title="Delete record (!)"
-    >
-        <core:icon identifier="actions-edit-delete" size="small" />
-    </a>
-</f:section>
-
-<f:section name="actionButtonLocalize">
-    <a href="{sbt:be.actionLink(type: 'localize', label: label, options: '{sysLanguageUid: demand.sysLanguageUid}')}" class="btn btn-default">
-        <core:icon identifier="actions-open" size="small" />
-    </a>
 </f:section>
 
 </html>
