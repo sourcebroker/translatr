@@ -8,13 +8,6 @@
     <f:render partial="Label/ActionButtons/Edit" arguments="{label: label}" />
     <f:render partial="Label/ActionButtons/Hide" arguments="{label: label}" />
     <f:render partial="Label/ActionButtons/Remove" arguments="{label: label}" />
-    <f:if condition="{parentLabel}">
-        <f:if condition="{label}">
-            <f:else>
-                <f:render partial="Label/ActionButtons/Localize" arguments="{label: parentLabel}" />
-            </f:else>
-        </f:if>
-    </f:if>
 </div>
 
 </html>

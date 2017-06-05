@@ -4,8 +4,8 @@
       data-namespace-typo3-fluid="true"
 >
 
-<a href="{sbt:be.actionLink(type: 'localize', label: label, options: '{sysLanguageUid: demand.sysLanguageUid}')}" class="btn btn-default">
-    <core:icon identifier="actions-open" size="small" />
+<a href="{sbt:be.actionLink(type: 'localize', label: parentLabel, options: '{sysLanguageUid: language.uid}')}" class="btn btn-default">
+    <core:icon identifier="actions-document-localize" size="small" overlay="flags-{language.flag}" />
 </a>
 
 </html>

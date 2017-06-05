@@ -1,6 +1,7 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
       xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
       xmlns:sbt="http://typo3.org/ns/SourceBroker/Translatr/ViewHelpers"
+      xmlns:v="http://typo3.org/ns/FluidTYPO3/Vhs/ViewHelpers"
       data-namespace-typo3-fluid="true"
 >
 
@@ -41,13 +42,23 @@
                     </td>
                     <f:for each="{demand.languages}" as="language">
                         <td>
-                            <f:for each="{label.language_childs}" as="childLabel">
-                                <f:if condition="{childLabel.sys_language_uid} == {language.uid}">
+                            {label.language_childs -> v:iterator.filter(propertyName: 'sys_language_uid', filter: language.uid) -> v:iterator.first() -> v:variable.set(name: 'childLabel')}
+
+                            <f:if condition="{childLabel}">
+                                <f:then>
                                     <f:render partial="Label/ActionButtons" arguments="{label: childLabel, parentLabel: label}" />
 
                                     {childLabel.text}
-                                </f:if>
-                            </f:for>
+                                </f:then>
+                                <f:else>
+                                    <f:render partial="Label/ActionButtons/Localize" arguments="{
+                                        parentLabel: label,
+                                        language: language
+                                    }" />
+
+                                    {label.text}
+                                </f:else>
+                            </f:if>
                         </td>
                     </f:for>
                 </tr>
