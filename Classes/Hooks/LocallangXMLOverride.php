@@ -32,12 +32,19 @@ class LocallangXMLOverride
     protected $overrideFilesBaseDirectoryPath;
 
     /**
+     * @var
+     */
+    protected $overrideFilesExtDirectoryPath;
+
+    /**
      *
      */
     public function initialize()
     {
         $this->setLocallangXMLOverrideFilePath();
         $this->setOverrideFilesBaseDirectoryPath();
+        $this->setOverrideFilesExtDirectoryPath();
+
         $this->createLocallangXMLOverrideFileIfNotExists();
 
         if (!$this->locallangXMLOverrideFileExists()) {
@@ -73,6 +80,15 @@ class LocallangXMLOverride
     }
 
     /**
+     * @return void
+     */
+    protected function setOverrideFilesExtDirectoryPath()
+    {
+        $this->overrideFilesExtDirectoryPath = $this->overrideFilesBaseDirectoryPath
+            .'ext'.DIRECTORY_SEPARATOR;
+    }
+
+    /**
      * @return bool
      */
     protected function locallangXMLOverrideFileExists()
@@ -98,14 +114,14 @@ class LocallangXMLOverride
     protected function createLocallangXMLOverrideFile()
     {
         $this->createLocallangXMLOverrideFileDirectoryIfNotExists();
-        $this->createOverrideFilesBaseDirectoryIfNotExists();
+        $this->createOverrideFilesDirectories();
 
-        $code = "<?php\n";
+        $code = '<?php'.PHP_EOL;
         foreach (
             $this->getTranslationOverrideFiles() as $overriddenFile => $filePath
         ) {
             $code .= '$GLOBALS[\'TYPO3_CONF_VARS\'][\'SYS\'][\'locallangXMLOverride\'][\''
-                .$overriddenFile.'\'][3454] = \''.$filePath.'\';';
+                .$overriddenFile.'\'][] = \''.$filePath.'\';'.PHP_EOL;
         }
 
         if (!file_put_contents($this->locallangXMLOverrideFilePath, $code)) {
@@ -135,27 +151,70 @@ class LocallangXMLOverride
     /**
      * @return void
      */
+    protected function createOverrideFilesDirectories()
+    {
+        $this->createOverrideFilesBaseDirectoryIfNotExists();
+        $this->createOverrideFilesExtDirectoryIfNotExists();
+    }
+
+    /**
+     * @return void
+     */
     protected function createOverrideFilesBaseDirectoryIfNotExists()
     {
-        if (!is_dir($this->overrideFilesBaseDirectoryPath)) {
-            if (!mkdir($this->overrideFilesBaseDirectoryPath, 0777, true)) {
+        $this->createDirectoryIfNotExists($this->overrideFilesBaseDirectoryPath);
+    }
+
+    /**
+     * @return void
+     */
+    protected function createOverrideFilesExtDirectoryIfNotExists()
+    {
+        $this->createDirectoryIfNotExists($this->overrideFilesExtDirectoryPath);
+    }
+
+    /**
+     * @param string $directoryPath Directory absolute path
+     */
+    protected function createDirectoryIfNotExists($directoryPath)
+    {
+        if (!is_dir($directoryPath)) {
+            if (!mkdir($directoryPath, 0777, true)) {
                 ExceptionUtility::throwException(\RuntimeException::class,
-                    'Could not create directory in '
-                    .$this->overrideFilesBaseDirectoryPath, 938457943);
+                    'Could not create directory in '.$directoryPath, 938457943);
             }
 
-            GeneralUtility::fixPermissions($this->overrideFilesBaseDirectoryPath);
+            GeneralUtility::fixPermissions($directoryPath);
         }
     }
 
     /**
-     * @todo
+     * @return array
+     *
+     * @todo check if return of relative path (in element value path) works fine. It will be better to return relative path to avoid problems with some specific server settings
      */
     protected function getTranslationOverrideFiles()
     {
-        return [
-            'EXT:news/Resources/Private/Language/locallang.xlf' => $this->overrideFilesBaseDirectoryPath
-                .'news/Resources/Private/Language/locallang.xlf',
-        ];
+        $translationOverrideFiles = [];
+
+        $files = new \RegexIterator(
+            new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($this->overrideFilesBaseDirectoryPath)
+            ),
+            '/locallang\.xlf|locallang\.xml/',
+            \RegexIterator::GET_MATCH
+        );
+
+        foreach($files as $fullPath => $file) {
+            $replacements = [
+                $this->overrideFilesExtDirectoryPath => 'EXT:',
+                $this->overrideFilesBaseDirectoryPath => '',
+            ];
+
+            $translationOverrideFiles[str_replace(array_keys($replacements), $replacements, $fullPath)] = $fullPath;
+        }
+
+        return $translationOverrideFiles;
     }
+
 }
