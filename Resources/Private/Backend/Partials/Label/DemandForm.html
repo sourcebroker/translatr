@@ -29,9 +29,9 @@
                 </label>
 
                 <div class="col-sm-8">
-                    <f:form.select property="sysLanguageUid" id="field-sys_language_uid" options="{languages}"
-                                   class="form-control"
-                                   additionalAttributes="{onchange: 'this.form.submit();'}"
+                    <f:form.select property="languages" id="field-sys_language_uid" options="{languages}"
+                                   optionValueField="uid" optionLabelField="title"
+                                   class="form-control" size="{languages -> f:count()}" multiple="1"
                     />
                 </div>
             </div>

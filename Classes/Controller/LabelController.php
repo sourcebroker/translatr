@@ -4,6 +4,7 @@ namespace SourceBroker\Translatr\Controller;
 
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Repository\LabelRepository;
+use SourceBroker\Translatr\Domain\Repository\LanguageRepository;
 use TYPO3\CMS\Core\FormProtection\FormProtectionFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -43,9 +44,14 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     /**
      * labelRepository
      *
-     * @var \SourceBroker\Translatr\Domain\Repository\LabelRepository
+     * @var LabelRepository
      */
     protected $labelRepository = null;
+
+    /**
+     * @var LanguageRepository
+     */
+    protected $languageRepository = null;
 
     /**
      * @param LabelRepository $labelRepository
@@ -56,9 +62,19 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     }
 
     /**
+     * @param LanguageRepository $languageRepository
+     */
+    public function injectLanguageRepository(LanguageRepository $languageRepository)
+    {
+        $this->languageRepository = $languageRepository;
+    }
+
+    /**
      * @param \SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand|null $demand
      *
      * @return void
+     *
+     * @ignorevalidation $demand
      */
     public function listAction(
         \SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand $demand = null
@@ -74,17 +90,13 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/AjaxDataHandler');
 
-        $languages = $this->labelRepository->getSysLanguagesItems();
-        $currentLanguageTitle = $languages[$demand->getSysLanguageUid()];
-
         $this->view->assignMultiple([
             'labels' => $this->labelRepository->findDemandedForBe($demand),
             'extensions' => $this->labelRepository->getExtensionsItems(),
-            'languages' => $languages,
+            'languages' => $this->languageRepository->findAll(),
             'demand' => $demand,
             'moduleToken' => $this->getToken(),
             'id' => GeneralUtility::_GET('id'),
-            'currentLanguageTitle' => $currentLanguageTitle,
         ]);
     }
 

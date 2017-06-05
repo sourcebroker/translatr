@@ -18,9 +18,9 @@
             <tr class="t3-row-header">
                 <th>Key</th>
                 <th>Label (Default)</th>
-                <f:if condition="{demand.sysLanguageUid} > 0">
-                    <th>Label ({currentLanguageTitle})</th>
-                </f:if>
+                <f:for each="{demand.languages}" as="language">
+                    <th>Label ({language.title})</th>
+                </f:for>
             </tr>
             </thead>
             <tbody>
@@ -39,17 +39,17 @@
 
                         {label.text}
                     </td>
-                    <f:if condition="{demand.sysLanguageUid} > 0">
+                    <f:for each="{demand.languages}" as="language">
                         <td>
                             <f:for each="{label.language_childs}" as="childLabel">
-                                <f:if condition="{childLabel.sys_language_uid} == {demand.sysLanguageUid}">
+                                <f:if condition="{childLabel.sys_language_uid} == {language.uid}">
                                     <f:render partial="Label/ActionButtons" arguments="{label: childLabel, parentLabel: label}" />
 
                                     {childLabel.text}
                                 </f:if>
                             </f:for>
                         </td>
-                    </f:if>
+                    </f:for>
                 </tr>
             </f:for>
             </tbody>

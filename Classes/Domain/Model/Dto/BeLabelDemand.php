@@ -14,6 +14,7 @@ namespace SourceBroker\Translatr\Domain\Model\Dto;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use SourceBroker\Translatr\Domain\Model\Language;
 
 /**
  * Administration Demand model
@@ -28,9 +29,17 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $extension = '';
 
     /**
-     * @var int
+     * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\SourceBroker\Translatr\Domain\Model\Language>
      */
-    protected $sysLanguageUid = 0;
+    protected $languages = null;
+
+    /**
+     * BeLabelDemand constructor.
+     */
+    public function __construct()
+    {
+        $this->languages = new \TYPO3\CMS\Extbase\Persistence\ObjectStorage();
+    }
 
     /**
      * @return string
@@ -49,29 +58,39 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     }
 
     /**
-     * @return int
-     */
-    public function getSysLanguageUid()
-    {
-        return $this->sysLanguageUid;
-    }
-
-    /**
-     * @param int $sysLanguageUid
-     */
-    public function setSysLanguageUid($sysLanguageUid)
-    {
-        $this->sysLanguageUid = $sysLanguageUid;
-    }
-
-    /**
      * Checks if all required properties are set
      *
      * @return bool
      */
     public function isValid()
     {
-        return $this->getExtension() && null !== $this->getSysLanguageUid();
+        return $this->getExtension();
+    }
+
+    /**
+     * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\SourceBroker\Translatr\Domain\Model\Language>
+     */
+    public function getLanguages()
+    {
+        return $this->languages;
+    }
+
+    /**
+     * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\SourceBroker\Translatr\Domain\Model\Language> $languages
+     */
+    public function setLanguages($languages)
+    {
+        $this->languages = $languages;
+    }
+
+    /**
+     * @return array<int>
+     */
+    public function getLanguageUids()
+    {
+        return array_map(function(Language $language) {
+            return (int)$language->getUid();
+        }, $this->getLanguages()->toArray());
     }
 
 }

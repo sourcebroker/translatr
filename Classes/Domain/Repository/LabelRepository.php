@@ -57,6 +57,11 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             'tx_translatr_domain_model_label'
         );
 
+        $languagesUidsForSql = implode(
+            ', ',
+            self::getDb()->cleanIntArray($demand->getLanguageUids() ?: [0])
+        );
+
         $query = <<<SQL
 /* select labels from default language */
 (
@@ -71,7 +76,7 @@ SELECT tx_translatr_domain_model_label.*
 FROM tx_translatr_domain_model_label 
   LEFT JOIN tx_translatr_domain_model_label AS parent
     ON (tx_translatr_domain_model_label.l10n_parent = parent.uid)
-WHERE tx_translatr_domain_model_label.sys_language_uid IN ({$demand->getSysLanguageUid()})  
+WHERE tx_translatr_domain_model_label.sys_language_uid IN ({$languagesUidsForSql})  
   AND tx_translatr_domain_model_label.deleted = 0
   AND parent.deleted = 0
   AND parent.extension = {$extensionNameForSql}
@@ -117,29 +122,6 @@ SQL;
         }
 
         return $extensions;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSysLanguagesItems()
-    {
-        $languages = [
-//            -1 => 'All',
-            0 => 'Default'
-            /* @todo get default language title here */
-        ];
-
-        foreach (
-            array_filter(
-                (array)$this->getDb()
-                    ->exec_SELECTgetRows('uid, title', 'sys_language', '1 = 1')
-            ) as $lang
-        ) {
-            $languages[(int)$lang['uid']] = $lang['title'];
-        }
-
-        return $languages;
     }
 
     /**
