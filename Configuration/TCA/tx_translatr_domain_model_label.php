@@ -41,6 +41,7 @@ return [
             'exclude' => 1,
             'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.language',
             'config' => [
+                'readOnly' => true,
                 'type' => 'select',
                 'renderType' => 'selectSingle',
                 'foreign_table' => 'sys_language',
@@ -55,6 +56,7 @@ return [
             'exclude' => 1,
             'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.l18n_parent',
             'config' => [
+                'readOnly' => true,
                 'type' => 'select',
                 'renderType' => 'selectSingle',
                 'items' => [
