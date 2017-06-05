@@ -5,6 +5,7 @@ namespace SourceBroker\Translatr\Domain\Repository;
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Model\Label;
 use SourceBroker\Translatr\Service\LabelService;
+use SourceBroker\Translatr\Utility\ArrayUtility;
 use SourceBroker\Translatr\Utility\ExtensionsUtility;
 use SourceBroker\Translatr\Utility\FileUtility;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
@@ -54,9 +55,6 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     }
 
     /**
-     * @todo Implement real fallback used in FE (include all settings from sys_language_mode
-     *       https://docs.typo3.org/typo3cms/TyposcriptReference/Setup/Config/Index.html#sys-language-mode)
-     *
      * @param BeLabelDemand $demand
      *
      * @return array
@@ -67,77 +65,54 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             return [];
         }
 
-        // NOTICE! Seems that extbase language fallback is not working correctly in BE, so manual fallback has to be done here
-        $query
-            = <<<SQL
+        $extensionNameForSql = self::getDb()->fullQuoteStr(
+            $demand->getExtension(),
+            'tx_translatr_domain_model_label'
+        );
+
+        $query = <<<SQL
 /* select labels from default language */
 (
 SELECT *
 FROM tx_translatr_domain_model_label
 WHERE tx_translatr_domain_model_label.sys_language_uid = 0 
   AND tx_translatr_domain_model_label.deleted = 0
-  AND tx_translatr_domain_model_label.extension = "{$demand->getExtension()}"
+  AND tx_translatr_domain_model_label.extension = {$extensionNameForSql}
 ) UNION (
-/* select labels for all languages */
-/* temporary disabled @todo implement support for `all languages` (-1) in the future
-/*
-SELECT *
-FROM tx_translatr_domain_model_label
-WHERE tx_translatr_domain_model_label.sys_language_uid = -1 
-  AND tx_translatr_domain_model_label.deleted = 0
-  AND tx_translatr_domain_model_label.extension = "{$demand->getExtension()}"
-) UNION (
-*/
-/* select labels for specified language */ 
+/* select labels for specified languages */ 
 SELECT tx_translatr_domain_model_label.* 
 FROM tx_translatr_domain_model_label 
   LEFT JOIN tx_translatr_domain_model_label AS parent
     ON (tx_translatr_domain_model_label.l10n_parent = parent.uid)
-WHERE tx_translatr_domain_model_label.sys_language_uid = {$demand->getSysLanguageUid()} 
+WHERE tx_translatr_domain_model_label.sys_language_uid IN ({$demand->getSysLanguageUid()})  
   AND tx_translatr_domain_model_label.deleted = 0
   AND parent.deleted = 0
-  AND parent.extension = "{$demand->getExtension()}"
+  AND parent.extension = {$extensionNameForSql}
 );
 SQL;
 
-        $query = self::getDb()->sql_query($query);
-        $rows = [];
+        $results = ArrayUtility::combineWithSubarrayFieldAsKey(
+            self::getDb()->sql_query($query)->fetch_all(MYSQLI_ASSOC),
+            'uid'
+        );
+        $processedResults = [];
 
-        while ($result = $query->fetch_assoc()) {
-            if (empty($result['l10n_parent'])) {
-                // is parent record
-                $rows[$result['uid']] = $result;
-            } elseif (isset($rows[$result['l10n_parent']])) {
-                $parentRecord =& $rows[$result['l10n_parent']];
+        foreach ($results as &$result) {
+            $uid = (int)$result['uid'];
+            $l10nParent = (int)$result['l10n_parent'];
+            $sysLanguageUid = (int)$result['sys_language_uid'];
 
-                // parent record exists, overwrite it fields
-                foreach ($result as $columnName => $columnValue) {
-                    $l10nMode
-                        = isset($GLOBALS['TCA']['tx_translatr_domain_model_label']['columns'][$columnName]['l10n_mode'])
-                        ?
-                        $GLOBALS['TCA']['tx_translatr_domain_model_label']['columns'][$columnName]['l10n_mode']
-                        : null;
-
-                    switch ($l10nMode) {
-                        case 'mergeIfNotBlank':
-                            // overwrite parent record only if field is not empty in translation
-                            if (!empty($columnValue)) {
-                                $parentRecord[$columnName] = $columnValue;
-                            }
-                            break;
-                        case 'exclude':
-                            // do no overwrite parent record at all
-                            break;
-                        default:
-                            // overwrite parent record value
-                            $parentRecord[$columnName] = $columnValue;
-
-                    }
-                }
+            if ($l10nParent === 0) {
+                // record in default language are treated as parents
+                $processedResults[$uid] = $result;
+                $processedResults[$uid]['language_childs'] = [];
+            } elseif ($l10nParent > 0) {
+                // add as a child to parent record
+                $processedResults[$l10nParent]['language_childs'][$sysLanguageUid] = $result;
             }
         }
 
-        return $rows;
+        return $processedResults;
     }
 
     /**
