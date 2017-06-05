@@ -9,7 +9,7 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
  *
  * @package SourceBroker\Translatr\Utility
  */
-class EmConfiguration
+class EmConfigurationUtility
 {
 
     /**

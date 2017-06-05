@@ -2,6 +2,8 @@
 
 namespace SourceBroker\Translatr\Hooks;
 
+use SourceBroker\Translatr\Domain\Model\Dto\EmConfiguration;
+use SourceBroker\Translatr\Utility\EmConfigurationUtility;
 use SourceBroker\Translatr\Utility\ExceptionUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -12,6 +14,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class LocallangXMLOverride
 {
+
+
     /**
      * @todo change path for TYPO3 v8
      *
@@ -37,10 +41,17 @@ class LocallangXMLOverride
     protected $overrideFilesExtDirectoryPath;
 
     /**
+     * @var EmConfiguration
+     */
+    protected $emConfiguration = null;
+
+    /**
      *
      */
     public function initialize()
     {
+        $this->setEmConfiguration();
+
         $this->setOverrideFilesLoaderFilePath();
         $this->setOverrideFilesBaseDirectoryPath();
         $this->setOverrideFilesExtDirectoryPath();
@@ -60,6 +71,14 @@ class LocallangXMLOverride
         }
 
         include $this->overrideFilesLoaderFilePath;
+    }
+
+    /**
+     * @return void
+     */
+    protected function setEmConfiguration()
+    {
+        $this->emConfiguration = EmConfigurationUtility::getSettings();
     }
 
     /**
@@ -137,16 +156,7 @@ class LocallangXMLOverride
      */
     protected function createOverrideFilesLoaderFileDirectoryIfNotExists()
     {
-        $dir = dirname($this->overrideFilesLoaderFilePath);
-
-        if (!is_dir($dir)) {
-            if (!mkdir($dir, 0777, true)) {
-                ExceptionUtility::throwException(\RuntimeException::class,
-                    'Could not create directory in '.$dir, 938457943);
-            }
-
-            GeneralUtility::fixPermissions($dir);
-        }
+        $this->createDirectoryIfNotExists(dirname($this->overrideFilesLoaderFilePath));
     }
 
     /**
@@ -229,6 +239,8 @@ class LocallangXMLOverride
     }
 
     /**
+     * @param string $locallangPath
+     *
      * @return string
      */
     protected function transformPathFromLocallangToLocallangOverrides($locallangPath)
@@ -258,8 +270,6 @@ class LocallangXMLOverride
         foreach ($locallangFiles as $locallangFile) {
             $this->createLocallangOverrideFileIfNotExist($locallangFile['ll_file']);
         }
-
-        die('zxc');
     }
 
     /**
@@ -280,7 +290,9 @@ class LocallangXMLOverride
     protected function createLocallangOverrideFile($locallangFile)
     {
         $labels = $this->getLabelsByLocallangFile($locallangFile);
+        $defaultLocallangOverrideFile = $this->transformPathFromLocallangToLocallangOverrides($locallangFile);
         $groupedLabels = [];
+
 
         foreach($labels as $label) {
             $groupedLabels[$label['isocode']][] = $label;
@@ -292,11 +304,19 @@ class LocallangXMLOverride
             $xml = $this->createXlfFileForLabels($labels);
             $xml->formatOutput = true;
 
-            // @todo save file with appropriate $isoCode in name
-            file_put_contents(
-                $this->transformPathFromLocallangToLocallangOverrides($locallangFile),
-                $xml->saveXML()
-            );
+            $outputFiles = [
+                $this->prependLocallangFileNameWithIsoCode($defaultLocallangOverrideFile, $isoCode)
+            ];
+
+            // for default isocode we save it also to file without isocode in name
+            if ($isoCode === $this->emConfiguration->getDefaultLanguageIsoCode()) {
+                $outputFiles[] = $defaultLocallangOverrideFile;
+            }
+
+            foreach ($outputFiles as $outputFile) {
+                $this->createDirectoryIfNotExists(dirname($outputFile));
+                file_put_contents($outputFile, $xml->saveXML());
+            }
         }
     }
 
@@ -343,21 +363,38 @@ class LocallangXMLOverride
         return $xml;
     }
 
+    /**
+     * @param string $filePath
+     * @param string $isoCode
+     *
+     * @return string
+     */
+    protected function prependLocallangFileNameWithIsoCode($filePath, $isoCode)
+    {
+        $fileName = basename($filePath);
+        $dirname = dirname($filePath);
+        $fileNameWithIsoCode = ($isoCode ? $isoCode.'.' : '').$fileName;
+
+        return $dirname.DIRECTORY_SEPARATOR.$fileNameWithIsoCode;
+    }
+
 
     /**
      * @param string $locallangFile
      *
      * @return array
-     *
-     * @todo instead of hardcoded "en", use default language isocode in MySQL SELECT statement
      */
     protected function getLabelsByLocallangFile($locallangFile)
     {
         return (array)$GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
             'label.text,
-                IF(label.ukey IS NOT NULL AND label.ukey != "", label.ukey, parent.ukey) AS ukey,
-                IF(label.extension IS NOT NULL AND label.extension != "", label.extension, parent.extension) AS extension,
-                IF(lang.language_isocode IS NOT NULL AND lang.language_isocode != "", lang.language_isocode, "en") AS isocode',
+                IF (label.ukey IS NOT NULL AND label.ukey != "", label.ukey, parent.ukey) AS ukey,
+                IF (label.extension IS NOT NULL AND label.extension != "", label.extension, parent.extension) AS extension,
+                IF (
+                    lang.language_isocode IS NOT NULL AND lang.language_isocode != "",
+                    lang.language_isocode, 
+                    '.$GLOBALS['TYPO3_DB']->fullQuoteStr($this->emConfiguration->getDefaultLanguageIsoCode(), 'tx_translatr_domain_model_label').'
+                ) AS isocode',
             'tx_translatr_domain_model_label AS label 
                 LEFT JOIN sys_language AS lang ON (
                     label.sys_language_uid = lang.uid
