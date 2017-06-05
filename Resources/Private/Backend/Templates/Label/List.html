@@ -1,4 +1,8 @@
-{namespace sbt=SourceBroker\Translatr\ViewHelpers}
+<html xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+      xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+      xmlns:sbt="http://typo3.org/ns/SourceBroker/Translatr/ViewHelpers"
+      data-namespace-typo3-fluid="true"
+>
 
 <f:layout name="Default" />
 
@@ -79,21 +83,13 @@
        data-toggle-title="{f:if(condition: label.hidden, then: 'Hide record', else: 'Un-hide record')}"
        data-original-title="{f:if(condition: label.hidden, then: 'Un-hide record', else: 'Hide record')}"
     >
-        <span class="t3js-icon icon icon-size-small icon-state-default icon-actions-edit-hide" data-identifier="actions-edit-hide">
-            <span class="icon-markup">
-                <img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-edit-{f:if(condition: label.hidden, then: 'unhide', else: 'hide')}.svg" width="16" height="16">
-            </span>
-        </span>
+        <core:icon identifier="actions-edit-{f:if(condition: label.hidden, then: 'unhide', else: 'hide')}" size="small" />
     </a>
 </f:section>
 
 <f:section name="actionButtonEdit">
     <a href="{sbt:be.actionLink(type: 'edit', label: label)}" class="btn btn-default">
-        <span class="t3js-icon icon icon-size-small icon-state-default icon-actions-open" data-identifier="actions-open">
-            <span class="icon-markup">
-                <img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
-            </span>
-        </span>
+        <core:icon identifier="actions-open" size="small" />
     </a>
 </f:section>
 
@@ -107,22 +103,14 @@
        title=""
        data-original-title="Delete record (!)"
     >
-        <span class="t3js-icon icon icon-size-small icon-state-default icon-actions-edit-delete"
-              data-identifier="actions-edit-delete">
-            <span class="icon-markup">
-                <img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-edit-delete.svg"
-                     width="16" height="16">
-            </span>
-        </span>
+        <core:icon identifier="actions-edit-delete" size="small" />
     </a>
 </f:section>
 
 <f:section name="actionButtonLocalize">
     <a href="{sbt:be.actionLink(type: 'localize', label: label, options: '{sysLanguageUid: demand.sysLanguageUid}')}" class="btn btn-default">
-        <span class="t3js-icon icon icon-size-small icon-state-default icon-actions-open" data-identifier="actions-open">
-            <span class="icon-markup">
-                <img src="/typo3/sysext/core/Resources/Public/Icons/T3Icons/actions/actions-document-open.svg" width="16" height="16">
-            </span>
-        </span>
+        <core:icon identifier="actions-open" size="small" />
     </a>
 </f:section>
+
+</html>
