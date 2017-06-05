@@ -4,7 +4,6 @@ namespace SourceBroker\Translatr\Domain\Repository;
 
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Model\Label;
-use SourceBroker\Translatr\Service\LabelService;
 use SourceBroker\Translatr\Utility\ArrayUtility;
 use SourceBroker\Translatr\Utility\ExtensionsUtility;
 use SourceBroker\Translatr\Utility\FileUtility;
@@ -41,18 +40,6 @@ use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
  */
 class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 {
-    /**
-     * @var LabelService
-     */
-    protected $labelService = null;
-
-    /**
-     * @param LabelService $labelService
-     */
-    public function injectLabelService(LabelService $labelService)
-    {
-        $this->labelService = $labelService;
-    }
 
     /**
      * @param BeLabelDemand $demand
