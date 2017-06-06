@@ -68,9 +68,9 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $hidden;
 
     /**
-     * @var int
+     * @var string
      */
-    protected $sysLanguageUid;
+    protected $language;
 
     /**
      * @var string
@@ -182,22 +182,6 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     }
 
     /**
-     * @return int
-     */
-    public function getSysLanguageUid()
-    {
-        return $this->sysLanguageUid;
-    }
-
-    /**
-     * @param int $sysLanguageUid
-     */
-    public function setSysLanguageUid($sysLanguageUid)
-    {
-        $this->sysLanguageUid = $sysLanguageUid;
-    }
-
-    /**
      * @return string
      */
     public function getLlFile()
@@ -211,6 +195,22 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     public function setLlFile($llFile)
     {
         $this->llFile = $llFile;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * @param string $language
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
     }
 
 }

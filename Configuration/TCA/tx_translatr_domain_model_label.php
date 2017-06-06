@@ -30,7 +30,7 @@ return [
         'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, hidden, extension, ukey, text, description',
     ],
     'types' => [
-        '1' => ['showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1, extension, ukey, text, description, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
+        '1' => ['showitem' => 'hidden;;1, language, extension, ukey, text, description, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
     ],
     'palettes' => [
         '1' => ['showitem' => ''],
@@ -41,14 +41,7 @@ return [
             'exclude' => 1,
             'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.language',
             'config' => [
-                'readOnly' => true,
-                'type' => 'select',
-                'renderType' => 'selectSingle',
-                'foreign_table' => 'sys_language',
-                'foreign_table_where' => 'ORDER BY sys_language.title',
-                'items' => [
-                    ['LLL:EXT:lang/locallang_general.xlf:LGL.default_value', 0],
-                ],
+                'type' => 'passthrough',
             ],
         ],
         'l10n_parent' => [
@@ -56,14 +49,7 @@ return [
             'exclude' => 1,
             'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.l18n_parent',
             'config' => [
-                'readOnly' => true,
-                'type' => 'select',
-                'renderType' => 'selectSingle',
-                'items' => [
-                    ['', 0],
-                ],
-                'foreign_table' => 'tx_translatr_domain_model_label',
-                'foreign_table_where' => 'AND tx_translatr_domain_model_label.sys_language_uid IN (-1,0)',
+                'type' => 'passthrough',
             ],
         ],
         'l10n_diffsource' => [
@@ -126,6 +112,7 @@ return [
             'l10n_mode' => 'exclude',
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.extension',
             'config' => [
+                'readOnly' => true,
                 'type' => 'select',
                 'renderType' => 'selectSingle',
                 'itemsProcFunc' => \SourceBroker\Translatr\Hooks\ItemsProcFunc::class
@@ -140,6 +127,7 @@ return [
             'l10n_mode' => 'exclude',
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.ukey',
             'config' => [
+                'readOnly' => true,
                 'type' => 'input',
                 'size' => 30,
                 'eval' => 'trim,required',
@@ -173,6 +161,18 @@ return [
                 'type' => 'passthrough',
             ],
         ],
+        'language' => [
+            'exclude' => 1,
+            'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.language',
+            'config' => [
+                'readOnly' => true,
+                'type' => 'select',
+                'items' => [
+                    ['Default', 'default'],
+                    ['German', 'de_DE'],
+                ]
+            ],
+        ]
 
     ],
 ];

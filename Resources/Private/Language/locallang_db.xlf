@@ -22,6 +22,9 @@
             <trans-unit id="tx_translatr_domain_model_label.ll_file">
                 <source>Locallang file path (relative)</source>
             </trans-unit>
+            <trans-unit id="tx_translatr_domain_model_label.language">
+                <source>Language</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>
