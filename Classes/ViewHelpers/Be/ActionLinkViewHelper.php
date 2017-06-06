@@ -81,13 +81,8 @@ class ActionLinkViewHelper
             'returnUrl' => self::getReturnUrl(),
         ];
 
-        if (isset($options['tcadefault']['sys_language_uid'])) {
-            $uriParameters['translatr_tcadefault']['sys_language_uid']
-                = [$options['tcadefault']['sys_language_uid']];
-        }
-        if (isset($options['tcadefault']['extension'])) {
-            $uriParameters['translatr_tcadefault']['extension']
-                = [$options['tcadefault']['extension']];
+        if (isset($options['tcadefault'])) {
+            $uriParameters['translatr_tcadefault'] = $options['tcadefault'];
         }
 
         return BackendUtility::getModuleUrl('record_edit', $uriParameters);

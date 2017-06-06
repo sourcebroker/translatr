@@ -57,27 +57,39 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             'tx_translatr_domain_model_label'
         );
 
-        $languagesUidsForSql = implode(
+        $languageListForSql = implode(
             ', ',
-            self::getDb()->cleanIntArray($demand->getLanguageUids() ?: [0])
+            self::getDb()->fullQuoteArray($demand->getLanguages() ?: ['default'], 'tx_translatr_domain_model_label')
         );
 
         $query = <<<SQL
 /* select labels from default language */
 (
-SELECT *
-FROM tx_translatr_domain_model_label
-WHERE tx_translatr_domain_model_label.sys_language_uid = 0 
-  AND tx_translatr_domain_model_label.deleted = 0
-  AND tx_translatr_domain_model_label.extension = {$extensionNameForSql}
+SELECT 
+  label.uid,
+  label.language,
+  label.ukey,
+  0 AS parent_uid,
+  label.hidden,
+  label.text
+FROM tx_translatr_domain_model_label AS label
+WHERE label.language = "default" 
+  AND label.deleted = 0
+  AND label.extension = {$extensionNameForSql}
 ) UNION (
 /* select labels for specified languages */ 
-SELECT tx_translatr_domain_model_label.* 
-FROM tx_translatr_domain_model_label 
+SELECT  
+  label.uid,
+  label.language,
+  label.ukey,
+  parent.uid AS parent_uid,
+  label.hidden,
+  label.text
+FROM tx_translatr_domain_model_label AS label 
   LEFT JOIN tx_translatr_domain_model_label AS parent
-    ON (tx_translatr_domain_model_label.l10n_parent = parent.uid)
-WHERE tx_translatr_domain_model_label.sys_language_uid IN ({$languagesUidsForSql})  
-  AND tx_translatr_domain_model_label.deleted = 0
+    ON (parent.language = "default" AND parent.ukey = label.ukey AND parent.ll_file = label.ll_file)
+WHERE label.language IN ({$languageListForSql})  
+  AND label.deleted = 0
   AND parent.deleted = 0
   AND parent.extension = {$extensionNameForSql}
 );
@@ -91,16 +103,17 @@ SQL;
 
         foreach ($results as &$result) {
             $uid = (int)$result['uid'];
-            $l10nParent = (int)$result['l10n_parent'];
-            $sysLanguageUid = (int)$result['sys_language_uid'];
+            $parentUid = (int)$result['parent_uid'];
+            $language = $result['language'];
 
-            if ($l10nParent === 0) {
+            if ($language === 'default') {
                 // record in default language are treated as parents
                 $processedResults[$uid] = $result;
                 $processedResults[$uid]['language_childs'] = [];
-            } elseif ($l10nParent > 0) {
+            } elseif ($parentUid > 0) {
                 // add as a child to parent record
-                $processedResults[$l10nParent]['language_childs'][$sysLanguageUid] = $result;
+                $processedResults[$parentUid]['language_childs'][$language]
+                    = $result;
             }
         }
 
@@ -113,12 +126,8 @@ SQL;
     public function getExtensionsItems()
     {
         $extensions = [''];
-        foreach (
-            ExtensionsUtility::getExtensionsListForTranslate() as $extensionData
-        ) {
-            if (isset($extensionData[1]) && $extensionData[1]) {
-                $extensions[$extensionData[1]] = $extensionData[0];
-            }
+        foreach (ExtensionsUtility::getExtensionsWithMetaData() as $extData) {
+            $extensions[$extData['extensionKey']] = $extData['title'];
         }
 
         return $extensions;
@@ -153,9 +162,9 @@ SQL;
 
         $llFilePath = $llFiles[0];
 
-        $parsedLabels
-            = $this->getLanguageService()->parserFactory->getParsedData($llFilePath,
-            'default');
+        $parsedLabels = $this->getLanguageService()
+            ->parserFactory
+            ->getParsedData($llFilePath, 'default');
         $labels = [];
 
         if (!is_array($parsedLabels) || !isset($parsedLabels['default'])
@@ -177,15 +186,17 @@ SQL;
         foreach ($labels as $labelKey => $label) {
             $obj = new Label();
             $obj->setPid(0);
-            $obj->setSysLanguageUid(0);
             $obj->setExtension($extKey);
             $obj->setText($label);
             $obj->setUkey($labelKey);
             $obj->setLlFile(FileUtility::getRelativePathFromAbsolute($llFilePath));
+            $obj->setLanguage('default');
 
             if (!$this->isLabelIndexed($obj)) {
                 $this->add($obj);
             }
+
+            unset($obj);
         }
 
         $this->objectManager->get(PersistenceManager::class)->persistAll();
@@ -200,8 +211,15 @@ SQL;
     {
         $query = $this->createQuery();
 
+        $query->getQuerySettings()->setEnableFieldsToBeIgnored([
+            'hidden',
+            'starttime',
+            'endtime',
+        ]);
+
         return $query->matching(
                 $query->logicalAnd([
+                    $query->equals('language', $label->getLanguage()),
                     $query->equals('llFile', $label->getLlFile()),
                     $query->equals('ukey', $label->getUkey()),
                 ])

@@ -29,7 +29,7 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $extension = '';
 
     /**
-     * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\SourceBroker\Translatr\Domain\Model\Language>
+     * @var array
      */
     protected $languages = null;
 
@@ -68,7 +68,7 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     }
 
     /**
-     * @return \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\SourceBroker\Translatr\Domain\Model\Language>
+     * @return array
      */
     public function getLanguages()
     {
@@ -76,21 +76,11 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     }
 
     /**
-     * @param \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\SourceBroker\Translatr\Domain\Model\Language> $languages
+     * @param array
      */
     public function setLanguages($languages)
     {
         $this->languages = $languages;
-    }
-
-    /**
-     * @return array<int>
-     */
-    public function getLanguageUids()
-    {
-        return array_map(function(Language $language) {
-            return (int)$language->getUid();
-        }, $this->getLanguages()->toArray());
     }
 
 }

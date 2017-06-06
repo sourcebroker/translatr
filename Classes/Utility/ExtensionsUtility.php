@@ -14,23 +14,9 @@ class ExtensionsUtility
 {
 
     /**
-     * @todo filter extensions available for current BE user
      * @return array
      */
-    public static function getExtensionsListForTranslate()
-    {
-        $extensionsWithMetadata = self::getExtensionsWithMetaData();
-        ksort($extensionsWithMetadata);
-
-        return array_map(function ($extension) {
-            return [$extension['title'], $extension['extensionKey']];
-        }, self::getExtensionsWithMetaData());
-    }
-
-    /**
-     * @return array
-     */
-    protected static function getExtensionsWithMetaData()
+    public static function getExtensionsWithMetaData()
     {
         return array_map(function ($extKey) {
             return MiscUtility::getExtensionMetaData($extKey);

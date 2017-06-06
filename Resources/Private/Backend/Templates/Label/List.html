@@ -18,9 +18,9 @@
             <thead>
             <tr class="t3-row-header">
                 <th>Key</th>
-                <th>Label (Default)</th>
+                <th>Label (default)</th>
                 <f:for each="{demand.languages}" as="language">
-                    <th>Label ({language.title})</th>
+                    <th>Label ({language})</th>
                 </f:for>
             </tr>
             </thead>
@@ -42,7 +42,7 @@
                     </td>
                     <f:for each="{demand.languages}" as="language">
                         <td>
-                            {label.language_childs -> v:iterator.filter(propertyName: 'sys_language_uid', filter: language.uid) -> v:iterator.first() -> v:variable.set(name: 'childLabel')}
+                            {label.language_childs -> v:iterator.filter(propertyName: 'language', filter: language) -> v:iterator.first() -> v:variable.set(name: 'childLabel')}
 
                             <f:if condition="{childLabel}">
                                 <f:then>
@@ -51,9 +51,15 @@
                                     {childLabel.text}
                                 </f:then>
                                 <f:else>
-                                    <f:render partial="Label/ActionButtons/Localize" arguments="{
-                                        parentLabel: label,
-                                        language: language
+                                    <f:render partial="Label/ActionButtons/New" arguments="{
+                                        language: language,
+                                        tcadefault: {
+                                            language: language,
+                                            ll_file: label.ll_file,
+                                            extension: {
+                                                0: 'news'
+                                            }
+                                        }
                                     }" />
 
                                     {label.text}

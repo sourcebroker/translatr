@@ -27,10 +27,10 @@ return [
         ],
     ],
     'interface' => [
-        'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, hidden, extension, ukey, text, description',
+        'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, hidden, extension, ukey, text, description, ll_file',
     ],
     'types' => [
-        '1' => ['showitem' => 'hidden;;1, language, extension, ukey, text, description, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
+        '1' => ['showitem' => 'hidden;;1, language, extension, ll_file, ukey, text, description, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
     ],
     'palettes' => [
         '1' => ['showitem' => ''],
@@ -115,8 +115,7 @@ return [
                 'readOnly' => true,
                 'type' => 'select',
                 'renderType' => 'selectSingle',
-                'itemsProcFunc' => \SourceBroker\Translatr\Hooks\ItemsProcFunc::class
-                    .'->getExtensionsList',
+                'itemsProcFunc' => \SourceBroker\Translatr\UserFunc\ExtensionItemsProcFunc::class.'->getItems',
                 'size' => 1,
                 'maxitems' => 1,
                 'eval' => 'required',
@@ -158,7 +157,8 @@ return [
             'exclude' => 1,
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.ll_file',
             'config' => [
-                'type' => 'passthrough',
+                'readOnly' => true,
+                'type' => 'input',
             ],
         ],
         'language' => [
@@ -167,9 +167,9 @@ return [
             'config' => [
                 'readOnly' => true,
                 'type' => 'select',
+                'itemsProcFunc' => \SourceBroker\Translatr\UserFunc\LanguageItemsProcFunc::class.'->getItems',
                 'items' => [
-                    ['Default', 'default'],
-                    ['German', 'de_DE'],
+                    ['', ''],
                 ]
             ],
         ]

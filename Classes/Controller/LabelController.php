@@ -5,6 +5,7 @@ namespace SourceBroker\Translatr\Controller;
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Repository\LabelRepository;
 use SourceBroker\Translatr\Domain\Repository\LanguageRepository;
+use SourceBroker\Translatr\Utility\LanguageUtility;
 use TYPO3\CMS\Core\FormProtection\FormProtectionFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -93,7 +94,7 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         $this->view->assignMultiple([
             'labels' => $this->labelRepository->findDemandedForBe($demand),
             'extensions' => $this->labelRepository->getExtensionsItems(),
-            'languages' => $this->languageRepository->findAll(),
+            'languages' => LanguageUtility::getAvailableLanguages(),
             'demand' => $demand,
             'moduleToken' => $this->getToken(),
             'id' => GeneralUtility::_GET('id'),

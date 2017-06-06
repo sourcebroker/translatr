@@ -66,25 +66,20 @@ class LabelRowInitializeNew implements FormDataProviderInterface
      */
     private function setDefaultDatabaseRowData()
     {
+        $defaultTcaData = $this->getDefaultTcaData();
+        $defaultTcaData = is_array($defaultTcaData) ? $defaultTcaData : [];
+
         $this->data['databaseRow'] = array_replace_recursive(
             $this->data['databaseRow'],
-            [
-                'sys_language_uid' => $this->getDefaultTcaData('sys_language_uid')
-                    ?: $this->data['databaseRow']['sys_language_uid'],
-                'extension' => $this->getDefaultTcaData('extension')
-                    ?: $this->data['databaseRow']['extension'],
-            ]
+            $defaultTcaData
         );
     }
 
     /**
      * @return mixed
      */
-    private function getDefaultTcaData($parameterName)
+    private function getDefaultTcaData()
     {
-        $defaultData = GeneralUtility::_GP('translatr_tcadefault');
-
-        return is_array($defaultData) && isset($defaultData[$parameterName])
-            ? $defaultData[$parameterName] : null;
+        return GeneralUtility::_GP('translatr_tcadefault');
     }
 }
