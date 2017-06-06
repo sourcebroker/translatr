@@ -15,15 +15,15 @@ class TcaFieldHidden
      */
     public function display(&$config)
     {
-        $displayValue = $config['itemFormElValue'];
+        $value = $config['itemFormElValue'];
 
-        if (is_array($displayValue)) {
-            $displayValue = implode(', ', $displayValue);
+        while (is_array($value)) {
+            $value = array_shift($value);
         }
 
         return <<<HTML
-<input type="hidden" value="{$config['itemFormElValue']}" name="{$config['itemFormElName']}" />
-<p>{$displayValue}</p>
+<input type="hidden" value="{$value}" name="{$config['itemFormElName']}" />
+<p>{$value}</p>
 HTML;
     }
 }
