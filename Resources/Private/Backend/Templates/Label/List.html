@@ -54,11 +54,14 @@
                                     <f:render partial="Label/ActionButtons/New" arguments="{
                                         language: language,
                                         tcadefault: {
-                                            language: language,
+                                            language: {
+                                                0: language
+                                            },
                                             ll_file: label.ll_file,
                                             extension: {
                                                 0: 'news'
-                                            }
+                                            },
+                                            ukey: label.ukey
                                         }
                                     }" />
 

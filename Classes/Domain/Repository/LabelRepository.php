@@ -71,7 +71,8 @@ SELECT
   label.ukey,
   0 AS parent_uid,
   label.hidden,
-  label.text
+  label.text,
+  label.ll_file
 FROM tx_translatr_domain_model_label AS label
 WHERE label.language = "default" 
   AND label.deleted = 0
@@ -84,7 +85,8 @@ SELECT
   label.ukey,
   parent.uid AS parent_uid,
   label.hidden,
-  label.text
+  label.text,
+  label.ll_file
 FROM tx_translatr_domain_model_label AS label 
   LEFT JOIN tx_translatr_domain_model_label AS parent
     ON (parent.language = "default" AND parent.ukey = label.ukey AND parent.ll_file = label.ll_file)

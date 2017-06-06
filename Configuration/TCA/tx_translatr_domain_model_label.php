@@ -112,12 +112,8 @@ return [
             'l10n_mode' => 'exclude',
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.extension',
             'config' => [
-                'readOnly' => true,
-                'type' => 'select',
-                'renderType' => 'selectSingle',
-                'itemsProcFunc' => \SourceBroker\Translatr\UserFunc\ExtensionItemsProcFunc::class.'->getItems',
-                'size' => 1,
-                'maxitems' => 1,
+                'type' => 'user',
+                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class.'->display',
                 'eval' => 'required',
             ],
         ],
@@ -126,9 +122,8 @@ return [
             'l10n_mode' => 'exclude',
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.ukey',
             'config' => [
-                'readOnly' => true,
-                'type' => 'input',
-                'size' => 30,
+                'type' => 'user',
+                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class.'->display',
                 'eval' => 'trim,required',
             ],
         ],
@@ -157,20 +152,16 @@ return [
             'exclude' => 1,
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.ll_file',
             'config' => [
-                'readOnly' => true,
-                'type' => 'input',
+                'type' => 'user',
+                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class.'->display',
             ],
         ],
         'language' => [
             'exclude' => 1,
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.language',
             'config' => [
-                'readOnly' => true,
-                'type' => 'select',
-                'itemsProcFunc' => \SourceBroker\Translatr\UserFunc\LanguageItemsProcFunc::class.'->getItems',
-                'items' => [
-                    ['', ''],
-                ]
+                'type' => 'user',
+                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class.'->display',
             ],
         ]
 

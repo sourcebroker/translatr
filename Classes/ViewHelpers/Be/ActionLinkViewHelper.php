@@ -70,7 +70,9 @@ class ActionLinkViewHelper
      */
     public function renderNewLink($options)
     {
-        $pid = (int)\TYPO3\CMS\Core\Utility\GeneralUtility::_GET('id');
+        // currently all records are stored on pid 0
+        // $pid = (int)\TYPO3\CMS\Core\Utility\GeneralUtility::_GET('id');
+        $pid = 0;
 
         $uriParameters = [
             'edit' => [
