@@ -51,6 +51,8 @@
                                     {childLabel.text}
                                 </f:then>
                                 <f:else>
+                                    {sbt:be.translate(llFile: label.ll_file, language: language, key: label.ukey) -> v:variable.set(name: 'labelText')}
+
                                     <f:render partial="Label/ActionButtons/New" arguments="{
                                         language: language,
                                         tcadefault: {
@@ -61,11 +63,12 @@
                                             extension: {
                                                 0: 'news'
                                             },
-                                            ukey: label.ukey
+                                            ukey: label.ukey,
+                                            text: labelText
                                         }
                                     }" />
 
-                                    {label.text}
+                                    {labelText}
                                 </f:else>
                             </f:if>
                         </td>
