@@ -6,6 +6,7 @@ use SourceBroker\Translatr\Domain\Model\Dto\EmConfiguration;
 use SourceBroker\Translatr\Utility\EmConfigurationUtility;
 use SourceBroker\Translatr\Utility\ExceptionUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * Class LocallangXMLOverride
@@ -14,17 +15,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class LocallangXMLOverride
 {
-
-
-    /**
-     * @todo change path for TYPO3 v8
-     *
-     * @var string
-     */
-    protected $cachePath
-        = PATH_site.'typo3temp'.DIRECTORY_SEPARATOR.'Cache'.DIRECTORY_SEPARATOR
-        .'TxTranslatr'.DIRECTORY_SEPARATOR;
-
     /**
      * @var string
      */
@@ -86,7 +76,7 @@ class LocallangXMLOverride
      */
     protected function setOverrideFilesLoaderFilePath()
     {
-        $this->overrideFilesLoaderFilePath = $this->cachePath
+        $this->overrideFilesLoaderFilePath = $this->getTempFolderPath()
             .'locallangOverrideLoader.php';
     }
 
@@ -95,7 +85,7 @@ class LocallangXMLOverride
      */
     protected function setOverrideFilesBaseDirectoryPath()
     {
-        $this->overrideFilesBaseDirectoryPath = $this->cachePath.'OverrideFiles'
+        $this->overrideFilesBaseDirectoryPath = $this->getTempFolderPath().'OverrideFiles'
             .DIRECTORY_SEPARATOR;
     }
 
@@ -218,7 +208,7 @@ class LocallangXMLOverride
 
         foreach($files as $fullPath => $file) {
             $translationOverrideFiles[
-                $this->transformPathFromLocallangOverridesToLocallang($fullPath)
+            $this->transformPathFromLocallangOverridesToLocallang($fullPath)
             ] = $fullPath;
         }
 
@@ -409,5 +399,26 @@ class LocallangXMLOverride
                     OR parent.ll_file = '.$GLOBALS['TYPO3_DB']->fullQuoteStr($locallangFile, 'tx_translatr_domain_model_label').'
                 )'
         );
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function getTempFolderPath()
+    {
+        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_branch) >
+            VersionNumberUtility::convertVersionNumberToInteger('8.0.0')
+        ) {
+            $cachePath = 'var/Cache/Data/TxTranslatr/';
+
+        } else {
+            $cachePath = 'Cache/Data/TxTranslatr/';
+        }
+        $tempFolderPath = PATH_site . 'typo3temp/' . $cachePath;
+        if (!is_dir($tempFolderPath)) {
+            GeneralUtility::mkdir_deep($tempFolderPath);
+        }
+        return $tempFolderPath;
     }
 }
