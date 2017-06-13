@@ -125,18 +125,17 @@ class LocallangXMLOverride
     {
         $this->createOverrideFilesLoaderFileDirectoryIfNotExists();
         $this->createOverrideFilesDirectories();
-
-        $code = '<?php'.PHP_EOL;
-        foreach (
-            $this->getTranslationOverrideFiles() as $overriddenFile => $filePath
-        ) {
-            $code .= '$GLOBALS[\'TYPO3_CONF_VARS\'][\'SYS\'][\'locallangXMLOverride\'][\''
-                .$overriddenFile.'\'][] = \''.$filePath.'\';'.PHP_EOL;
+        $code = '<?php' . PHP_EOL;
+        foreach ($this->getTranslationOverrideFiles() as $isocode => $fileDatas) {
+            foreach ($fileDatas as $fileData) {
+                $code .= '$GLOBALS[\'TYPO3_CONF_VARS\'][\'SYS\'][\'locallangXMLOverride\'][\'' . $isocode . '\'][\''
+                    . $fileData['overwritten'] . '\'][] = \'' . $fileData['overwriteWith'] . '\';' . PHP_EOL;
+            }
         }
 
         if (!file_put_contents($this->overrideFilesLoaderFilePath, $code)) {
             ExceptionUtility::throwException(\RuntimeException::class,
-                'Could not write file in '.$this->overrideFilesLoaderFilePath,
+                'Could not write file in ' . $this->overrideFilesLoaderFilePath,
                 390847534);
         }
     }
@@ -206,12 +205,13 @@ class LocallangXMLOverride
             \RegexIterator::GET_MATCH
         );
 
-        foreach($files as $fullPath => $file) {
-            $translationOverrideFiles[
-            $this->transformPathFromLocallangOverridesToLocallang($fullPath)
-            ] = $fullPath;
+        foreach ($files as $fullPath => $file) {
+            $isoCode = explode('/', substr($fullPath, strlen($this->overrideFilesBaseDirectoryPath)))[1];
+            $translationOverrideFiles[$isoCode][] = [
+                'overwritten' => $this->transformPathFromLocallangOverridesToLocallang($fullPath),
+                'overwriteWith' => $fullPath
+            ];
         }
-
         return $translationOverrideFiles;
     }
 
@@ -224,8 +224,16 @@ class LocallangXMLOverride
             $this->overrideFilesExtDirectoryPath => 'EXT:',
             $this->overrideFilesBaseDirectoryPath => '',
         ];
+        $pathInfo = pathinfo(explode(':', str_replace(array_keys($replacements), $replacements, $fullPath))[1]);
+        $dirnameExploded = explode(DIRECTORY_SEPARATOR, $pathInfo['dirname']);
+        array_shift($dirnameExploded);
+        $pathNoIso = implode(DIRECTORY_SEPARATOR, $dirnameExploded);
 
-        return str_replace(array_keys($replacements), $replacements, $fullPath);
+        $nameExploded = explode('.', $pathInfo['basename']);
+        array_shift($nameExploded);
+        $nameNoIso = implode('.', $nameExploded);
+
+        return 'EXT:' . $pathNoIso . '/' . $nameNoIso;
     }
 
     /**
@@ -233,12 +241,11 @@ class LocallangXMLOverride
      *
      * @return string
      */
-    protected function transformPathFromLocallangToLocallangOverrides($locallangPath)
+    protected function transformPathFromLocallangToLocallangOverrides($locallangPath, $isocode)
     {
         if (GeneralUtility::isFirstPartOfStr($locallangPath, 'EXT:')) {
-            return str_replace('EXT:', $this->overrideFilesExtDirectoryPath, $locallangPath);
+            return str_replace('EXT:', $this->overrideFilesExtDirectoryPath .  $isocode . '/', $locallangPath);
         }
-
         return $this->overrideFilesBaseDirectoryPath.$locallangPath;
     }
 
@@ -248,27 +255,25 @@ class LocallangXMLOverride
     protected function createNotExistingLocallangOverrideFiles()
     {
         $locallangFiles = (array)$GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
-            'DISTINCT tx_translatr_domain_model_label.ll_file',
+            'DISTINCT tx_translatr_domain_model_label.ll_file, language',
             'tx_translatr_domain_model_label',
             'tx_translatr_domain_model_label.deleted = 0 AND tx_translatr_domain_model_label.hidden = 0'
         );
-
         if (!$locallangFiles) {
             return;
         }
-
         foreach ($locallangFiles as $locallangFile) {
-            $this->createLocallangOverrideFileIfNotExist($locallangFile['ll_file']);
+            $this->createLocallangOverrideFileIfNotExist($locallangFile['ll_file'], $locallangFile['language']);
         }
     }
 
     /**
      * @param string $locallangFile
+     * @param $isoCode
      */
-    protected function createLocallangOverrideFileIfNotExist($locallangFile)
+    protected function createLocallangOverrideFileIfNotExist($locallangFile, $isoCode)
     {
-        $locallangOverrideFilePath = $this->transformPathFromLocallangToLocallangOverrides($locallangFile);
-
+        $locallangOverrideFilePath = $this->transformPathFromLocallangToLocallangOverrides($locallangFile, $isoCode);
         if (!is_file($locallangOverrideFilePath)) {
             $this->createLocallangOverrideFile($locallangFile);
         }
@@ -280,7 +285,6 @@ class LocallangXMLOverride
     protected function createLocallangOverrideFile($locallangFile)
     {
         $labels = $this->getLabelsByLocallangFile($locallangFile);
-        $defaultLocallangOverrideFile = $this->transformPathFromLocallangToLocallangOverrides($locallangFile);
         $groupedLabels = [];
 
 
@@ -289,23 +293,18 @@ class LocallangXMLOverride
         }
 
         unset($labels);
-
         foreach ($groupedLabels as $isoCode => $labels) {
             $xml = $this->createXlfFileForLabels($labels);
             $xml->formatOutput = true;
-
+            $defaultLocallangOverrideFile = $this->transformPathFromLocallangToLocallangOverrides($locallangFile, $isoCode);
             $outputFiles = [
                 $this->prependLocallangFileNameWithIsoCode($defaultLocallangOverrideFile, $isoCode)
             ];
-
-            // for default isocode we save it also to file without isocode in name
-            if ($isoCode === $this->emConfiguration->getDefaultLanguageIsoCode()) {
-                $outputFiles[] = $defaultLocallangOverrideFile;
-            }
-
             foreach ($outputFiles as $outputFile) {
                 $this->createDirectoryIfNotExists(dirname($outputFile));
                 file_put_contents($outputFile, $xml->saveXML());
+                $pathParts = pathinfo($outputFile);
+                rename($outputFile, $pathParts['dirname'] . '/' . $pathParts['filename'] . '.xlf');
             }
         }
     }
@@ -340,13 +339,19 @@ class LocallangXMLOverride
             $transUnit = $xml->createElement('trans-unit');
             $transUnit->setAttribute('id', $label['ukey']);
 
-            $target = $xml->createElement('target');
-            $transUnit->appendChild($target);
-
-            $target->appendChild(
-                $xml->createCDATASection($label['text'])
-            );
-
+            if($label['isocode'] == 'default') {
+                $source = $xml->createElement('source');
+                $transUnit->appendChild($source);
+                $source->appendChild(
+                    $xml->createCDATASection($label['text'])
+                );
+            } else {
+                $target = $xml->createElement('target');
+                $transUnit->appendChild($target);
+                $target->appendChild(
+                    $xml->createCDATASection($label['text'])
+                );
+            }
             $fileBody->appendChild($transUnit);
         }
 
@@ -363,9 +368,7 @@ class LocallangXMLOverride
     {
         $fileName = basename($filePath);
         $dirname = dirname($filePath);
-        $fileNameWithIsoCode = ($isoCode ? $isoCode.'.' : '').$fileName;
-
-        return $dirname.DIRECTORY_SEPARATOR.$fileNameWithIsoCode;
+        return $dirname. '/'. $isoCode . '.' . $fileName;
     }
 
 
@@ -380,11 +383,7 @@ class LocallangXMLOverride
             'label.text,
                 IF (label.ukey IS NOT NULL AND label.ukey != "", label.ukey, parent.ukey) AS ukey,
                 IF (label.extension IS NOT NULL AND label.extension != "", label.extension, parent.extension) AS extension,
-                IF (
-                    lang.language_isocode IS NOT NULL AND lang.language_isocode != "",
-                    lang.language_isocode, 
-                    '.$GLOBALS['TYPO3_DB']->fullQuoteStr($this->emConfiguration->getDefaultLanguageIsoCode(), 'tx_translatr_domain_model_label').'
-                ) AS isocode',
+                label.language AS isocode',
             'tx_translatr_domain_model_label AS label 
                 LEFT JOIN sys_language AS lang ON (
                     label.sys_language_uid = lang.uid
