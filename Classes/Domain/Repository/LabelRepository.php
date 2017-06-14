@@ -129,9 +129,9 @@ SQL;
     {
         $extensions = [''];
         foreach (ExtensionsUtility::getExtensionsWithMetaData() as $extData) {
-            $extensions[$extData['extensionKey']] = $extData['title'];
+            $extensions[$extData['extensionKey']] = $extData['extensionKey'] . ' (' . ($extData['title']) . ')';
         }
-
+        ksort($extensions);
         return $extensions;
     }
 
