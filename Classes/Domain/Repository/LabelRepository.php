@@ -101,6 +101,17 @@ SQL;
             self::getDb()->sql_query($query)->fetch_all(MYSQLI_ASSOC),
             'uid'
         );
+        // sql_query()->fetch_all() is still not supported on all hostings
+        $result = self::getDb()->sql_query($query);
+        $resultAssoc = [];
+        while ($row = $result->fetch_assoc()) {
+            $resultAssoc[] = $row;
+        }
+        $results = ArrayUtility::combineWithSubarrayFieldAsKey(
+            $resultAssoc,
+            'uid'
+        );
+
         $processedResults = [];
 
         foreach ($results as &$result) {
