@@ -6,7 +6,6 @@ use SourceBroker\Translatr\Domain\Model\Dto\EmConfiguration;
 use SourceBroker\Translatr\Utility\EmConfigurationUtility;
 use SourceBroker\Translatr\Utility\ExceptionUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * Class LocallangXMLOverride
@@ -76,7 +75,7 @@ class LocallangXMLOverride
      */
     protected function setOverrideFilesLoaderFilePath()
     {
-        $this->overrideFilesLoaderFilePath = $this->getTempFolderPath()
+        $this->overrideFilesLoaderFilePath = \SourceBroker\Translatr\Utility\FileUtility::getTempFolderPath()
             .'locallangOverrideLoader.php';
     }
 
@@ -85,7 +84,7 @@ class LocallangXMLOverride
      */
     protected function setOverrideFilesBaseDirectoryPath()
     {
-        $this->overrideFilesBaseDirectoryPath = $this->getTempFolderPath().'OverrideFiles'
+        $this->overrideFilesBaseDirectoryPath = \SourceBroker\Translatr\Utility\FileUtility::getTempFolderPath().'OverrideFiles'
             .DIRECTORY_SEPARATOR;
     }
 
@@ -398,26 +397,5 @@ class LocallangXMLOverride
                     OR parent.ll_file = '.$GLOBALS['TYPO3_DB']->fullQuoteStr($locallangFile, 'tx_translatr_domain_model_label').'
                 )'
         );
-    }
-
-
-    /**
-     * @return string
-     */
-    protected function getTempFolderPath()
-    {
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_branch) >
-            VersionNumberUtility::convertVersionNumberToInteger('8.0.0')
-        ) {
-            $cachePath = 'var/Cache/Data/TxTranslatr/';
-
-        } else {
-            $cachePath = 'Cache/Data/TxTranslatr/';
-        }
-        $tempFolderPath = PATH_site . 'typo3temp/' . $cachePath;
-        if (!is_dir($tempFolderPath)) {
-            GeneralUtility::mkdir_deep($tempFolderPath);
-        }
-        return $tempFolderPath;
     }
 }
