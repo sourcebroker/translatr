@@ -135,7 +135,7 @@ class LocallangXMLOverride
                 'Could not write file in ' . $this->overrideFilesLoaderFilePath,
                 390847534);
         }
-        GeneralUtility::fixPermissions($this->overrideFilesLoaderFilePath);
+        GeneralUtility::fixPermissions($this->overrideFilesLoaderFilePath, true);
     }
 
     /**
@@ -182,7 +182,7 @@ class LocallangXMLOverride
                     'Could not create directory in '.$directoryPath, 938457943);
             }
 
-            GeneralUtility::fixPermissions($directoryPath);
+            GeneralUtility::fixPermissions($directoryPath, true);
         }
     }
 
@@ -303,7 +303,7 @@ class LocallangXMLOverride
                 $this->createDirectoryIfNotExists(dirname($outputFile));
                 file_put_contents($outputFile, $xml->saveXML());
                 $pathParts = pathinfo($outputFile);
-                GeneralUtility::fixPermissions($outputFile);
+                GeneralUtility::fixPermissions($outputFile, true);
                 rename($outputFile, $pathParts['dirname'] . '/' . $pathParts['filename'] . '.xlf');
             }
         }
