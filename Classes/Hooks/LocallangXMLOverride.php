@@ -76,7 +76,7 @@ class LocallangXMLOverride
     protected function setOverrideFilesLoaderFilePath()
     {
         $this->overrideFilesLoaderFilePath = \SourceBroker\Translatr\Utility\FileUtility::getTempFolderPath()
-            .'locallangOverrideLoader.php';
+            .'/locallangOverrideLoader.php';
     }
 
     /**
@@ -84,8 +84,7 @@ class LocallangXMLOverride
      */
     protected function setOverrideFilesBaseDirectoryPath()
     {
-        $this->overrideFilesBaseDirectoryPath = \SourceBroker\Translatr\Utility\FileUtility::getTempFolderPath().'OverrideFiles'
-            .DIRECTORY_SEPARATOR;
+        $this->overrideFilesBaseDirectoryPath = \SourceBroker\Translatr\Utility\FileUtility::getTempFolderPath().'/OverrideFiles';
     }
 
     /**
@@ -93,8 +92,7 @@ class LocallangXMLOverride
      */
     protected function setOverrideFilesExtDirectoryPath()
     {
-        $this->overrideFilesExtDirectoryPath = $this->overrideFilesBaseDirectoryPath
-            .'ext'.DIRECTORY_SEPARATOR;
+        $this->overrideFilesExtDirectoryPath = $this->overrideFilesBaseDirectoryPath .'/ext';
     }
 
     /**
@@ -137,6 +135,7 @@ class LocallangXMLOverride
                 'Could not write file in ' . $this->overrideFilesLoaderFilePath,
                 390847534);
         }
+        GeneralUtility::fixPermissions($this->overrideFilesLoaderFilePath);
     }
 
     /**
@@ -161,7 +160,7 @@ class LocallangXMLOverride
      */
     protected function createOverrideFilesBaseDirectoryIfNotExists()
     {
-        $this->createDirectoryIfNotExists($this->overrideFilesBaseDirectoryPath);
+        $this->createDirectoryIfNotExists($this->overrideFilesExtDirectoryPath);
     }
 
     /**
@@ -205,7 +204,7 @@ class LocallangXMLOverride
         );
 
         foreach ($files as $fullPath => $file) {
-            $isoCode = explode('/', substr($fullPath, strlen($this->overrideFilesBaseDirectoryPath)))[1];
+            $isoCode = explode('/', substr($fullPath, strlen($this->overrideFilesBaseDirectoryPath . '/')))[1];
             $translationOverrideFiles[$isoCode][] = [
                 'overwritten' => $this->transformPathFromLocallangOverridesToLocallang($fullPath),
                 'overwriteWith' => $fullPath
@@ -226,6 +225,7 @@ class LocallangXMLOverride
         $pathInfo = pathinfo(explode(':', str_replace(array_keys($replacements), $replacements, $fullPath))[1]);
         $dirnameExploded = explode(DIRECTORY_SEPARATOR, $pathInfo['dirname']);
         array_shift($dirnameExploded);
+        array_shift($dirnameExploded);
         $pathNoIso = implode(DIRECTORY_SEPARATOR, $dirnameExploded);
 
         $nameExploded = explode('.', $pathInfo['basename']);
@@ -243,9 +243,9 @@ class LocallangXMLOverride
     protected function transformPathFromLocallangToLocallangOverrides($locallangPath, $isocode)
     {
         if (GeneralUtility::isFirstPartOfStr($locallangPath, 'EXT:')) {
-            return str_replace('EXT:', $this->overrideFilesExtDirectoryPath .  $isocode . '/', $locallangPath);
+            return str_replace('EXT:', $this->overrideFilesExtDirectoryPath . '/' .  $isocode . '/', $locallangPath);
         }
-        return $this->overrideFilesBaseDirectoryPath.$locallangPath;
+        return $this->overrideFilesBaseDirectoryPath . '/' . $locallangPath;
     }
 
     /**
@@ -303,6 +303,7 @@ class LocallangXMLOverride
                 $this->createDirectoryIfNotExists(dirname($outputFile));
                 file_put_contents($outputFile, $xml->saveXML());
                 $pathParts = pathinfo($outputFile);
+                GeneralUtility::fixPermissions($outputFile);
                 rename($outputFile, $pathParts['dirname'] . '/' . $pathParts['filename'] . '.xlf');
             }
         }
