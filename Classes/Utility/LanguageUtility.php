@@ -19,8 +19,8 @@ class LanguageUtility
     public static function getAvailableLanguages()
     {
         $languages = self::getLocales()->getLanguages();
+        unset($languages['default']);
         asort($languages);
-
         return $languages;
     }
 
