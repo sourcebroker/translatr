@@ -177,12 +177,11 @@ class LocallangXMLOverride
     protected function createDirectoryIfNotExists($directoryPath)
     {
         if (!is_dir($directoryPath)) {
-            if (!mkdir($directoryPath, 0777, true)) {
+            GeneralUtility::mkdir_deep($directoryPath);
+            if (!is_dir($directoryPath)) {
                 ExceptionUtility::throwException(\RuntimeException::class,
                     'Could not create directory in '.$directoryPath, 938457943);
             }
-
-            GeneralUtility::fixPermissions($directoryPath, true);
         }
     }
 
