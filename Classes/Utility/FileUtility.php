@@ -48,10 +48,10 @@ class FileUtility
         if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_branch) >
             VersionNumberUtility::convertVersionNumberToInteger('8.0.0')
         ) {
-            $cachePath = 'var/Cache/Data/TxTranslatr/';
+            $cachePath = 'var/Cache/Data/TxTranslatr';
 
         } else {
-            $cachePath = 'Cache/Data/TxTranslatr/';
+            $cachePath = 'Cache/Data/TxTranslatr';
         }
         $tempFolderPath = PATH_site . 'typo3temp/' . $cachePath;
         if (!is_dir($tempFolderPath)) {
