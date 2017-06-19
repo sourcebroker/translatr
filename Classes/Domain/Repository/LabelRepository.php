@@ -97,10 +97,6 @@ WHERE label.language IN ({$languageListForSql})
 );
 SQL;
 
-        $results = ArrayUtility::combineWithSubarrayFieldAsKey(
-            self::getDb()->sql_query($query)->fetch_all(MYSQLI_ASSOC),
-            'uid'
-        );
         // sql_query()->fetch_all() is still not supported on all hostings
         $result = self::getDb()->sql_query($query);
         $resultAssoc = [];
