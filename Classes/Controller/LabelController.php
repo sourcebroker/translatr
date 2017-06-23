@@ -90,6 +90,14 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 
         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/AjaxDataHandler');
+        $pageRenderer->loadRequireJsModule('TYPO3/CMS/Translatr/Translatr');
+
+        $pageRenderer->addRequireJsConfiguration([
+                'paths' => [
+                    'select2' => '../typo3conf/ext/translatr/Resources/Public/JavaScript/jquery.select2/dist/js/select2',
+                ]
+            ]
+        );
 
         $this->view->assignMultiple([
             'labels' => $this->labelRepository->findDemandedForBe($demand),
