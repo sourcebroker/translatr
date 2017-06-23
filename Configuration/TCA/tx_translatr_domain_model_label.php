@@ -14,7 +14,6 @@ return [
         'transOrigDiffSourceField' => 'l10n_diffsource',
         'delete' => 'deleted',
         'enablecolumns' => [
-            'disabled' => 'hidden',
             'starttime' => 'starttime',
             'endtime' => 'endtime',
         ],
@@ -27,10 +26,10 @@ return [
         ],
     ],
     'interface' => [
-        'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, hidden, extension, ukey, text, description, ll_file',
+        'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, extension, ukey, text, description, ll_file',
     ],
     'types' => [
-        '1' => ['showitem' => 'hidden;;1, language, extension, ll_file, ukey, text, description, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
+        '1' => ['showitem' => 'language, extension, ll_file, ukey, text, description, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
     ],
     'palettes' => [
         '1' => ['showitem' => ''],
@@ -64,14 +63,6 @@ return [
                 'type' => 'input',
                 'size' => 30,
                 'max' => 255,
-            ],
-        ],
-
-        'hidden' => [
-            'exclude' => 1,
-            'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.hidden',
-            'config' => [
-                'type' => 'check',
             ],
         ],
         'starttime' => [
