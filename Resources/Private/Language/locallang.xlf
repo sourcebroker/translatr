@@ -22,6 +22,9 @@
             <trans-unit id="tx_translatr_domain_model_label.ll_file">
                 <source>Locallang File Path</source>
             </trans-unit>
+            <trans-unit id="flushLanguageCache">
+                <source>Flush language cache</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>
