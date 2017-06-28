@@ -39,7 +39,7 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
      *
      * @var string
      */
-    protected $plugin = 0;
+    protected $extension = '';
 
     /**
      * Unique key of the translation
@@ -63,35 +63,35 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $description = '';
 
     /**
-     * @var bool
+     * @var string
      */
-    protected $hidden;
+    protected $language;
 
     /**
-     * @var int
+     * @var string
      */
-    protected $sysLanguageUid;
+    protected $llFile = '';
 
     /**
-     * Returns the plugin
+     * Returns the extension
      *
-     * @return string $plugin
+     * @return string $extension
      */
-    public function getPlugin()
+    public function getExtension()
     {
-        return $this->plugin;
+        return $this->extension;
     }
 
     /**
-     * Sets the plugin
+     * Sets the extension
      *
-     * @param string $plugin
+     * @param string $extension
      *
      * @return void
      */
-    public function setPlugin($plugin)
+    public function setExtension($extension)
     {
-        $this->plugin = $plugin;
+        $this->extension = $extension;
     }
 
     /**
@@ -161,34 +161,35 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    public function isHidden()
+    public function getLlFile()
     {
-        return $this->hidden;
+        return $this->llFile;
     }
 
     /**
-     * @param bool $hidden
+     * @param string $llFile
      */
-    public function setHidden($hidden)
+    public function setLlFile($llFile)
     {
-        $this->hidden = $hidden;
+        $this->llFile = $llFile;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getSysLanguageUid()
+    public function getLanguage()
     {
-        return $this->sysLanguageUid;
+        return $this->language;
     }
 
     /**
-     * @param int $sysLanguageUid
+     * @param string $language
      */
-    public function setSysLanguageUid($sysLanguageUid)
+    public function setLanguage($language)
     {
-        $this->sysLanguageUid = $sysLanguageUid;
+        $this->language = $language;
     }
+
 }

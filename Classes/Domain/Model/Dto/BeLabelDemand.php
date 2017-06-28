@@ -14,6 +14,7 @@ namespace SourceBroker\Translatr\Domain\Model\Dto;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use SourceBroker\Translatr\Domain\Model\Language;
 
 /**
  * Administration Demand model
@@ -25,43 +26,35 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * @var string
      */
-    protected $plugin = '';
+    protected $extension = '';
 
     /**
-     * @var int
+     * @var array
      */
-    protected $sysLanguageUid = 0;
+    protected $languages = null;
+
+    /**
+     * BeLabelDemand constructor.
+     */
+    public function __construct()
+    {
+        $this->languages = new \TYPO3\CMS\Extbase\Persistence\ObjectStorage();
+    }
 
     /**
      * @return string
      */
-    public function getPlugin()
+    public function getExtension()
     {
-        return $this->plugin;
+        return $this->extension;
     }
 
     /**
-     * @param string $plugin
+     * @param string $extension
      */
-    public function setPlugin($plugin)
+    public function setExtension($extension)
     {
-        $this->plugin = $plugin;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSysLanguageUid()
-    {
-        return $this->sysLanguageUid;
-    }
-
-    /**
-     * @param int $sysLanguageUid
-     */
-    public function setSysLanguageUid($sysLanguageUid)
-    {
-        $this->sysLanguageUid = $sysLanguageUid;
+        $this->extension = $extension;
     }
 
     /**
@@ -71,7 +64,23 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
      */
     public function isValid()
     {
-        return $this->getPlugin() && null !== $this->getSysLanguageUid();
+        return $this->getExtension();
+    }
+
+    /**
+     * @return array
+     */
+    public function getLanguages()
+    {
+        return $this->languages;
+    }
+
+    /**
+     * @param array
+     */
+    public function setLanguages($languages)
+    {
+        $this->languages = $languages;
     }
 
 }

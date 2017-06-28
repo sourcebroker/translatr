@@ -9,7 +9,7 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
  *
  * @package SourceBroker\Translatr\Utility
  */
-class EmConfiguration
+class EmConfigurationUtility
 {
 
     /**
@@ -21,8 +21,10 @@ class EmConfiguration
     public static function getSettings()
     {
         $configuration = self::parseSettings();
-        require_once ExtensionManagementUtility::extPath('translatr').'Classes/Domain/Model/Dto/EmConfiguration.php';
-        $settings = new \SourceBroker\Translatr\Domain\Model\Dto\EmConfiguration($configuration);
+        require_once ExtensionManagementUtility::extPath('translatr')
+            .'Classes/Domain/Model/Dto/EmConfiguration.php';
+        $settings
+            = new \SourceBroker\Translatr\Domain\Model\Dto\EmConfiguration($configuration);
 
         return $settings;
     }
@@ -34,10 +36,11 @@ class EmConfiguration
      */
     public static function parseSettings()
     {
-        $settings = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['translatr']);
+        $settings
+            = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['translatr']);
 
         if (!is_array($settings)) {
-            $settings = array();
+            $settings = [];
         }
 
         return $settings;

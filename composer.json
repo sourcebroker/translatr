@@ -2,9 +2,12 @@
   "name": "sourcebroker/translatr",
   "type": "typo3-cms-extension",
   "description": "Allows to create translation labels in BE module",
-  "license": ["GPL-2.0+"],
+  "license": [
+    "GPL-2.0+"
+  ],
   "require": {
-    "typo3/cms-core": ">=7.6.0,<9"
+    "typo3/cms-core": ">=7.6.0,<9",
+    "fluidtypo3/vhs": ">=3.0  <=4.2"
   },
   "autoload": {
     "psr-4": {

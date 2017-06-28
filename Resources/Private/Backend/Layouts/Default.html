@@ -1,31 +1,10 @@
-
 <f:be.container>
-	<div class="typo3-fullDoc">
-		<div id="typo3-docheader">
-			<div class="typo3-docheader-functions">
-				<div class="left">
-
-				</div>
-				<div class="right">
-					<f:be.pagePath />
-					<f:be.pageInfo />
-				</div>
-			</div>
-			<div class="typo3-docheader-buttons">
-				<div class="left">
-
-				</div>
-				<div class="right">
-					<f:be.buttons.shortcut />
-				</div>
-			</div>
-
-		</div>
-		<div id="typo3-docbody">
-			<div id="typo3-inner-docbody">
-				<f:flashMessages />
-				<f:render section="content" />
-			</div>
-		</div>
-	</div>
+    <div class="typo3-fullDoc">
+        <div id="typo3-docbody" class="translatr-container">
+            <div id="typo3-inner-docbody">
+                <f:flashMessages />
+                <f:render section="content" />
+            </div>
+        </div>
+    </div>
 </f:be.container>

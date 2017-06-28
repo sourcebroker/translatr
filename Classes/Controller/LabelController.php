@@ -4,6 +4,8 @@ namespace SourceBroker\Translatr\Controller;
 
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Repository\LabelRepository;
+use SourceBroker\Translatr\Domain\Repository\LanguageRepository;
+use SourceBroker\Translatr\Utility\LanguageUtility;
 use TYPO3\CMS\Core\FormProtection\FormProtectionFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -43,9 +45,14 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     /**
      * labelRepository
      *
-     * @var \SourceBroker\Translatr\Domain\Repository\LabelRepository
+     * @var LabelRepository
      */
     protected $labelRepository = null;
+
+    /**
+     * @var LanguageRepository
+     */
+    protected $languageRepository = null;
 
     /**
      * @param LabelRepository $labelRepository
@@ -56,23 +63,46 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
     }
 
     /**
+     * @param LanguageRepository $languageRepository
+     */
+    public function injectLanguageRepository(LanguageRepository $languageRepository)
+    {
+        $this->languageRepository = $languageRepository;
+    }
+
+    /**
      * @param \SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand|null $demand
      *
      * @return void
+     *
+     * @ignorevalidation $demand
      */
-    public function listAction(\SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand $demand = null)
-    {
+    public function listAction(
+        \SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand $demand = null
+    ) {
         if (is_null($demand)) {
             $demand = $this->objectManager->get(BeLabelDemand::class);
         }
 
+        if ($demand->getExtension()) {
+            $this->labelRepository->indexExtensionLabels($demand->getExtension());
+        }
+
         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/AjaxDataHandler');
+        $pageRenderer->loadRequireJsModule('TYPO3/CMS/Translatr/Translatr');
+
+        $pageRenderer->addRequireJsConfiguration([
+                'paths' => [
+                    'select2' => '../typo3conf/ext/translatr/Resources/Public/JavaScript/jquery.select2/dist/js/select2',
+                ]
+            ]
+        );
 
         $this->view->assignMultiple([
             'labels' => $this->labelRepository->findDemandedForBe($demand),
-            'plugins' => $this->labelRepository->getPluginsItems(),
-            'languages' => $this->labelRepository->getSysLanguagesItems(),
+            'extensions' => $this->labelRepository->getExtensionsItems(),
+            'languages' => LanguageUtility::getAvailableLanguages(),
             'demand' => $demand,
             'moduleToken' => $this->getToken(),
             'id' => GeneralUtility::_GET('id'),
@@ -86,6 +116,7 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      */
     protected function getToken()
     {
-        return FormProtectionFactory::get()->generateToken('moduleCall', 'web_TranslatrTranslate');
+        return FormProtectionFactory::get()
+            ->generateToken('moduleCall', 'web_TranslatrTranslate');
     }
 }

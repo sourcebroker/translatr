@@ -3,8 +3,12 @@
 namespace SourceBroker\Translatr\Domain\Repository;
 
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
-use SourceBroker\Translatr\Utility\PluginsUtility;
+use SourceBroker\Translatr\Domain\Model\Label;
+use SourceBroker\Translatr\Utility\ArrayUtility;
+use SourceBroker\Translatr\Utility\ExtensionsUtility;
+use SourceBroker\Translatr\Utility\FileUtility;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
 /***************************************************************
  *
@@ -38,9 +42,6 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 {
 
     /**
-     * @todo Implement real fallback used in FE (include all settings from sys_language_mode
-     *     https://docs.typo3.org/typo3cms/TyposcriptReference/Setup/Config/Index.html#sys-language-mode)
-     *
      * @param BeLabelDemand $demand
      *
      * @return array
@@ -51,106 +52,184 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             return [];
         }
 
-        // NOTICE! Seems that extbase language fallback is not working correctly in BE, so manual fallback has to be done here
+        $extensionNameForSql = self::getDb()->fullQuoteStr(
+            $demand->getExtension(),
+            'tx_translatr_domain_model_label'
+        );
+
+        $languageListForSql = implode(
+            ', ',
+            self::getDb()->fullQuoteArray($demand->getLanguages() ?: ['default'], 'tx_translatr_domain_model_label')
+        );
+
         $query = <<<SQL
 /* select labels from default language */
 (
-SELECT *
-FROM tx_translatr_domain_model_label
-WHERE tx_translatr_domain_model_label.sys_language_uid = 0 
-  AND tx_translatr_domain_model_label.deleted = 0
-  AND tx_translatr_domain_model_label.plugin = "{$demand->getPlugin()}"
+SELECT 
+  label.uid,
+  label.language,
+  label.ukey,
+  0 AS parent_uid,
+  label.text,
+  label.ll_file
+FROM tx_translatr_domain_model_label AS label
+WHERE label.language = "default" 
+  AND label.deleted = 0
+  AND label.extension = {$extensionNameForSql}
 ) UNION (
-/* select labels for all languages */
-SELECT *
-FROM tx_translatr_domain_model_label
-WHERE tx_translatr_domain_model_label.sys_language_uid = -1 
-  AND tx_translatr_domain_model_label.deleted = 0
-  AND tx_translatr_domain_model_label.plugin = "{$demand->getPlugin()}"
-) UNION (
-/* select labels for specified language */ 
-SELECT tx_translatr_domain_model_label.* 
-FROM tx_translatr_domain_model_label 
+/* select labels for specified languages */ 
+SELECT  
+  label.uid,
+  label.language,
+  label.ukey,
+  parent.uid AS parent_uid,
+  label.text,
+  label.ll_file
+FROM tx_translatr_domain_model_label AS label 
   LEFT JOIN tx_translatr_domain_model_label AS parent
-    ON (tx_translatr_domain_model_label.l10n_parent = parent.uid)
-WHERE tx_translatr_domain_model_label.sys_language_uid = {$demand->getSysLanguageUid()} 
-  AND tx_translatr_domain_model_label.deleted = 0
+    ON (parent.language = "default" AND parent.ukey = label.ukey AND parent.ll_file = label.ll_file)
+WHERE label.language IN ({$languageListForSql})  
+  AND label.deleted = 0
   AND parent.deleted = 0
-  AND parent.plugin = "{$demand->getPlugin()}"
+  AND parent.extension = {$extensionNameForSql}
 );
 SQL;
 
-        $query = self::getDb()->sql_query($query);
-        $rows = [];
+        // sql_query()->fetch_all() is still not supported on all hostings
+        $result = self::getDb()->sql_query($query);
+        $resultAssoc = [];
+        while ($row = $result->fetch_assoc()) {
+            $resultAssoc[] = $row;
+        }
+        $results = ArrayUtility::combineWithSubarrayFieldAsKey(
+            $resultAssoc,
+            'uid'
+        );
 
-        while ($result = $query->fetch_assoc()) {
-            if (empty($result['l10n_parent'])) {
-                // is parent record
-                $rows[$result['uid']] = $result;
-            } elseif (isset($rows[$result['l10n_parent']])) {
-                $parentRecord =& $rows[$result['l10n_parent']];
+        $processedResults = [];
 
-                // parent record exists, overwrite it fields
-                foreach ($result as $columnName => $columnValue) {
-                    $l10nMode = isset($GLOBALS['TCA']['tx_translatr_domain_model_label']['columns'][$columnName]['l10n_mode']) ?
-                        $GLOBALS['TCA']['tx_translatr_domain_model_label']['columns'][$columnName]['l10n_mode'] : null;
+        foreach ($results as &$result) {
+            $uid = (int)$result['uid'];
+            $parentUid = (int)$result['parent_uid'];
+            $language = $result['language'];
 
-                    switch ($l10nMode) {
-                        case 'mergeIfNotBlank':
-                            // overwrite parent record only if field is not empty in translation
-                            if (!empty($columnValue)) {
-                                $parentRecord[$columnName] = $columnValue;
-                            }
-                            break;
-                        case 'exclude':
-                            // do no overwrite parent record at all
-                            break;
-                        default:
-                            // overwrite parent record value
-                            $parentRecord[$columnName] = $columnValue;
-
-                    }
-                }
+            if ($language === 'default') {
+                // record in default language are treated as parents
+                $processedResults[$uid] = $result;
+                $processedResults[$uid]['language_childs'] = [];
+            } elseif ($parentUid > 0) {
+                // add as a child to parent record
+                $processedResults[$parentUid]['language_childs'][$language]
+                    = $result;
             }
         }
 
-        return $rows;
+        return $processedResults;
     }
 
     /**
      * @return array
      */
-    public function getPluginsItems()
+    public function getExtensionsItems()
     {
-        // first empty element
-        $plugins = [''];
-        foreach (PluginsUtility::getPluginsListForTranslate() as $pluginData) {
-            if (isset($pluginData[1]) && $pluginData[1]) {
-                $plugins[$pluginData[1]] = $pluginData[0];
-            }
+        $extensions = [''];
+        foreach (ExtensionsUtility::getExtensionsWithMetaData() as $extData) {
+            $extensions[$extData['extensionKey']] = $extData['extensionKey'] . ' (' . ($extData['title']) . ')';
         }
-
-        return $plugins;
+        ksort($extensions);
+        return $extensions;
     }
 
     /**
-     * @return array
+     * @todo Implement support for other translation files as currently only
+     *       the main FE translation file is supported
+     *       (EXT:{extKey}/Resources/Private/Language/locallang.xlf or
+     *       EXT:{extKey}/Resources/Private/Language/locallang.xml)
+     * @todo When support for more files will be implemented, then indexing
+     *       proces should be moved somewhere else to speed up the BE module
+     *       (currently it's done on every request to keep labels up to date)
+     *
+     * @param string $extKey
+     *
+     * @return void
      */
-    public function getSysLanguagesItems()
+    public function indexExtensionLabels($extKey)
     {
-        $languages = [
-            -1 => 'All',
-            0 => 'Default'
-            /* @todo get default language title here */
-        ];
+        $llDirectoryPath = PATH_site.'typo3conf'.DIRECTORY_SEPARATOR.'ext'
+            .DIRECTORY_SEPARATOR.$extKey.DIRECTORY_SEPARATOR.'Resources'
+            .DIRECTORY_SEPARATOR.'Private'.DIRECTORY_SEPARATOR.'Language'
+            .DIRECTORY_SEPARATOR;
+        $llFiles = glob($llDirectoryPath.'locallang.{xlf,xml}', GLOB_BRACE);
 
-        foreach (array_filter(
-            (array)$this->getDb()->exec_SELECTgetRows('uid, title', 'sys_language', '1 = 1')
-        ) as $lang) {
-            $languages[(int)$lang['uid']] = $lang['title'];
+        if (!is_array($llFiles) || !isset($llFiles[0])
+            || !file_exists($llFiles[0])
+        ) {
+            return;
         }
 
-        return $languages;
+        $llFilePath = $llFiles[0];
+
+        $parsedLabels = $this->getLanguageService()
+            ->parserFactory
+            ->getParsedData($llFilePath, 'default');
+        $labels = [];
+
+        if (!is_array($parsedLabels) || !isset($parsedLabels['default'])
+            || !is_array($parsedLabels['default'])
+        ) {
+            return;
+        }
+
+        foreach ($parsedLabels['default'] as $labelKey => $labelData) {
+            $labels[$labelKey] = $labelData[0]['target']
+                ?: $labelData[0]['source'] ?: null;
+        }
+
+        // remove null labels
+        $labels = array_filter($labels, function ($label) {
+            return !is_null($label);
+        });
+
+        foreach ($labels as $labelKey => $label) {
+            $obj = new Label();
+            $obj->setPid(0);
+            $obj->setExtension($extKey);
+            $obj->setText($label);
+            $obj->setUkey($labelKey);
+            $obj->setLlFile(FileUtility::getRelativePathFromAbsolute($llFilePath));
+            $obj->setLanguage('default');
+
+            if (!$this->isLabelIndexed($obj)) {
+                $this->add($obj);
+            }
+
+            unset($obj);
+        }
+
+        $this->objectManager->get(PersistenceManager::class)->persistAll();
+    }
+
+    /**
+     * @param Label $label
+     *
+     * @return bool
+     */
+    protected function isLabelIndexed(Label $label)
+    {
+        $query = $this->createQuery();
+
+        $query->getQuerySettings()->setEnableFieldsToBeIgnored([
+            'starttime',
+            'endtime',
+        ]);
+
+        return $query->matching(
+                $query->logicalAnd([
+                    $query->equals('language', $label->getLanguage()),
+                    $query->equals('llFile', $label->getLlFile()),
+                    $query->equals('ukey', $label->getUkey()),
+                ])
+            )->count() > 0;
     }
 
     /**
