@@ -63,11 +63,6 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $description = '';
 
     /**
-     * @var bool
-     */
-    protected $hidden;
-
-    /**
      * @var string
      */
     protected $language;
@@ -163,22 +158,6 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     public function setDescription($description)
     {
         $this->description = $description;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isHidden()
-    {
-        return $this->hidden;
-    }
-
-    /**
-     * @param bool $hidden
-     */
-    public function setHidden($hidden)
-    {
-        $this->hidden = $hidden;
     }
 
     /**

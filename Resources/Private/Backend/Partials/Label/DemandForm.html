@@ -1,4 +1,9 @@
-{namespace sbt=SourceBroker\Translatr\ViewHelpers}
+<html xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+      xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+      xmlns:sbt="http://typo3.org/ns/SourceBroker/Translatr/ViewHelpers"
+      xmlns:v="http://typo3.org/ns/FluidTYPO3/Vhs/ViewHelpers"
+      data-namespace-typo3-fluid="true"
+>
 
 <f:form object="{demand}" name="demand" method="get">
     <input type="hidden" name="M" value="web_TranslatrTranslate">
@@ -6,34 +11,25 @@
     <input type="hidden" name="id" value="{id}">
 
     <div class="row">
-        <div class="col-sm-6 form-horizontal">
+        <div class="col-sm-6">
             <div class="form-group">
-                <label for="field-extension" class="col-sm-4 control-label">
+                <label for="field-extension" class="control-label">
                     Extension
                 </label>
-
-                <div class="col-sm-8">
-                    <f:form.select property="extension" id="field-extension" options="{extensions}" class="form-control"
-                                   additionalAttributes="{onchange: 'this.form.submit();'}"
-                    />
-                </div>
+                <f:form.select property="extension" id="field-extension" options="{extensions}" class="form-control"
+                               additionalAttributes="{onchange: 'this.form.submit();'}"
+                />
             </div>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-6 form-horizontal">
+        <div class="col-sm-6">
             <div class="form-group">
-                <label for="field-sys_language_uid" class="col-sm-4 control-label">
+                <label for="field-sys_language_uid" class="control-label">
                     Language
                 </label>
-
-                <div class="col-sm-8">
-                    <f:form.select property="languages" id="field-sys_language_uid" options="{languages}"
-                                   optionValueField="uid" optionLabelField="title"
-                                   class="form-control" size="{languages -> f:count()}" multiple="1"
-                    />
-                </div>
+                <f:form.select property="languages" id="field-sys_language_uid" options="{languages}"
+                               optionValueField="uid" optionLabelField="title"
+                               class="form-control" size="{languages -> f:count()}" multiple="1"
+                />
             </div>
         </div>
     </div>

@@ -255,7 +255,7 @@ class LocallangXMLOverride
         $locallangFiles = (array)$GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
             'DISTINCT tx_translatr_domain_model_label.ll_file, language',
             'tx_translatr_domain_model_label',
-            'tx_translatr_domain_model_label.deleted = 0 AND tx_translatr_domain_model_label.hidden = 0'
+            'tx_translatr_domain_model_label.deleted = 0'
         );
         if (!$locallangFiles) {
             return;
