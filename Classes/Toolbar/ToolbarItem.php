@@ -40,14 +40,15 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
     public function manipulateCacheActions(&$cacheActions, &$optionValues) {
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
 
-        $cacheActions[] = array(
-            'id'    => self::$itemKey,
-            'title' => $this->getLanguageService()->sL('LLL:EXT:translatr/Resources/Private/Language/locallang.xlf:flushLanguageCache'),
-            'href'  => BackendUtility::getAjaxUrl('language_cache::flushCache'),
-            'icon' => $this->iconFactory->getIcon('actions-system-cache-clear-impact-medium', Icon::SIZE_SMALL)->render()
-        );
-        $optionValues[] = self::$itemKey;
-
+        if($this->getBackendUser()->isAdmin() || $this->getBackendUser()->getTSConfigVal('tx_translatr.clearCache.language')) {
+            $cacheActions[] = array(
+                'id' => self::$itemKey,
+                'title' => $this->getLanguageService()->sL('LLL:EXT:translatr/Resources/Private/Language/locallang.xlf:flushLanguageCache'),
+                'href' => BackendUtility::getAjaxUrl('language_cache::flushCache'),
+                'icon' => $this->iconFactory->getIcon('actions-system-cache-clear-impact-medium', Icon::SIZE_SMALL)->render()
+            );
+            $optionValues[] = self::$itemKey;
+        }
     }
 
     /**
