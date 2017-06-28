@@ -252,16 +252,18 @@ class LocallangXMLOverride
      */
     protected function createNotExistingLocallangOverrideFiles()
     {
-        $locallangFiles = (array)$GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
-            'DISTINCT tx_translatr_domain_model_label.ll_file, language',
-            'tx_translatr_domain_model_label',
-            'tx_translatr_domain_model_label.deleted = 0'
-        );
-        if (!$locallangFiles) {
-            return;
-        }
-        foreach ($locallangFiles as $locallangFile) {
-            $this->createLocallangOverrideFileIfNotExist($locallangFile['ll_file'], $locallangFile['language']);
+        if(false === file_exists($this->overrideFilesLoaderFilePath)) {
+            $locallangFiles = (array)$GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
+                'DISTINCT tx_translatr_domain_model_label.ll_file, language',
+                'tx_translatr_domain_model_label',
+                'tx_translatr_domain_model_label.deleted = 0'
+            );
+            if (!$locallangFiles) {
+                return;
+            }
+            foreach ($locallangFiles as $locallangFile) {
+                $this->createLocallangOverrideFileIfNotExist($locallangFile['ll_file'], $locallangFile['language']);
+            }
         }
     }
 
@@ -367,7 +369,7 @@ class LocallangXMLOverride
     {
         $fileName = basename($filePath);
         $dirname = dirname($filePath);
-        return $dirname. '/'. $isoCode . '.' . $fileName;
+        return $dirname. '/' .$isoCode . '.' .  $fileName;
     }
 
 
