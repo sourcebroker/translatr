@@ -8,7 +8,7 @@ use TYPO3\CMS\Backend\Template\Components\Buttons\SplitButton;
 /**
  * Xclass SplitButton to add getters and setters
  *
- * Use to remove 'save and new' can be removed inline editing will be done.
+ * Used to remove 'save and new'. Can be removed when inline editing will be done.
  */
 class TranslatrSplitButton extends SplitButton
 {
