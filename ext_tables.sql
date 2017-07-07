@@ -35,8 +35,8 @@ CREATE TABLE tx_translatr_domain_model_label (
 	l10n_diffsource mediumblob,
 
 	PRIMARY KEY (uid),
+	UNIQUE KEY ukey (ukey,ll_file,language),
 	KEY parent (pid),
 	KEY t3ver_oid (t3ver_oid,t3ver_wsid),
- KEY language (l10n_parent,sys_language_uid)
-
+  KEY language (l10n_parent,sys_language_uid)
 );
