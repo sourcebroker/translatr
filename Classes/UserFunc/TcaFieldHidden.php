@@ -11,6 +11,7 @@ class TcaFieldHidden
 {
 
     /**
+     * @param $config
      * @return string
      */
     public function display(&$config)
@@ -21,9 +22,15 @@ class TcaFieldHidden
             $value = array_shift($value);
         }
 
-        return <<<HTML
+        if (empty($value)) {
+            $returnValue = '<p style="color: #f00;">Ukey value couldn\'t be determined. Contact your administrator.</p>';
+        } else {
+            $returnValue = <<<HTML
 <input type="hidden" value="{$value}" name="{$config['itemFormElName']}" />
 <p>{$value}</p>
 HTML;
+        }
+
+        return $returnValue;
     }
 }

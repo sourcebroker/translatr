@@ -72,7 +72,11 @@ class TceMain
                 $flashMessageService = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Messaging\FlashMessageService::class);
                 $flashMessageService->getMessageQueueByIdentifier()->addMessage($message);
 
-                $GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_translatr_domain_model_label', 'uid = ' . (int)$id);
+                $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+                    'tx_translatr_domain_model_label',
+                    'uid = ' . (int)$id,
+                    ['deleted' => 1]
+                );
 
             } else {
                 preg_match('/^EXT\:([a-z\_]+)\//', $record['ll_file'], $matches);
