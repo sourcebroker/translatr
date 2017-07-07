@@ -52,7 +52,7 @@ class TceMain
         \TYPO3\CMS\Core\DataHandling\DataHandler &$pObj
     ) {
         if ($table == 'tx_translatr_domain_model_label') {
-            if (strpos($id, 'NEW') !== false) {
+            if ($status === 'new') {
                 $id = $pObj->substNEWwithIDs[$id];
             };
 
