@@ -52,14 +52,50 @@ class TceMain
         \TYPO3\CMS\Core\DataHandling\DataHandler &$pObj
     ) {
         if ($table == 'tx_translatr_domain_model_label') {
+            if ($status === 'new') {
+                $id = $pObj->substNEWwithIDs[$id];
+            };
+
             $record = BackendUtility::getRecord($table, $id);
-            $this->clearCacheForLanguage($record['language']);
+
+            if (empty($record['ukey'])) {
+                /** @var \TYPO3\CMS\Core\Messaging\FlashMessage $message */
+                $message = GeneralUtility::makeInstance(
+                    \TYPO3\CMS\Core\Messaging\FlashMessage::class,
+                    'Ukey field value can\'t be empty',
+                    'Translatr',
+                    \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR,
+                    true
+                );
+
+                /** @var $flashMessageService \TYPO3\CMS\Core\Messaging\FlashMessageService */
+                $flashMessageService = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Messaging\FlashMessageService::class);
+                $flashMessageService->getMessageQueueByIdentifier()->addMessage($message);
+
+                $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+                    'tx_translatr_domain_model_label',
+                    'uid = ' . (int)$id,
+                    ['deleted' => 1]
+                );
+
+            } else {
+                preg_match('/^EXT\:([a-z\_]+)\//', $record['ll_file'], $matches);
+
+                if (isset($matches[1])) {
+                    if ($record['extension'] != $matches[1]) {
+                        $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+                            'tx_translatr_domain_model_label',
+                            'uid = ' . (int)$id,
+                            ['extension' => $matches[1]]
+                        );
+                    }
+                }
+            }
         }
     }
 
     /**
      *  Make atomic remove.
-
      * @param $language
      */
     private function clearCacheForLanguage($language)
