@@ -7,6 +7,8 @@ use SourceBroker\Translatr\Xclass\TranslatrSplitButton;
 /**
  * Class ButtonBarHook
  *
+ * Use to remove 'save and new' can be removed inline editing will be done.
+ *
  * @package SourceBroker\Translatr\Hooks
  */
 class ButtonBarHook

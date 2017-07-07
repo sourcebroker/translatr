@@ -10,9 +10,11 @@ call_user_func(
             . '->initialize';
         $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['additionalBackendItems']['cacheActions']['translatr'] = \SourceBroker\Translatr\Toolbar\ToolbarItem::class;
 
+        // Use to remove 'save and new' can be removed inline editing will be done.
         $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['Backend\Template\Components\ButtonBar']['getButtonsHook'][]
             = \SourceBroker\Translatr\Hooks\ButtonBarHook::class . '->modify';
 
+        // Use to remove 'save and new' can be removed inline editing will be done.
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Backend\Template\Components\Buttons\SplitButton::class] = array(
             'className' => \SourceBroker\Translatr\Xclass\TranslatrSplitButton::class,
         );
