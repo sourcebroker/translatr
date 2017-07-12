@@ -1,4 +1,5 @@
 <?php
+
 namespace SourceBroker\Translatr\Toolbar;
 
 /**
@@ -17,12 +18,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * Prepares additional flush cache entry.
  *
  */
-class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInterface {
+class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInterface
+{
     static $itemKey = 'flushLanguageCache';
 
     /**
@@ -37,16 +40,32 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
      * @param array $optionValues Array of AccessConfigurations-identifiers (typically used by userTS with options.clearCache.identifier)
      * @return void
      */
-    public function manipulateCacheActions(&$cacheActions, &$optionValues) {
+    public function manipulateCacheActions(&$cacheActions, &$optionValues)
+    {
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
 
-        if($this->getBackendUser()->isAdmin() || $this->getBackendUser()->getTSConfigVal('tx_translatr.clearCache.language')) {
-            $cacheActions[] = array(
-                'id' => self::$itemKey,
-                'title' => $this->getLanguageService()->sL('LLL:EXT:translatr/Resources/Private/Language/locallang.xlf:flushLanguageCache'),
-                'href' => BackendUtility::getAjaxUrl('language_cache::flushCache'),
-                'icon' => $this->iconFactory->getIcon('actions-system-cache-clear-impact-medium', Icon::SIZE_SMALL)->render()
-            );
+        if ($this->getBackendUser()->isAdmin() || $this->getBackendUser()->getTSConfigVal('tx_translatr.clearCache.language')) {
+
+            if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_branch) >
+                VersionNumberUtility::convertVersionNumberToInteger('8.0.0')
+            ) {
+                $cacheActions[] = [
+                    'id' => self::$itemKey,
+                    'title' => 'LLL:EXT:translatr/Resources/Private/Language/locallang.xlf:flushLanguageCache',
+                    'description' => 'LLL:EXT:translatr/Resources/Private/Language/locallang.xlf:flushLanguageCacheDescription',
+                    //'href' => BackendUtility::getModuleUrl('translatr', ['language_cache' => 'flushCache']),
+                    'href' => BackendUtility::getAjaxUrl('language_cache::flushCache'),
+                    'iconIdentifier' => 'actions-system-cache-clear-impact-medium'
+                ];
+            } else {
+                $cacheActions[] = [
+                    'id' => self::$itemKey,
+                    'title' => $this->getLanguageService()->sL('LLL:EXT:translatr/Resources/Private/Language/locallang.xlf:flushLanguageCache'),
+                    'href' => BackendUtility::getAjaxUrl('language_cache::flushCache'),
+                    'icon' => $this->iconFactory->getIcon('actions-system-cache-clear-impact-medium',
+                        Icon::SIZE_SMALL)->render()
+                ];
+            }
             $optionValues[] = self::$itemKey;
         }
     }
@@ -56,7 +75,8 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
      *
      * @return void
      */
-    public function flushCache() {
+    public function flushCache()
+    {
         $tempPath = \SourceBroker\Translatr\Utility\FileUtility::getTempFolderPath();
         $tempPathRenamed = $tempPath . time();
         rename($tempPath, $tempPathRenamed);
@@ -73,7 +93,8 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
      *
      * @return \TYPO3\CMS\Core\Authentication\BackendUserAuthentication
      */
-    protected function getBackendUser() {
+    protected function getBackendUser()
+    {
         return $GLOBALS['BE_USER'];
     }
 
@@ -82,7 +103,8 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
      *
      * @return \TYPO3\CMS\Lang\LanguageService
      */
-    protected function getLanguageService() {
+    protected function getLanguageService()
+    {
         return $GLOBALS['LANG'];
     }
 }
