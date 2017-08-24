@@ -52,4 +52,7 @@ tx_translatr {
         vi = Vietnamese
         zh = Chinese (Trad.)
     }
+    extensions {
+        #10 = extension_key
+    }
 }

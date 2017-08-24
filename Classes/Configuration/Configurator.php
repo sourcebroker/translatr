@@ -101,7 +101,7 @@ class Configurator
     /**
      * @return mixed|\TYPO3\CMS\Core\Database\DatabaseConnection
      */
-    public function getDatabaseConnection()
+    protected function getDatabaseConnection()
     {
         return $GLOBALS['TYPO3_DB'];
     }
