@@ -2,7 +2,7 @@
 
 namespace SourceBroker\Translatr\Utility;
 
-use TYPO3\CMS\Core\Localization\Locales;
+use SourceBroker\Translatr\Configuration\Configurator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -18,17 +18,7 @@ class LanguageUtility
      */
     public static function getAvailableLanguages()
     {
-        $languages = self::getLocales()->getLanguages();
-        unset($languages['default']);
-        asort($languages);
-        return $languages;
-    }
-
-    /**
-     * @return Locales
-     */
-    protected static function getLocales()
-    {
-        return GeneralUtility::makeInstance(Locales::class);
+        $conf = GeneralUtility::makeInstance(Configurator::class);
+        return $conf->getOption('languages');
     }
 }
