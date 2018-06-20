@@ -28,6 +28,20 @@ Use composer:
   composer require sourcebroker/translatr
 
 
+Usage
+*****
+
+Workflow to add new labels:
+
+.. image:: Documentation/Images/Workflow.png
+  :width: 100%
+
+After you edit new label clear the cache so the new labels will be generated:
+
+.. image:: Documentation/Images/Cache.png
+  :width: 100%
+
+
 Changelog
 *********
 
