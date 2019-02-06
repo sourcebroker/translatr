@@ -49,13 +49,13 @@ class FileUtility
                 $cachePath = 'var/cache/data/txtranslatr';
                 break;
             case 8:
-                $cachePath = 'var/Cache/Data/TxTranslatr';
+                $cachePath = 'var/Cache/Data/txtranslatr';
                 break;
             case 7:
-                $cachePath = 'Cache/Data/TxTranslatr';
+                $cachePath = 'Cache/Data/txtranslatr';
                 break;
             default:
-                $cachePath = 'Cache/TxTranslatr';
+                $cachePath = 'Cache/txtranslatr';
         }
         $tempFolderPath = PATH_site . 'typo3temp/' . $cachePath;
         if (!is_dir($tempFolderPath)) {
