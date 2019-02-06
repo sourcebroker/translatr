@@ -23,7 +23,7 @@ call_user_func(
         $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass']['translatr']
             = \SourceBroker\Translatr\Hooks\TceMain::class;
 
-        if (TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) <= 8007000) {
+        if (TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) <= 8007999) {
             \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::registerAjaxHandler(
                 'language_cache::flushCache',
                 \SourceBroker\Translatr\Toolbar\ToolbarItem::class . '->flushCache'
