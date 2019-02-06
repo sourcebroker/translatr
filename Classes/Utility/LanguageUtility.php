@@ -33,7 +33,7 @@ class LanguageUtility
             $languageFactory = GeneralUtility::makeInstance(LocalizationFactory::class);
             $parsedLabels = $languageFactory->getParsedData($file, $language);
         } else {
-            $parsedLabels = $GLOBALS['LANG']->getLanguageService()
+            $parsedLabels = $GLOBALS['LANG']
                 ->parserFactory
                 ->getParsedData($file, $language);
         }
