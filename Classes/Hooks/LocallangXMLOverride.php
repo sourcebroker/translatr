@@ -84,7 +84,7 @@ class LocallangXMLOverride
      */
     protected function setOverrideFilesBaseDirectoryPath()
     {
-        $this->overrideFilesBaseDirectoryPath = \SourceBroker\Translatr\Utility\FileUtility::getTempFolderPath().'/OverrideFiles';
+        $this->overrideFilesBaseDirectoryPath = \SourceBroker\Translatr\Utility\FileUtility::getTempFolderPath().'/overrides';
     }
 
     /**
