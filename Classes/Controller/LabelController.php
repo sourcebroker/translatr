@@ -116,7 +116,7 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      * @param bool $tokenOnly Set it to TRUE to get only the token, otherwise including the &moduleToken= as prefix
      * @return string
      */
-    protected function getToken(bool $tokenOnly)
+    protected function getToken($tokenOnly)
     {
         if (MiscUtility::isTypo39up()) {
             $tokenParameterName = 'token';
