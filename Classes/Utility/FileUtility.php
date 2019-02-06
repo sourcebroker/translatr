@@ -3,7 +3,6 @@
 namespace SourceBroker\Translatr\Utility;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * Class FileUtility
@@ -45,13 +44,18 @@ class FileUtility
      */
     public static function getTempFolderPath()
     {
-        if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_branch) >
-            VersionNumberUtility::convertVersionNumberToInteger('8.0.0')
-        ) {
-            $cachePath = 'var/Cache/Data/TxTranslatr';
-
-        } else {
-            $cachePath = 'Cache/Data/TxTranslatr';
+        switch(substr(TYPO3_version, 0, 1)) {
+            case 9:
+                $cachePath = 'var/cache/data/txtranslatr';
+                break;
+            case 8:
+                $cachePath = 'var/Cache/Data/TxTranslatr';
+                break;
+            case 7:
+                $cachePath = 'Cache/Data/TxTranslatr';
+                break;
+            default:
+                $cachePath = 'Cache/TxTranslatr';
         }
         $tempFolderPath = PATH_site . 'typo3temp/' . $cachePath;
         if (!is_dir($tempFolderPath)) {
@@ -59,5 +63,4 @@ class FileUtility
         }
         return $tempFolderPath;
     }
-
 }

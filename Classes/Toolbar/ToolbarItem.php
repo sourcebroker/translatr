@@ -14,11 +14,15 @@ namespace SourceBroker\Translatr\Toolbar;
  *
  * The TYPO3 project - inspiring people to share!
  */
+
+use SourceBroker\Translatr\Utility\MiscUtility;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Core\Http\JsonResponse;
 
 /**
  * Prepares additional flush cache entry.
@@ -39,6 +43,7 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
      * @param array $cacheActions Array of CacheMenuItems
      * @param array $optionValues Array of AccessConfigurations-identifiers (typically used by userTS with options.clearCache.identifier)
      * @return void
+     * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
      */
     public function manipulateCacheActions(&$cacheActions, &$optionValues)
     {
@@ -46,6 +51,12 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
 
         if ($this->getBackendUser()->isAdmin() || $this->getBackendUser()->getTSConfigVal('tx_translatr.clearCache.language')) {
 
+            if (MiscUtility::isTypo39up()) {
+                $href = (string)GeneralUtility::makeInstance(UriBuilder::class)
+                    ->buildUriFromRoute('translatr_toolbaritem_flushcache', []);
+            } else {
+                $href = BackendUtility::getAjaxUrl('language_cache::flushCache');
+            }
             if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_branch) >
                 VersionNumberUtility::convertVersionNumberToInteger('8.0.0')
             ) {
@@ -53,15 +64,14 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
                     'id' => self::$itemKey,
                     'title' => 'LLL:EXT:translatr/Resources/Private/Language/locallang.xlf:flushLanguageCache',
                     'description' => 'LLL:EXT:translatr/Resources/Private/Language/locallang.xlf:flushLanguageCacheDescription',
-                    //'href' => BackendUtility::getModuleUrl('translatr', ['language_cache' => 'flushCache']),
-                    'href' => BackendUtility::getAjaxUrl('language_cache::flushCache'),
+                    'href' => $href,
                     'iconIdentifier' => 'actions-system-cache-clear-impact-medium'
                 ];
             } else {
                 $cacheActions[] = [
                     'id' => self::$itemKey,
                     'title' => $this->getLanguageService()->sL('LLL:EXT:translatr/Resources/Private/Language/locallang.xlf:flushLanguageCache'),
-                    'href' => BackendUtility::getAjaxUrl('language_cache::flushCache'),
+                    'href' => $href,
                     'icon' => $this->iconFactory->getIcon('actions-system-cache-clear-impact-medium',
                         Icon::SIZE_SMALL)->render()
                 ];
@@ -85,6 +95,7 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
         /** @var \TYPO3\CMS\Core\Cache\Frontend\FrontendInterface $cacheFrontend */
         $cacheFrontend = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager')->getCache('l10n');
         $cacheFrontend->flush();
+        return (new JsonResponse());
     }
 
 

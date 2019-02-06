@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+master
+~~~~~~
+1) [TASK] Compatibility with TYPO3 9.5
+
 0.7.0
 ~~~~~
 1) [TASK] Extend compatibility to ext:vhs to version 4.4.

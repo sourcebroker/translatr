@@ -6,10 +6,10 @@ use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Repository\LabelRepository;
 use SourceBroker\Translatr\Domain\Repository\LanguageRepository;
 use SourceBroker\Translatr\Utility\LanguageUtility;
+use SourceBroker\Translatr\Utility\MiscUtility;
 use TYPO3\CMS\Core\FormProtection\FormProtectionFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Page\PageRenderer;
-
 
 /***************************************************************
  *
@@ -104,19 +104,30 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
             'extensions' => $this->labelRepository->getExtensionsItems(),
             'languages' => LanguageUtility::getAvailableLanguages(),
             'demand' => $demand,
-            'moduleToken' => $this->getToken(),
+            'moduleToken' => $this->getToken(true),
             'id' => GeneralUtility::_GET('id'),
+            'is9up' => MiscUtility::isTypo39up()
         ]);
     }
 
     /**
      * Get a CSRF token
      *
+     * @param bool $tokenOnly Set it to TRUE to get only the token, otherwise including the &moduleToken= as prefix
      * @return string
      */
-    protected function getToken()
+    protected function getToken(bool $tokenOnly)
     {
-        return FormProtectionFactory::get()
-            ->generateToken('moduleCall', 'web_TranslatrTranslate');
+        if (MiscUtility::isTypo39up()) {
+            $tokenParameterName = 'token';
+            $token = FormProtectionFactory::get('backend')->generateToken('route', 'web_TranslatrTranslate');
+        } else {
+            $tokenParameterName = 'moduleToken';
+            $token = FormProtectionFactory::get()->generateToken('moduleCall', 'web_TranslatrTranslate');
+        }
+        if ($tokenOnly) {
+            return $token;
+        }
+        return '&' . $tokenParameterName . '=' . $token;
     }
 }

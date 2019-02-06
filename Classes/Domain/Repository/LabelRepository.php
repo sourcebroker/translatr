@@ -7,6 +7,7 @@ use SourceBroker\Translatr\Domain\Model\Label;
 use SourceBroker\Translatr\Utility\ArrayUtility;
 use SourceBroker\Translatr\Utility\ExtensionsUtility;
 use SourceBroker\Translatr\Utility\FileUtility;
+use SourceBroker\Translatr\Utility\LanguageUtility;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
@@ -169,9 +170,7 @@ SQL;
 
         $llFilePath = $llFiles[0];
 
-        $parsedLabels = $this->getLanguageService()
-            ->parserFactory
-            ->getParsedData($llFilePath, 'default');
+        $parsedLabels = LanguageUtility::parseLanguageLabels($llFilePath, 'default');
         $labels = [];
 
         if (!is_array($parsedLabels) || !isset($parsedLabels['default'])

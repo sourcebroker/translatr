@@ -6,9 +6,17 @@
 >
 
 <f:form object="{demand}" name="demand" method="get">
-    <input type="hidden" name="M" value="web_TranslatrTranslate">
-    <input type="hidden" name="moduleToken" value="{moduleToken}">
     <input type="hidden" name="id" value="{id}">
+    <f:if condition="{is9up}">
+        <f:then>
+            <input type="hidden" name="route" value="/web/TranslatrTranslate/">
+            <input type="hidden" name="token" value="{moduleToken}">
+        </f:then>
+        <f:else>
+            <input type="hidden" name="M" value="web_TranslatrTranslate">
+            <input type="hidden" name="moduleToken" value="{moduleToken}">
+        </f:else>
+    </f:if>
 
     <div class="row">
         <div class="col-sm-6">

@@ -2,6 +2,8 @@
 
 namespace SourceBroker\Translatr\ViewHelpers\Be;
 
+use SourceBroker\Translatr\Utility\LanguageUtility;
+
 /**
  * Class TranslateViewHelper
  *
@@ -32,11 +34,7 @@ class TranslateViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewH
         /** @var string $llFile */
         /** @var string $key */
         extract($this->arguments);
-
-        $parsedLabels = $this->getLanguageService()
-            ->parserFactory
-            ->getParsedData($llFile, $language);
-
+        $parsedLabels = LanguageUtility::parseLanguageLabels($llFile, $language);
         return $parsedLabels[$language][$key][0]['target'] ?: '';
     }
 

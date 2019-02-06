@@ -5,7 +5,6 @@ namespace SourceBroker\Translatr\Utility;
 use SourceBroker\Translatr\Configuration\Configurator;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Documentation\Utility\MiscUtility;
 
 /**
  * Class ExtensionsUtility
