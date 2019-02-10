@@ -22,7 +22,7 @@ class EmConfigurationUtility
     {
         $configuration = self::parseSettings();
         require_once ExtensionManagementUtility::extPath('translatr')
-            .'Classes/Domain/Model/Dto/EmConfiguration.php';
+            . 'Classes/Domain/Model/Dto/EmConfiguration.php';
         $settings
             = new \SourceBroker\Translatr\Domain\Model\Dto\EmConfiguration($configuration);
 

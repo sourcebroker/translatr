@@ -23,9 +23,9 @@ class FileUtility
     {
         if (GeneralUtility::isAbsPath($path)) {
             $replacements = [
-                PATH_site.'typo3conf'.DIRECTORY_SEPARATOR.'ext'
-                .DIRECTORY_SEPARATOR => 'EXT:',
-                PATH_site.'typo3conf'.DIRECTORY_SEPARATOR => 'typo3conf',
+                PATH_site . 'typo3conf' . DIRECTORY_SEPARATOR . 'ext'
+                . DIRECTORY_SEPARATOR => 'EXT:',
+                PATH_site . 'typo3conf' . DIRECTORY_SEPARATOR => 'typo3conf',
                 PATH_site => '',
             ];
 
@@ -44,7 +44,7 @@ class FileUtility
      */
     public static function getTempFolderPath()
     {
-        switch(substr(TYPO3_version, 0, 1)) {
+        switch (substr(TYPO3_version, 0, 1)) {
             case 9:
                 $cachePath = 'var/cache/data/txtranslatr';
                 break;

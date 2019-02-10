@@ -35,7 +35,7 @@ class ExceptionUtility
                 throw $exception;
             } else {
                 throw new \RuntimeException($exceptionClassName
-                    .' is not the instanceof \Exception or \Throwable',
+                    . ' is not the instanceof \Exception or \Throwable',
                     9023740239);
             }
         }

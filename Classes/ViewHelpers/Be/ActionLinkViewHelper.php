@@ -58,7 +58,7 @@ class ActionLinkViewHelper
                 return $this->renderLocalization($this->arguments['label']);
             default:
                 throw new InvalidArgumentValueException('Unknown action type `'
-                    .$this->arguments['type'].'`.',
+                    . $this->arguments['type'] . '`.',
                     1982739543);
         }
     }

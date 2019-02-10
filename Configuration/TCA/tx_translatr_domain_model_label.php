@@ -104,7 +104,7 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.extension',
             'config' => [
                 'type' => 'user',
-                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class.'->display',
+                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class . '->display',
                 'eval' => 'required',
             ],
         ],
@@ -114,7 +114,7 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.ukey',
             'config' => [
                 'type' => 'user',
-                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class.'->display',
+                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class . '->display',
                 'eval' => 'trim,required',
             ],
         ],
@@ -144,7 +144,7 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.ll_file',
             'config' => [
                 'type' => 'user',
-                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class.'->display',
+                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class . '->display',
             ],
         ],
         'language' => [
@@ -152,7 +152,7 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.language',
             'config' => [
                 'type' => 'user',
-                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class.'->display',
+                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class . '->display',
             ],
         ]
 

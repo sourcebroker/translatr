@@ -5,13 +5,13 @@
       data-namespace-typo3-fluid="true"
 >
 
-<f:layout name="Default" />
+<f:layout name="Default"/>
 
 <f:section name="content">
 
-    <f:flashMessages />
+    <f:flashMessages/>
 
-    <f:render partial="Label/DemandForm" arguments="{_all}" />
+    <f:render partial="Label/DemandForm" arguments="{_all}"/>
 
     <f:if condition="{labels}">
         <table class="table table-hover">
@@ -31,28 +31,31 @@
                         {label.ukey}
                         <f:if condition="{label.description}">
                             <span class="t3-help-teaser" title="{label.description}">
-                                <core:icon identifier="status-dialog-information" size="small" />
+                                <core:icon identifier="status-dialog-information" size="small"/>
                             </span>
                         </f:if>
                     </td>
                     <td>
                         <f:if condition="{demand.languages -> f:count()} == 0">
-                            <f:render partial="Label/ActionButtons" arguments="{label: label}" />
+                            <f:render partial="Label/ActionButtons" arguments="{label: label}"/>
                         </f:if>
                         {label.text}
                     </td>
                     <f:for each="{demand.languages}" as="language">
                         <td>
-                            {label.language_childs -> v:iterator.filter(propertyName: 'language', filter: language) -> v:iterator.first() -> v:variable.set(name: 'childLabel')}
+                            {label.language_childs -> v:iterator.filter(propertyName: 'language', filter: language) ->
+                            v:iterator.first() -> v:variable.set(name: 'childLabel')}
 
                             <f:if condition="{childLabel}">
                                 <f:then>
-                                    <f:render partial="Label/ActionButtons" arguments="{label: childLabel, parentLabel: label}" />
+                                    <f:render partial="Label/ActionButtons"
+                                              arguments="{label: childLabel, parentLabel: label}"/>
 
                                     {childLabel.text}
                                 </f:then>
                                 <f:else>
-                                    {sbt:be.translate(llFile: label.ll_file, language: language, key: label.ukey) -> v:variable.set(name: 'labelText')}
+                                    {sbt:be.translate(llFile: label.ll_file, language: language, key: label.ukey) ->
+                                    v:variable.set(name: 'labelText')}
 
                                     <f:render partial="Label/ActionButtons/New" arguments="{
                                         language: language,
@@ -67,7 +70,7 @@
                                             ukey: label.ukey,
                                             text: labelText
                                         }
-                                    }" />
+                                    }"/>
 
                                     {labelText}
                                 </f:else>

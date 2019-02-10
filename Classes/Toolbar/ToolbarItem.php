@@ -95,7 +95,7 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
         /** @var \TYPO3\CMS\Core\Cache\Frontend\FrontendInterface $cacheFrontend */
         $cacheFrontend = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager')->getCache('l10n');
         $cacheFrontend->flush();
-        if(MiscUtility::isTypo39up()) {
+        if (MiscUtility::isTypo39up()) {
             return new JsonResponse();
         }
     }

@@ -18,7 +18,7 @@ class ArrayUtility
      */
     public static function combineWithSubarrayFieldAsKey($array, $keyField)
     {
-        return array_combine(array_map(function($result) use ($keyField) {
+        return array_combine(array_map(function ($result) use ($keyField) {
             return $result[$keyField] ?: null;
         }, $array), $array);
     }

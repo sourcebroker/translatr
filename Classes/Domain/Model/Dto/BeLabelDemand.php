@@ -14,6 +14,7 @@ namespace SourceBroker\Translatr\Domain\Model\Dto;
  *
  * The TYPO3 project - inspiring people to share!
  */
+
 use SourceBroker\Translatr\Domain\Model\Language;
 
 /**

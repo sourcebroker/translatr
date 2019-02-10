@@ -1,15 +1,13 @@
-define(['jquery', 'select2'], function($) {
-    'use strict';
+define(['jquery', 'select2'], function ($) {
+  'use strict'
 
-    var Translatr = {
+  var Translatr = {}
 
-    };
+  Translatr.init = function () {
+    $('#field-extension, #field-sys_language_uid').select2()
+  }
 
-    Translatr.init = function() {
-        $('#field-extension, #field-sys_language_uid').select2();
-    };
+  Translatr.init()
 
-    Translatr.init();
-
-    return Translatr;
-});
+  return Translatr
+})

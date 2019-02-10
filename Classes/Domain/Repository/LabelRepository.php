@@ -156,11 +156,11 @@ SQL;
      */
     public function indexExtensionLabels($extKey)
     {
-        $llDirectoryPath = PATH_site.'typo3conf'.DIRECTORY_SEPARATOR.'ext'
-            .DIRECTORY_SEPARATOR.$extKey.DIRECTORY_SEPARATOR.'Resources'
-            .DIRECTORY_SEPARATOR.'Private'.DIRECTORY_SEPARATOR.'Language'
-            .DIRECTORY_SEPARATOR;
-        $llFiles = glob($llDirectoryPath.'locallang.{xlf,xml}', GLOB_BRACE);
+        $llDirectoryPath = PATH_site . 'typo3conf' . DIRECTORY_SEPARATOR . 'ext'
+            . DIRECTORY_SEPARATOR . $extKey . DIRECTORY_SEPARATOR . 'Resources'
+            . DIRECTORY_SEPARATOR . 'Private' . DIRECTORY_SEPARATOR . 'Language'
+            . DIRECTORY_SEPARATOR;
+        $llFiles = glob($llDirectoryPath . 'locallang.{xlf,xml}', GLOB_BRACE);
 
         if (!is_array($llFiles) || !isset($llFiles[0])
             || !file_exists($llFiles[0])
