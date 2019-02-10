@@ -5,6 +5,7 @@ Changelog
 ~~~~~
 1) [BUGFIX] Fix wrong TYPO3 restriction version for conditions.
 2) [TASK] Optimize function usage.
+3) [BREAKING] Move generated files from typo3temp folder to uploads folder.
 
 0.8.3
 ~~~~~
