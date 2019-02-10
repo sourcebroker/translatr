@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+0.8.5
+~~~~~
+1) [TASK] Change ext:vhs restriction.
+
 0.8.4
 ~~~~~
 1) [BUGFIX] Fix wrong TYPO3 restriction version for conditions.
