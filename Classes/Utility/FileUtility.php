@@ -11,7 +11,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class FileUtility
 {
-
     /**
      * Returns relative path to the $filePath
      *
@@ -44,20 +43,7 @@ class FileUtility
      */
     public static function getTempFolderPath()
     {
-        switch (substr(TYPO3_version, 0, 1)) {
-            case 9:
-                $cachePath = 'var/cache/data/txtranslatr';
-                break;
-            case 8:
-                $cachePath = 'var/Cache/Data/txtranslatr';
-                break;
-            case 7:
-                $cachePath = 'Cache/Data/txtranslatr';
-                break;
-            default:
-                $cachePath = 'Cache/txtranslatr';
-        }
-        $tempFolderPath = PATH_site . 'typo3temp/' . $cachePath;
+        $tempFolderPath = PATH_site . 'uploads/tx_translator';
         if (!is_dir($tempFolderPath)) {
             GeneralUtility::mkdir_deep($tempFolderPath);
         }
