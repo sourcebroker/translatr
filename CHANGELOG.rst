@@ -1,17 +1,22 @@
 Changelog
 ---------
 
+0.8.4
+~~~~~
+1) [BUGFIX] Fix wrong TYPO3 restriction version for conditions.
+2) [TASK] Optimize function usage.
+
 0.8.3
 ~~~~~
-[BUGFIX] Fix wrong TYPO3 restriction version for conditions.
+1) [BUGFIX] Fix wrong TYPO3 restriction version for conditions.
 
 0.8.2
 ~~~~~
-[TASK] Update version restrictions.
+1) [TASK] Update version restrictions.
 
 0.8.1
 ~~~~~
-[TASK] Update version restrictions.
+1) [TASK] Update version restrictions.
 
 0.8.0
 ~~~~~

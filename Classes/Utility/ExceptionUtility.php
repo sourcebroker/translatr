@@ -23,7 +23,7 @@ class ExceptionUtility
         $errorMessage,
         $errorCode
     ) {
-        if (self::isProductionContext()) {
+        if (GeneralUtility::getApplicationContext()->isProduction()) {
             // @todo add to TYPO3 logs for production context to not break down the site
         } else {
             $exception = GeneralUtility::makeInstance($exceptionClassName,
@@ -39,13 +39,5 @@ class ExceptionUtility
                     9023740239);
             }
         }
-    }
-
-    /**
-     * @return bool
-     */
-    protected static function isProductionContext()
-    {
-        return GeneralUtility::getApplicationContext()->isProduction();
     }
 }
