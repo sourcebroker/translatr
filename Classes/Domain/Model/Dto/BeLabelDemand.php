@@ -15,8 +15,6 @@ namespace SourceBroker\Translatr\Domain\Model\Dto;
  * The TYPO3 project - inspiring people to share!
  */
 
-use SourceBroker\Translatr\Domain\Model\Language;
-
 /**
  * Administration Demand model
  *
@@ -83,5 +81,4 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     {
         $this->languages = $languages;
     }
-
 }

@@ -7,7 +7,6 @@ use SourceBroker\Translatr\Utility\LanguageUtility;
 /**
  * Class TranslateViewHelper
  *
- * @package SourceBroker\Translatr\ViewHelpers\Be
  */
 class TranslateViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
 {

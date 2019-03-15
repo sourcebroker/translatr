@@ -7,7 +7,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Class FileUtility
  *
- * @package SourceBroker\Translatr\Utility
  */
 class FileUtility
 {

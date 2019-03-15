@@ -7,7 +7,6 @@ use SourceBroker\Translatr\Utility\ExtensionsUtility;
 /**
  * Class ExtensionItemsProcFunc
  *
- * @package SourceBroker\Translatr\Hooks
  */
 class ExtensionItemsProcFunc
 {
@@ -23,5 +22,4 @@ class ExtensionItemsProcFunc
             return [$extension['title'], $extension['extensionKey']];
         }, $extensionsWithMetadata);
     }
-
 }

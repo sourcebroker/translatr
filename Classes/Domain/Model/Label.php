@@ -2,7 +2,6 @@
 
 namespace SourceBroker\Translatr\Domain\Model;
 
-
 /***************************************************************
  *
  *  Copyright notice
@@ -191,5 +190,4 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     {
         $this->language = $language;
     }
-
 }

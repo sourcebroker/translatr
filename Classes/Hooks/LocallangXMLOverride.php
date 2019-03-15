@@ -10,7 +10,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Class LocallangXMLOverride
  *
- * @package SourceBroker\Translatr\Hooks
  */
 class LocallangXMLOverride
 {
@@ -131,9 +130,11 @@ class LocallangXMLOverride
         }
 
         if (!file_put_contents($this->overrideFilesLoaderFilePath, $code)) {
-            ExceptionUtility::throwException(\RuntimeException::class,
+            ExceptionUtility::throwException(
+                \RuntimeException::class,
                 'Could not write file in ' . $this->overrideFilesLoaderFilePath,
-                390847534);
+                390847534
+            );
         }
         GeneralUtility::fixPermissions($this->overrideFilesLoaderFilePath, true);
     }
@@ -179,8 +180,11 @@ class LocallangXMLOverride
         if (!is_dir($directoryPath)) {
             GeneralUtility::mkdir_deep($directoryPath);
             if (!is_dir($directoryPath)) {
-                ExceptionUtility::throwException(\RuntimeException::class,
-                    'Could not create directory in ' . $directoryPath, 938457943);
+                ExceptionUtility::throwException(
+                    \RuntimeException::class,
+                    'Could not create directory in ' . $directoryPath,
+                    938457943
+                );
             }
         }
     }
@@ -253,11 +257,9 @@ class LocallangXMLOverride
     protected function createNotExistingLocallangOverrideFiles()
     {
         if (false === file_exists($this->overrideFilesLoaderFilePath)) {
-            $locallangFiles = (array)$GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
-                'DISTINCT tx_translatr_domain_model_label.ll_file, language',
-                'tx_translatr_domain_model_label',
-                'tx_translatr_domain_model_label.deleted = 0'
-            );
+            $locallangFiles =
+                GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database'])
+                    ->getLocallanfFiles();
             if (!$locallangFiles) {
                 return;
             }
@@ -287,7 +289,6 @@ class LocallangXMLOverride
         $labels = $this->getLabelsByLocallangFile($locallangFile);
         $groupedLabels = [];
 
-
         foreach ($labels as $label) {
             $groupedLabels[$label['isocode']][] = $label;
         }
@@ -296,8 +297,10 @@ class LocallangXMLOverride
         foreach ($groupedLabels as $isoCode => $labels) {
             $xml = $this->createXlfFileForLabels($labels);
             $xml->formatOutput = true;
-            $defaultLocallangOverrideFile = $this->transformPathFromLocallangToLocallangOverrides($locallangFile,
-                $isoCode);
+            $defaultLocallangOverrideFile = $this->transformPathFromLocallangToLocallangOverrides(
+                $locallangFile,
+                $isoCode
+            );
             $outputFiles = [
                 $this->prependLocallangFileNameWithIsoCode($defaultLocallangOverrideFile, $isoCode)
             ];
@@ -373,7 +376,6 @@ class LocallangXMLOverride
         return $dirname . '/' . $isoCode . '.' . $fileName;
     }
 
-
     /**
      * @param string $locallangFile
      *
@@ -381,26 +383,8 @@ class LocallangXMLOverride
      */
     protected function getLabelsByLocallangFile($locallangFile)
     {
-        return (array)$GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
-            'label.text,
-                IF (label.ukey IS NOT NULL AND label.ukey != "", label.ukey, parent.ukey) AS ukey,
-                IF (label.extension IS NOT NULL AND label.extension != "", label.extension, parent.extension) AS extension,
-                label.language AS isocode',
-            'tx_translatr_domain_model_label AS label 
-                LEFT JOIN sys_language AS lang ON (
-                    label.sys_language_uid = lang.uid
-                )
-                LEFT JOIN tx_translatr_domain_model_label AS parent ON (
-                    label.l10n_parent = parent.uid
-                )',
-            'label.deleted = 0 
-                AND label.hidden = 0
-                AND (
-                    label.ll_file = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($locallangFile,
-                'tx_translatr_domain_model_label') . ' 
-                    OR parent.ll_file = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($locallangFile,
-                'tx_translatr_domain_model_label') . '
-                )'
-        );
+        return
+            GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database'])
+                ->getLabelsByLocallangFile($locallangFile);
     }
 }

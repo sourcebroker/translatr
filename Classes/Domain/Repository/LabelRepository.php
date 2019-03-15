@@ -4,11 +4,10 @@ namespace SourceBroker\Translatr\Domain\Repository;
 
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Model\Label;
-use SourceBroker\Translatr\Utility\ArrayUtility;
 use SourceBroker\Translatr\Utility\ExtensionsUtility;
 use SourceBroker\Translatr\Utility\FileUtility;
 use SourceBroker\Translatr\Utility\LanguageUtility;
-use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
 /***************************************************************
@@ -49,83 +48,9 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      */
     public function findDemandedForBe(BeLabelDemand $demand)
     {
-        if (!$demand->isValid()) {
-            return [];
-        }
-
-        $extensionNameForSql = self::getDb()->fullQuoteStr(
-            $demand->getExtension(),
-            'tx_translatr_domain_model_label'
-        );
-
-        $languageListForSql = implode(
-            ', ',
-            self::getDb()->fullQuoteArray($demand->getLanguages() ?: ['default'], 'tx_translatr_domain_model_label')
-        );
-
-        $query = <<<SQL
-/* select labels from default language */
-(
-SELECT 
-  label.uid,
-  label.language,
-  label.ukey,
-  0 AS parent_uid,
-  label.text,
-  label.ll_file
-FROM tx_translatr_domain_model_label AS label
-WHERE label.language = "default" 
-  AND label.deleted = 0
-  AND label.extension = {$extensionNameForSql}
-) UNION (
-/* select labels for specified languages */ 
-SELECT  
-  label.uid,
-  label.language,
-  label.ukey,
-  parent.uid AS parent_uid,
-  label.text,
-  label.ll_file
-FROM tx_translatr_domain_model_label AS label 
-  LEFT JOIN tx_translatr_domain_model_label AS parent
-    ON (parent.language = "default" AND parent.ukey = label.ukey AND parent.ll_file = label.ll_file)
-WHERE label.language IN ({$languageListForSql})  
-  AND label.deleted = 0
-  AND parent.deleted = 0
-  AND parent.extension = {$extensionNameForSql}
-);
-SQL;
-
-        // sql_query()->fetch_all() is still not supported on all hostings
-        $result = self::getDb()->sql_query($query);
-        $resultAssoc = [];
-        while ($row = $result->fetch_assoc()) {
-            $resultAssoc[] = $row;
-        }
-        $results = ArrayUtility::combineWithSubarrayFieldAsKey(
-            $resultAssoc,
-            'uid'
-        );
-
-        $processedResults = [];
-
-        foreach ($results as &$result) {
-            $uid = (int)$result['uid'];
-            $parentUid = (int)$result['parent_uid'];
-            $language = $result['language'];
-
-            if ($language === 'default') {
-                // record in default language are treated as parents
-                $processedResults[$uid] = $result;
-                $processedResults[$uid]['language_childs'] = [];
-            } elseif ($parentUid > 0) {
-                // add as a child to parent record
-                $processedResults[$parentUid]['language_childs'][$language]
-                    = $result;
-            }
-        }
-
-        return $processedResults;
+        return
+            GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database'])
+                ->findDemandedForBe($demand);
     }
 
     /**
@@ -237,13 +162,5 @@ SQL;
     protected function getLanguageService()
     {
         return $GLOBALS['LANG'];
-    }
-
-    /**
-     * @return DatabaseConnection
-     */
-    protected function getDb()
-    {
-        return $GLOBALS['TYPO3_DB'];
     }
 }

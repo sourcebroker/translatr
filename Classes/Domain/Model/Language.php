@@ -30,7 +30,6 @@ namespace SourceBroker\Translatr\Domain\Model;
 /**
  * Class Language
  *
- * @package SourceBroker\Translatr\Domain\Model
  */
 class Language extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
 {

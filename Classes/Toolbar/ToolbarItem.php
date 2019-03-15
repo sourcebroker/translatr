@@ -14,15 +14,14 @@ namespace SourceBroker\Translatr\Toolbar;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
 use SourceBroker\Translatr\Utility\MiscUtility;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Imaging\Icon;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Core\Http\JsonResponse;
+use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * Prepares additional flush cache entry.
@@ -30,7 +29,7 @@ use TYPO3\CMS\Core\Http\JsonResponse;
  */
 class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInterface
 {
-    static $itemKey = 'flushLanguageCache';
+    public static $itemKey = 'flushLanguageCache';
 
     /**
      * @var IconFactory
@@ -50,7 +49,6 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
 
         if ($this->getBackendUser()->isAdmin() || $this->getBackendUser()->getTSConfigVal('tx_translatr.clearCache.language')) {
-
             if (MiscUtility::isTypo39up()) {
                 $href = (string)GeneralUtility::makeInstance(UriBuilder::class)
                     ->buildUriFromRoute('translatr_toolbaritem_flushcache', []);
@@ -72,8 +70,10 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
                     'id' => self::$itemKey,
                     'title' => $this->getLanguageService()->sL('LLL:EXT:translatr/Resources/Private/Language/locallang.xlf:flushLanguageCache'),
                     'href' => $href,
-                    'icon' => $this->iconFactory->getIcon('actions-system-cache-clear-impact-medium',
-                        Icon::SIZE_SMALL)->render()
+                    'icon' => $this->iconFactory->getIcon(
+                        'actions-system-cache-clear-impact-medium',
+                        Icon::SIZE_SMALL
+                    )->render()
                 ];
             }
             $optionValues[] = self::$itemKey;
@@ -99,7 +99,6 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
             return new JsonResponse();
         }
     }
-
 
     /**
      * Wrapper around the global BE user object.

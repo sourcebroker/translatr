@@ -9,7 +9,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Class LanguageUtility
  *
- * @package SourceBroker\Translatr\Utility
  */
 class LanguageUtility
 {
