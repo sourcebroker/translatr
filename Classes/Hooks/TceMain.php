@@ -2,17 +2,13 @@
 
 namespace SourceBroker\Translatr\Hooks;
 
-use SourceBroker\Translatr\Domain\Model\Dto\EmConfiguration;
-use SourceBroker\Translatr\Utility\EmConfigurationUtility;
-use SourceBroker\Translatr\Utility\ExceptionUtility;
+use SourceBroker\Translatr\Database\Database;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * Class TceMain
  *
- * @package SourceBroker\Translatr\Hooks
  */
 class TceMain
 {
@@ -54,9 +50,11 @@ class TceMain
         if ($table == 'tx_translatr_domain_model_label') {
             if ($status === 'new') {
                 $id = $pObj->substNEWwithIDs[$id];
-            };
+            }
 
             $record = BackendUtility::getRecord($table, $id);
+            /** @var Database $db */
+            $db = GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database']);
 
             if (empty($record['ukey'])) {
                 /** @var \TYPO3\CMS\Core\Messaging\FlashMessage $message */
@@ -72,22 +70,13 @@ class TceMain
                 $flashMessageService = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Messaging\FlashMessageService::class);
                 $flashMessageService->getMessageQueueByIdentifier()->addMessage($message);
 
-                $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
-                    'tx_translatr_domain_model_label',
-                    'uid = ' . (int)$id,
-                    ['deleted' => 1]
-                );
-
+                $db->update('tx_translatr_domain_model_label', ['deleted' => 1], ['uid' => (int)$id]);
             } else {
                 preg_match('/^EXT\:([a-z\_]+)\//', $record['ll_file'], $matches);
 
                 if (isset($matches[1])) {
                     if ($record['extension'] != $matches[1]) {
-                        $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
-                            'tx_translatr_domain_model_label',
-                            'uid = ' . (int)$id,
-                            ['extension' => $matches[1]]
-                        );
+                        $db->update('tx_translatr_domain_model_label', ['extension' => $matches[1]], ['uid' => (int)$id]);
                     }
                 }
             }

@@ -2,12 +2,9 @@
 
 namespace SourceBroker\Translatr\Domain\Model\Dto;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-
 /**
  * Class EmConfiguration
  *
- * @package SourceBroker\Translatr\Domain\Model\Dto
  */
 class EmConfiguration
 {

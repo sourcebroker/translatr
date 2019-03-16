@@ -49,7 +49,6 @@ class MiscUtility
         return $EM_CONF[$_EXTKEY];
     }
 
-
     /**
      * @return bool
      */

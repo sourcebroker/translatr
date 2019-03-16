@@ -5,7 +5,6 @@ namespace SourceBroker\Translatr\Utility;
 /**
  * Class ArrayUtility
  *
- * @package SourceBroker\Translatr\Utility
  */
 class ArrayUtility
 {

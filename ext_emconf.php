@@ -1,6 +1,5 @@
 <?php
 /** @var string $_EXTKEY */
-
 $EM_CONF[$_EXTKEY] = [
     'title' => 'translatr',
     'description' => '',

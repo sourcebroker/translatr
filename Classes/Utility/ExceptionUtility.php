@@ -7,7 +7,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Class ExceptionUtility
  *
- * @package SourceBroker\Translatr\Utility
  */
 class ExceptionUtility
 {
@@ -26,17 +25,22 @@ class ExceptionUtility
         if (GeneralUtility::getApplicationContext()->isProduction()) {
             // @todo add to TYPO3 logs for production context to not break down the site
         } else {
-            $exception = GeneralUtility::makeInstance($exceptionClassName,
-                $errorMessage, $errorCode);
+            $exception = GeneralUtility::makeInstance(
+                $exceptionClassName,
+                $errorMessage,
+                $errorCode
+            );
 
             if ($exception instanceof \Exception
                 || $exception instanceof \Throwable
             ) {
                 throw $exception;
             } else {
-                throw new \RuntimeException($exceptionClassName
+                throw new \RuntimeException(
+                    $exceptionClassName
                     . ' is not the instanceof \Exception or \Throwable',
-                    9023740239);
+                    9023740239
+                );
             }
         }
     }

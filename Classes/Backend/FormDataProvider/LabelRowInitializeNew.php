@@ -8,7 +8,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Class LabelRowInitializeNew
  *
- * @package SourceBroker\Translatr\Backend\FormDataProvider
  */
 class LabelRowInitializeNew implements FormDataProviderInterface
 {

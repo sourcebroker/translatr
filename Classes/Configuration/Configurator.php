@@ -46,10 +46,8 @@ class Configurator
             $this->setConfig($config);
         } else {
             $rootPageForTsConfig = null;
-            $rootPageForTsConfigRow = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
-                'uid',
-                'pages',
-                'pid=0 AND deleted=0');
+            $rootPageForTsConfigRow
+                = GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database'])->getRootPage();
             if ($rootPageForTsConfigRow !== null) {
                 $rootPageForTsConfig = $rootPageForTsConfigRow['uid'];
             }
@@ -96,13 +94,5 @@ class Configurator
             }
         }
         return $config;
-    }
-
-    /**
-     * @return mixed|\TYPO3\CMS\Core\Database\DatabaseConnection
-     */
-    protected function getDatabaseConnection()
-    {
-        return $GLOBALS['TYPO3_DB'];
     }
 }

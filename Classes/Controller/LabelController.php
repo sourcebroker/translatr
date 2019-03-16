@@ -8,8 +8,8 @@ use SourceBroker\Translatr\Domain\Repository\LanguageRepository;
 use SourceBroker\Translatr\Utility\LanguageUtility;
 use SourceBroker\Translatr\Utility\MiscUtility;
 use TYPO3\CMS\Core\FormProtection\FormProtectionFactory;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /***************************************************************
  *
@@ -92,7 +92,8 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/AjaxDataHandler');
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Translatr/Translatr');
 
-        $pageRenderer->addRequireJsConfiguration([
+        $pageRenderer->addRequireJsConfiguration(
+            [
                 'paths' => [
                     'select2' => '../typo3conf/ext/translatr/Resources/Public/JavaScript/jquery.select2/dist/js/select2',
                 ]

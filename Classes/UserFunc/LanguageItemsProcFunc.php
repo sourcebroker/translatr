@@ -7,7 +7,6 @@ use SourceBroker\Translatr\Utility\LanguageUtility;
 /**
  * Class LanguageItemsProcFunc
  *
- * @package SourceBroker\Translatr\UserFunc
  */
 class LanguageItemsProcFunc
 {

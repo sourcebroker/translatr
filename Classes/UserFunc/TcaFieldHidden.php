@@ -5,7 +5,6 @@ namespace SourceBroker\Translatr\UserFunc;
 /**
  * Class LanguageItemsProcFunc
  *
- * @package SourceBroker\Translatr\UserFunc
  */
 class TcaFieldHidden
 {

@@ -7,7 +7,6 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 /**
  * Utility class to get the settings from Extension Manager
  *
- * @package SourceBroker\Translatr\Utility
  */
 class EmConfigurationUtility
 {
@@ -45,5 +44,4 @@ class EmConfigurationUtility
 
         return $settings;
     }
-
 }

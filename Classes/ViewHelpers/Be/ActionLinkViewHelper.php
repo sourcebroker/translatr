@@ -10,10 +10,8 @@ use TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList;
 /**
  * Class ActionLinkViewHelper
  *
- * @package SourceBroker\Translatr\ViewHelpers\Be
  */
-class ActionLinkViewHelper
-    extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
+class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
 {
     const TABLE = 'tx_translatr_domain_model_label';
     const MODULE_NAME = 'web_TranslatrTranslate';
@@ -25,13 +23,24 @@ class ActionLinkViewHelper
      */
     public function initializeArguments()
     {
-        $this->registerArgument('type', 'string',
+        $this->registerArgument(
+            'type',
+            'string',
             'Type of the action; Possible values: `edit`, `hide`, `show`, `delete`.',
-            true);
-        $this->registerArgument('label', 'array',
-            'Label on which action should be taken.', false);
-        $this->registerArgument('options', 'array', 'Additional options.',
-            false);
+            true
+        );
+        $this->registerArgument(
+            'label',
+            'array',
+            'Label on which action should be taken.',
+            false
+        );
+        $this->registerArgument(
+            'options',
+            'array',
+            'Additional options.',
+            false
+        );
     }
 
     /**
@@ -49,17 +58,23 @@ class ActionLinkViewHelper
             case 'new':
                 return $this->renderNewLink($this->arguments['options']);
             case 'edit':
-                return $this->renderEditLink($this->arguments['label'],
-                    $this->arguments['options']);
+                return $this->renderEditLink(
+                    $this->arguments['label'],
+                    $this->arguments['options']
+                );
             case 'localize':
-                return $this->renderLocalizeLink($this->arguments['label'],
-                    $this->arguments['options']);
+                return $this->renderLocalizeLink(
+                    $this->arguments['label'],
+                    $this->arguments['options']
+                );
             case 'localization':
                 return $this->renderLocalization($this->arguments['label']);
             default:
-                throw new InvalidArgumentValueException('Unknown action type `'
+                throw new InvalidArgumentValueException(
+                    'Unknown action type `'
                     . $this->arguments['type'] . '`.',
-                    1982739543);
+                    1982739543
+                );
         }
     }
 
@@ -121,8 +136,10 @@ class ActionLinkViewHelper
     public function renderLocalizeLink(array $label, array $options = [])
     {
         if (!isset($options['sysLanguageUid'])) {
-            throw new InvalidArgumentValueException('`sysLanguageUid` is required setting for localize link',
-                198237121456);
+            throw new InvalidArgumentValueException(
+                '`sysLanguageUid` is required setting for localize link',
+                198237121456
+            );
         }
 
         $targetLanguageUid = intval($options['sysLanguageUid']);
