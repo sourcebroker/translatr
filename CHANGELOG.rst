@@ -4,6 +4,7 @@ Changelog
 0.8.5
 ~~~~~
 1) [TASK] Change ext:vhs restriction.
+2) [BUGFIX] Create database class for compatibility of db operations for TYPO3 9.5 and before.
 
 0.8.4
 ~~~~~
