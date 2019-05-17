@@ -86,6 +86,18 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 
         if ($demand->getExtension()) {
             $this->labelRepository->indexExtensionLabels($demand->getExtension());
+            $GLOBALS['BE_USER']->pushModuleData('translatr/recentlySelectedModule', $demand->getExtension());
+        } else {
+            $demand->setExtension($GLOBALS['BE_USER']->getModuleData('translatr/recentlySelectedModule'));
+            $this->labelRepository->indexExtensionLabels($demand->getExtension());
+        }
+
+        if (is_array($demand->getLanguages())) {
+            $GLOBALS['BE_USER']->pushModuleData('translatr/recentlySelectedLanguages', $demand->getLanguages());
+        } else {
+            $demand->setLanguages(is_array($GLOBALS['BE_USER']
+                ->getModuleData('translatr/recentlySelectedLanguages'))
+                ? $GLOBALS['BE_USER']->getModuleData('translatr/recentlySelectedLanguages') : []);
         }
 
         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
