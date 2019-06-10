@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+0.9.0
+~~~~~
+1) [FEATURE] Store info about last edited file and language.
+2) [BUGFIX] Fix error on cache clean.
+
 0.8.5
 ~~~~~
 1) [TASK] Change ext:vhs restriction.
