@@ -42,7 +42,7 @@ class FileUtility
      */
     public static function getTempFolderPath()
     {
-        $tempFolderPath = PATH_site . 'uploads/tx_translator';
+        $tempFolderPath = PATH_site . 'uploads/tx_translatr';
         if (!is_dir($tempFolderPath)) {
             GeneralUtility::mkdir_deep($tempFolderPath);
         }

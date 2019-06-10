@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+0.9.1
+~~~~~
+1) [BUGFIX] Fix cache folder name.
+
 0.9.0
 ~~~~~
 1) [FEATURE] Store info about last edited file and language.
