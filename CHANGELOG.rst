@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+0.9.2
+~~~~~
+1) [TASK] Add scrutinizer config
+
 0.9.1
 ~~~~~
 1) [BUGFIX] Fix cache folder name.
