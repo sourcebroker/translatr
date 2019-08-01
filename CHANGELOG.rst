@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+0.9.3
+~~~~~
+1) [BUGFIX] Records should not be stored in pid 0 because regular users can not edit on pid 0.
+   Make it the default pid for extbase "create record".
+
 0.9.2
 ~~~~~
 1) [TASK] Add scrutinizer config

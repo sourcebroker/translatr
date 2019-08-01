@@ -116,7 +116,6 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 
         foreach ($labels as $labelKey => $label) {
             $obj = new Label();
-            $obj->setPid(0);
             $obj->setExtension($extKey);
             $obj->setText($label);
             $obj->setUkey($labelKey);

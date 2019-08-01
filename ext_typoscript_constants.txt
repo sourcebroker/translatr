@@ -9,7 +9,6 @@ module.tx_translatr_translate {
     }
 
     persistence {
-        # cat=module.tx_translatr_translate//a; type=string; label=Default storage PID
-        storagePid = 0
+        storagePid =
     }
 }

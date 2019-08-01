@@ -4,6 +4,10 @@ module.tx_translatr_web_translatrtranslate {
         partialRootPaths.0 = {$module.tx_translatr_translate.view.partialRootPath}
         layoutRootPaths.0 = {$module.tx_translatr_translate.view.layoutRootPath}
     }
+    persistence {
+        # extbase by default creates records in first record form table page that has pid=0 but you can overwrite it here
+        # storagePid = {$module.tx_translatr_translate.persistence.storagePid}
+    }
 }
 
 config.tx_extbase.persistence.classes {
