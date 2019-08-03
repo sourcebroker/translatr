@@ -5,6 +5,8 @@ Changelog
 ~~~~~
 1) [TASK] Store records on zero pid.
 2) [TASK] TCA optimisations.
+3) [BUGFIX] Fix wrong table for ConnectionPool.
+4) [TASK] Cleanup not needed fields and functionality.
 
 0.9.3
 ~~~~~

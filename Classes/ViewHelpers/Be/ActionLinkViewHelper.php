@@ -62,13 +62,6 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
                     $this->arguments['label'],
                     $this->arguments['options']
                 );
-            case 'localize':
-                return $this->renderLocalizeLink(
-                    $this->arguments['label'],
-                    $this->arguments['options']
-                );
-            case 'localization':
-                return $this->renderLocalization($this->arguments['label']);
             default:
                 throw new InvalidArgumentValueException(
                     'Unknown action type `'
@@ -160,14 +153,6 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
         ];
 
         return BackendUtility::getModuleUrl('tce_db', $uriParameters);
-    }
-
-    /**
-     * @return string
-     */
-    public function renderLocalization(array $label)
-    {
-        return $this->getLanguageFlag($label['sys_language_uid']);
     }
 
     /**
