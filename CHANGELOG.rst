@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+0.9.4
+~~~~~
+1) [TASK] Store records on zero pid.
+2) [TASK] TCA optimisations.
+
 0.9.3
 ~~~~~
 1) [BUGFIX] Records should not be stored in pid 0 because regular users can not edit on pid 0.

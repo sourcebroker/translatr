@@ -30,7 +30,7 @@ return [
         'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, extension, ukey, text, description, ll_file',
     ],
     'types' => [
-        '1' => ['showitem' => 'language, extension, ll_file, ukey, text, description, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
+        '1' => ['showitem' => 'text, description, language, extension, ll_file, ukey, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
     ],
     'palettes' => [
         '1' => ['showitem' => ''],
@@ -125,7 +125,7 @@ return [
             'config' => [
                 'type' => 'text',
                 'cols' => 40,
-                'rows' => 15,
+                'rows' => 3,
                 'eval' => 'trim',
             ],
         ],

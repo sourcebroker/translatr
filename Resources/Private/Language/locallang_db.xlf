@@ -14,7 +14,7 @@
                 <source>Ukey</source>
             </trans-unit>
             <trans-unit id="tx_translatr_domain_model_label.text">
-                <source>Text</source>
+                <source>Translation</source>
             </trans-unit>
             <trans-unit id="tx_translatr_domain_model_label.description">
                 <source>Description (Not used in FE; Displays additional information about the label in BE)</source>
