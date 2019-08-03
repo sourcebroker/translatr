@@ -4,9 +4,14 @@ defined('TYPO3_MODE') || die('Access denied.');
 
 call_user_func(
     function ($extKey) {
-        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['connectToDB'][$extKey]
-            = \SourceBroker\Translatr\Hooks\LocallangXMLOverride::class
-            . '->initialize';
+
+        if (file_exists(PATH_site . 'uploads/tx_translatr/locallangOverrideLoader.php')) {
+            require_once(PATH_site . 'uploads/tx_translatr/locallangOverrideLoader.php');
+        } else {
+            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['connectToDB'][$extKey]
+                = \SourceBroker\Translatr\Hooks\LocallangXMLOverride::class
+                . '->initialize';
+        }
 
         $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['additionalBackendItems']['cacheActions']['translatr'] = \SourceBroker\Translatr\Toolbar\ToolbarItem::class;
 

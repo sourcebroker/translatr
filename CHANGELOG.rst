@@ -8,6 +8,7 @@ Changelog
 3) [BUGFIX] Fix wrong table for ConnectionPool.
 4) [TASK] Cleanup not needed fields and functionality.
 5) [TASK] Add support for translation of backend files.
+6) [TASK] Read lang overwrite files directly if exists.
 
 0.9.3
 ~~~~~
