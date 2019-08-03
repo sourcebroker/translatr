@@ -43,7 +43,8 @@ class Database76 implements Database
 
         $languageListForSql = implode(
             ', ',
-            $this->getDatabaseConnection()->fullQuoteArray($demand->getLanguages() ?: ['default'], 'tx_translatr_domain_model_label')
+            $this->getDatabaseConnection()->fullQuoteArray($demand->getLanguages() ?: ['default'],
+                'tx_translatr_domain_model_label')
         );
 
         $query = <<<SQL
@@ -113,30 +114,18 @@ SQL;
 
     public function getLabelsByLocallangFile($locallangFile)
     {
+        $escapedLocallangFile = $this->getDatabaseConnection()->fullQuoteStr($locallangFile,
+            'tx_translatr_domain_model_label');
         return (array)$this->getDatabaseConnection()->exec_SELECTgetRows(
             'label.text,
-                IF (label.ukey IS NOT NULL AND label.ukey != "", label.ukey, parent.ukey) AS ukey,
-                IF (label.extension IS NOT NULL AND label.extension != "", label.extension, parent.extension) AS extension,
+                label.ukey AS ukey,
+                label.extension AS extension,
                 label.language AS isocode',
-            'tx_translatr_domain_model_label AS label 
-                LEFT JOIN sys_language AS lang ON (
-                    label.sys_language_uid = lang.uid
-                )
-                LEFT JOIN tx_translatr_domain_model_label AS parent ON (
-                    label.l10n_parent = parent.uid
-                )',
-            'label.deleted = 0 
+            'tx_translatr_domain_model_label AS label' .
+            'label.deleted = 0
                 AND label.hidden = 0
                 AND (
-                    label.ll_file = ' . $this->getDatabaseConnection()->fullQuoteStr(
-                $locallangFile,
-                'tx_translatr_domain_model_label'
-            ) . ' 
-                    OR parent.ll_file = ' . $this->getDatabaseConnection()->fullQuoteStr(
-                    $locallangFile,
-                'tx_translatr_domain_model_label'
-                ) . '
-                )'
+                    label.ll_file = ' . $escapedLocallangFile . ')'
         );
     }
 

@@ -135,28 +135,18 @@ SQL;
 /* select labels from default language */
 SELECT 
   label.text,
-  IF (label.ukey IS NOT NULL AND label.ukey != "", label.ukey, parent.ukey) AS ukey,
-  IF (label.extension IS NOT NULL AND label.extension != "", label.extension, parent.extension) AS extension,
+  label.ukey AS ukey,
+  label.extension AS extension,
   label.language AS isocode
 FROM tx_translatr_domain_model_label AS label
-LEFT JOIN sys_language AS lang ON (
-    label.sys_language_uid = lang.uid
-)
-LEFT JOIN tx_translatr_domain_model_label AS parent ON (
-    label.l10n_parent = parent.uid
-)
 WHERE label.deleted = 0 
   AND label.hidden = 0
-  AND (
-    label.ll_file = ? 
-    OR parent.ll_file = ?
-  )
+  AND label.ll_file = ?
 ;
 SQL;
         $stmt = $connection->executeQuery(
             $query,
             [
-                $locallangFile,
                 $locallangFile
             ],
             [
