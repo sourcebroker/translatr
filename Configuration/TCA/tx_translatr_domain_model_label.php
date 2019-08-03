@@ -7,11 +7,6 @@ return [
         'crdate' => 'crdate',
         'cruser_id' => 'cruser_id',
         'dividers2tabs' => true,
-        'versioningWS' => 2,
-        'versioning_followPages' => true,
-        'languageField' => 'sys_language_uid',
-        'transOrigPointerField' => 'l10n_parent',
-        'transOrigDiffSourceField' => 'l10n_diffsource',
         'delete' => 'deleted',
         'enablecolumns' => [
             'starttime' => 'starttime',
@@ -27,7 +22,7 @@ return [
         ],
     ],
     'interface' => [
-        'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, extension, ukey, text, description, ll_file',
+        'showRecordFieldList' => 'extension, ukey, text, description, ll_file',
     ],
     'types' => [
         '1' => ['showitem' => 'text, description, language, extension, ll_file, ukey, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
@@ -36,36 +31,6 @@ return [
         '1' => ['showitem' => ''],
     ],
     'columns' => [
-
-        'sys_language_uid' => [
-            'exclude' => 1,
-            'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.language',
-            'config' => [
-                'type' => 'passthrough',
-            ],
-        ],
-        'l10n_parent' => [
-            'displayCond' => 'FIELD:sys_language_uid:>:0',
-            'exclude' => 1,
-            'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.l18n_parent',
-            'config' => [
-                'type' => 'passthrough',
-            ],
-        ],
-        'l10n_diffsource' => [
-            'config' => [
-                'type' => 'passthrough',
-            ],
-        ],
-
-        't3ver_label' => [
-            'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.versionLabel',
-            'config' => [
-                'type' => 'input',
-                'size' => 30,
-                'max' => 255,
-            ],
-        ],
         'starttime' => [
             'exclude' => 1,
             'l10n_mode' => 'mergeIfNotBlank',
@@ -156,6 +121,5 @@ return [
                 'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class . '->display',
             ],
         ]
-
     ],
 ];
