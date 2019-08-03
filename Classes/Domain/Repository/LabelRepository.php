@@ -67,6 +67,9 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     }
 
     /**
+     * @param string $extKey
+     *
+     * @return void
      * @todo Implement support for other translation files as currently only
      *       the main FE translation file is supported
      *       (EXT:{extKey}/Resources/Private/Language/locallang.xlf or
@@ -75,61 +78,54 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      *       proces should be moved somewhere else to speed up the BE module
      *       (currently it's done on every request to keep labels up to date)
      *
-     * @param string $extKey
-     *
-     * @return void
      */
     public function indexExtensionLabels($extKey)
     {
-        $llDirectoryPath = PATH_site . 'typo3conf' . DIRECTORY_SEPARATOR . 'ext'
-            . DIRECTORY_SEPARATOR . $extKey . DIRECTORY_SEPARATOR . 'Resources'
-            . DIRECTORY_SEPARATOR . 'Private' . DIRECTORY_SEPARATOR . 'Language'
-            . DIRECTORY_SEPARATOR;
-        $llFiles = glob($llDirectoryPath . 'locallang.{xlf,xml}', GLOB_BRACE);
+        $llDirectoryPath = PATH_site . 'typo3conf/ext/' . $extKey . '/Resources/Private/Language/';
+        $llFilesFrontend = glob($llDirectoryPath . 'locallang.{xml,xlf}', GLOB_BRACE);
+        $llFilesBackend = glob($llDirectoryPath . 'locallang_db.{xml,xlf}', GLOB_BRACE);
+        $llFiles = array_merge($llFilesFrontend, $llFilesBackend);
 
         if (!is_array($llFiles) || !isset($llFiles[0])
             || !file_exists($llFiles[0])
         ) {
             return;
         }
+        foreach ($llFiles as $llFile) {
+            $parsedLabels = LanguageUtility::parseLanguageLabels($llFile, 'default');
+            $labels = [];
 
-        $llFilePath = $llFiles[0];
-
-        $parsedLabels = LanguageUtility::parseLanguageLabels($llFilePath, 'default');
-        $labels = [];
-
-        if (!is_array($parsedLabels) || !isset($parsedLabels['default'])
-            || !is_array($parsedLabels['default'])
-        ) {
-            return;
-        }
-
-        foreach ($parsedLabels['default'] as $labelKey => $labelData) {
-            $labels[$labelKey] = $labelData[0]['target']
-                ?: $labelData[0]['source'] ?: null;
-        }
-
-        // remove null labels
-        $labels = array_filter($labels, function ($label) {
-            return !is_null($label);
-        });
-
-        foreach ($labels as $labelKey => $label) {
-            $obj = new Label();
-            $obj->setExtension($extKey);
-            $obj->setText($label);
-            $obj->setUkey($labelKey);
-            $obj->setLlFile(FileUtility::getRelativePathFromAbsolute($llFilePath));
-            $obj->setLanguage('default');
-
-            if (!$this->isLabelIndexed($obj)) {
-                $this->add($obj);
+            if (!is_array($parsedLabels) || !isset($parsedLabels['default'])
+                || !is_array($parsedLabels['default'])
+            ) {
+                return;
             }
 
-            unset($obj);
-        }
+            foreach ($parsedLabels['default'] as $labelKey => $labelData) {
+                $labels[$labelKey] = $labelData[0]['target']
+                    ?: $labelData[0]['source'] ?: null;
+            }
 
-        $this->objectManager->get(PersistenceManager::class)->persistAll();
+            // remove null labels
+            $labels = array_filter($labels, function ($label) {
+                return !is_null($label);
+            });
+
+            foreach ($labels as $labelKey => $label) {
+                $obj = new Label();
+                $obj->setExtension($extKey);
+                $obj->setText($label);
+                $obj->setUkey($labelKey);
+                $obj->setLlFile(FileUtility::getRelativePathFromAbsolute($llFile));
+                $obj->setLlFileIndex(strrev(FileUtility::getRelativePathFromAbsolute($llFile)));
+                $obj->setLanguage('default');
+                if (!$this->isLabelIndexed($obj)) {
+                    $this->add($obj);
+                }
+                unset($obj);
+            }
+            $this->objectManager->get(PersistenceManager::class)->persistAll();
+        }
     }
 
     /**

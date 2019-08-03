@@ -72,6 +72,11 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $llFile = '';
 
     /**
+     * @var string
+     */
+    protected $llFileIndex = '';
+
+    /**
      * Returns the extension
      *
      * @return string $extension
@@ -173,6 +178,22 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     public function setLlFile($llFile)
     {
         $this->llFile = $llFile;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLlFileIndex()
+    {
+        return $this->llFileIndex;
+    }
+
+    /**
+     * @param string llFileIndex
+     */
+    public function setLlFileIndex($llFileIndex)
+    {
+        $this->llFileIndex = $llFileIndex;
     }
 
     /**

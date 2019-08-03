@@ -11,6 +11,7 @@ CREATE TABLE tx_translatr_domain_model_label (
 	text text NOT NULL,
 	description text NOT NULL,
 	ll_file varchar(255) DEFAULT '' NOT NULL,
+	ll_file_index varchar(100) DEFAULT '' NOT NULL,
 	language varchar(31) DEFAULT '' NOT NULL,
 
 	tstamp int(11) unsigned DEFAULT '0' NOT NULL,
@@ -22,6 +23,6 @@ CREATE TABLE tx_translatr_domain_model_label (
 	endtime int(11) unsigned DEFAULT '0' NOT NULL,
 
 	PRIMARY KEY (uid),
-	UNIQUE KEY ukey (ukey,ll_file,language),
+	UNIQUE KEY ukey (ukey,language,ll_file_index),
 	KEY parent (pid),
 );

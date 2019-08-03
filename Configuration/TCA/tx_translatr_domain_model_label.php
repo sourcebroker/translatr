@@ -113,6 +113,11 @@ return [
                 'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class . '->display',
             ],
         ],
+        'll_file_index' => [
+            'config' => [
+                'type' => 'passthrough',
+            ],
+        ],
         'language' => [
             'exclude' => 1,
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.language',

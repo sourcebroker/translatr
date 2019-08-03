@@ -202,7 +202,7 @@ class LocallangXMLOverride
             new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($this->overrideFilesBaseDirectoryPath)
             ),
-            '/locallang\.xlf|locallang\.xml/',
+            '/locallang(|_db)\.xlf|locallang(|_db)\.xml/',
             \RegexIterator::GET_MATCH
         );
 

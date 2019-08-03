@@ -7,6 +7,7 @@ Changelog
 2) [TASK] TCA optimisations.
 3) [BUGFIX] Fix wrong table for ConnectionPool.
 4) [TASK] Cleanup not needed fields and functionality.
+5) [TASK] Add support for translation of backend files.
 
 0.9.3
 ~~~~~
