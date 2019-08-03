@@ -170,7 +170,7 @@ SQL;
     public function getLocallanfFiles()
     {
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_translatr_domain_model_label');
         return $queryBuilder
             ->select('label.ll_file', 'label.language')
             ->from('tx_translatr_domain_model_label', 'label')
