@@ -9,6 +9,6 @@ module.tx_translatr_translate {
     }
 
     persistence {
-        storagePid =
+        storagePid = 0
     }
 }

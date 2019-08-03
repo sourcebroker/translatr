@@ -22,6 +22,7 @@ return [
         'hideTable' => true,
         'rootLevel' => 1,
         'security' => [
+            'ignoreWebMountRestriction' => true,
             'ignoreRootLevelRestriction' => true,
         ],
     ],
