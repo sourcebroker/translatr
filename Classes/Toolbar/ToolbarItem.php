@@ -53,7 +53,7 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
                 $href = (string)GeneralUtility::makeInstance(UriBuilder::class)
                     ->buildUriFromRoute('translatr_toolbaritem_flushcache', []);
             } else {
-                $href = BackendUtility::getAjaxUrl('language_cache::flushCache');
+                $href = /** @scrutinizer ignore-deprecated */ BackendUtility::getAjaxUrl('language_cache::flushCache');
             }
             if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_branch) >
                 VersionNumberUtility::convertVersionNumberToInteger('8.0.0')

@@ -30,9 +30,12 @@ class TranslateViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewH
     public function render()
     {
         /** @var string $language */
+        $language = $this->arguments['language'];
         /** @var string $llFile */
+        $llFile = $this->arguments['llFile'];
         /** @var string $key */
-        extract($this->arguments);
+        $key = $this->arguments['key'];
+
         $parsedLabels = LanguageUtility::parseLanguageLabels($llFile, $language);
         return $parsedLabels[$language][$key][0]['target'] ?: '';
     }
