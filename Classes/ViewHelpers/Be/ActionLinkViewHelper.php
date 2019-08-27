@@ -220,11 +220,13 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
             'M',
             'moduleToken',
         ];
-        foreach ($getParameters as $key => $value) {
-            if (in_array($key, $ignoreKeys)) {
-                continue;
+        if (is_array($getParameters)) {
+            foreach ($getParameters as $key => $value) {
+                if (in_array($key, $ignoreKeys)) {
+                    continue;
+                }
+                $parameters[$key] = $value;
             }
-            $parameters[$key] = $value;
         }
 
         return $parameters;
