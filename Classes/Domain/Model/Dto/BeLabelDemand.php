@@ -28,7 +28,7 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $extension = '';
 
     /**
-     * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage
+     * @var array
      */
     protected $languages = null;
 
@@ -63,7 +63,7 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
      */
     public function isValid()
     {
-        return $this->getExtension();
+        return $this->getExtension() ? true : false;
     }
 
     /**

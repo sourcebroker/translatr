@@ -94,9 +94,9 @@ SQL;
                 $demand->getExtension()
             ],
             [
-                ParameterType::STRING,
-                ParameterType::STRING,
-                ParameterType::STRING,
+                \PDO::PARAM_STR,
+                \PDO::PARAM_STR,
+                \PDO::PARAM_STR,
             ]
         );
 
@@ -160,8 +160,8 @@ SQL;
                 $locallangFile
             ],
             [
-                ParameterType::STRING,
-                ParameterType::STRING
+                \PDO::PARAM_STR,
+                \PDO::PARAM_STR
             ]
         );
         return $stmt->fetchAll();

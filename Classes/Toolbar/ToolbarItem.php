@@ -83,7 +83,7 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
     /**
      * Flushes the language cache (l10n).
      *
-     * @return void
+     * @return HtmlResponse
      */
     public function flushCache()
     {
