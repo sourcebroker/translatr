@@ -7,6 +7,7 @@ use SourceBroker\Translatr\Domain\Model\Label;
 use SourceBroker\Translatr\Utility\ExtensionsUtility;
 use SourceBroker\Translatr\Utility\FileUtility;
 use SourceBroker\Translatr\Utility\LanguageUtility;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
@@ -40,6 +41,7 @@ use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
  */
 class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 {
+    const TABLE = 'tx_translatr_domain_model_label';
 
     /**
      * @param BeLabelDemand $demand
@@ -159,21 +161,24 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         return $GLOBALS['LANG'];
     }
 
-    public function findByProperties(string $extension, string $path, string $key)
+    /**
+     * @param string $key
+     * @param array $values
+     * @param string $extension
+     * @param string $path
+     */
+    public function updateSelectedRow(string $key, string $extension, string $path, array $values): void
     {
-        $query = $this->createQuery();
-
-        $query->getQuerySettings()->setEnableFieldsToBeIgnored([
-            'starttime',
-            'endtime',
-        ]);
-
-        return $query->matching(
-            $query->logicalAnd([
-                $query->equals('extension', $extension),
-                $query->equals('llFile', $path),
-                $query->equals('ukey', $key),
-            ])
-        )->execute();
+        GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable(self::TABLE)
+            ->update(
+                self::TABLE,
+                $values,
+                [
+                    'extension' => $extension,
+                    'ukey' => $key,
+                    'll_file' => $path
+                ]
+            );
     }
 }

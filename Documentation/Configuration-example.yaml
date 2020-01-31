@@ -1,0 +1,8 @@
+#Should be placed at '/Configuration/Translation/Configuration.yaml
+presets:
+  local: &preset-local
+    tags: ['general', 'vue']
+ext:
+  local:
+    locallang.xml:
+      'search.submit': *preset-local

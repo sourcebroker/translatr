@@ -7,7 +7,7 @@
  *
  */
 return [
-    'language:frontend:tags' => [
-        'class' => \SourceBroker\Translatr\Command\ImportTagsCommand::class
+    'language:import:configuration' => [
+        'class' => \SourceBroker\Translatr\Command\ImportConfigurationCommand::class
     ],
 ];
