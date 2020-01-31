@@ -158,4 +158,22 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     {
         return $GLOBALS['LANG'];
     }
+
+    public function findByProperties(string $extension, string $path, string $key)
+    {
+        $query = $this->createQuery();
+
+        $query->getQuerySettings()->setEnableFieldsToBeIgnored([
+            'starttime',
+            'endtime',
+        ]);
+
+        return $query->matching(
+            $query->logicalAnd([
+                $query->equals('extension', $extension),
+                $query->equals('llFile', $path),
+                $query->equals('ukey', $key),
+            ])
+        )->execute();
+    }
 }
