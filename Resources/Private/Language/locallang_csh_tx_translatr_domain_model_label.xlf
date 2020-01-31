@@ -19,6 +19,9 @@
             <trans-unit id="ll_file.description">
                 <source>Locallang relative path</source>
             </trans-unit>
+            <trans-unit id="tags.description">
+                <source>Tags</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

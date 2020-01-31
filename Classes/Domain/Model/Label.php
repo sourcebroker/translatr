@@ -62,6 +62,13 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $description = '';
 
     /**
+     * tags
+     *
+     * @var string
+     */
+    protected $tags = '';
+
+    /**
      * @var string
      */
     protected $language;
@@ -210,5 +217,21 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     public function setLanguage($language)
     {
         $this->language = $language;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param string $tags
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
     }
 }

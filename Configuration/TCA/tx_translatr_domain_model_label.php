@@ -25,7 +25,7 @@ return [
         'showRecordFieldList' => 'extension, ukey, text, description, ll_file',
     ],
     'types' => [
-        '1' => ['showitem' => 'text, description, language, extension, ll_file, ukey, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
+        '1' => ['showitem' => 'text, description, tags, language, extension, ll_file, ukey, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
     ],
     'palettes' => [
         '1' => ['showitem' => ''],
@@ -125,6 +125,16 @@ return [
                 'type' => 'user',
                 'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class . '->display',
             ],
-        ]
+        ],
+        'tags' => [
+            'exclude' => 1,
+            'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.tags',
+            'config' => [
+                'type' => 'text',
+                'cols' => 40,
+                'rows' => 1,
+                'eval' => 'trim',
+            ],
+        ],
     ],
 ];
