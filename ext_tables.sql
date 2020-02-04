@@ -10,6 +10,7 @@ CREATE TABLE tx_translatr_domain_model_label (
 	ukey varchar(255) DEFAULT '' NOT NULL,
 	text text NOT NULL,
 	description text NOT NULL,
+	tags text NOT NULL,
 	ll_file varchar(255) DEFAULT '' NOT NULL,
 	ll_file_index varchar(100) DEFAULT '' NOT NULL,
 	language varchar(31) DEFAULT '' NOT NULL,

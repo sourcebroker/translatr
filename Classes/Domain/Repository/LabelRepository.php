@@ -7,6 +7,7 @@ use SourceBroker\Translatr\Domain\Model\Label;
 use SourceBroker\Translatr\Utility\ExtensionsUtility;
 use SourceBroker\Translatr\Utility\FileUtility;
 use SourceBroker\Translatr\Utility\LanguageUtility;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
@@ -40,6 +41,7 @@ use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
  */
 class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 {
+    const TABLE = 'tx_translatr_domain_model_label';
 
     /**
      * @param BeLabelDemand $demand
@@ -157,5 +159,26 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     protected function getLanguageService()
     {
         return $GLOBALS['LANG'];
+    }
+
+    /**
+     * @param string $key
+     * @param array $values
+     * @param string $extension
+     * @param string $path
+     */
+    public function updateSelectedRow(string $key, string $extension, string $path, array $values): void
+    {
+        GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable(self::TABLE)
+            ->update(
+                self::TABLE,
+                $values,
+                [
+                    'extension' => $extension,
+                    'ukey' => $key,
+                    'll_file' => $path
+                ]
+            );
     }
 }
