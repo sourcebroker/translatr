@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+0.9.5
+~~~~~
+
+1) [FEATURE] Add possibility to import configuration and use tags for labels
+2) [TASK] Change dependency to TYPO3 and ext:vhs.
+
 0.9.4
 ~~~~~
 1) [TASK] Store records on zero pid.
