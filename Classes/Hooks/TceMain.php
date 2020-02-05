@@ -51,7 +51,6 @@ class TceMain
             if ($status === 'new') {
                 $id = $pObj->substNEWwithIDs[$id];
             }
-
             $record = BackendUtility::getRecord($table, $id);
             /** @var Database $db */
             $db = GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database']);
@@ -80,6 +79,7 @@ class TceMain
                     }
                 }
             }
+            $db->update('tx_translatr_domain_model_label', ['modify' => 1], ['uid' => (int)$id]);
         }
     }
 

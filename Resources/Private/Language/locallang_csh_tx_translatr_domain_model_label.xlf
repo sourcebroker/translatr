@@ -22,6 +22,9 @@
             <trans-unit id="tags.description">
                 <source>Tags</source>
             </trans-unit>
+            <trans-unit id="modify.description">
+                <source>Modify</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

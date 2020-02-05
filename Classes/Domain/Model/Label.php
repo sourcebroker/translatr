@@ -84,6 +84,11 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $llFileIndex = '';
 
     /**
+     * @var int
+     */
+    protected $modify = '';
+
+    /**
      * Returns the extension
      *
      * @return string $extension
@@ -233,5 +238,21 @@ class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     public function setTags($tags)
     {
         $this->tags = $tags;
+    }
+
+    /**
+     * @return int
+     */
+    public function getModify()
+    {
+        return $this->modify;
+    }
+
+    /**
+     * @param int $modify
+     */
+    public function setModify(int $modify)
+    {
+        $this->modify = $modify;
     }
 }

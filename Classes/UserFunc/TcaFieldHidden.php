@@ -21,12 +21,16 @@ class TcaFieldHidden
             $value = array_shift($value);
         }
 
-        if (empty($value)) {
-            $returnValue = '<p style="color: #f00;">Ukey value couldn\'t be determined. Contact your administrator.</p>';
+        if (!is_numeric($value) && empty($value)) {
+            $returnValue = $config['field'] == 'ukey' ? '<p style="color: #f00;">Ukey value couldn\'t be determined. Contact your administrator.</p>' : '<p></p>';
         } else {
+            $displayValue = $value;
+            if (is_numeric($value)) {
+                $displayValue = $value === 0 ? 'No' : 'Yes';
+            }
             $returnValue = <<<HTML
 <input type="hidden" value="{$value}" name="{$config['itemFormElName']}" />
-<p>{$value}</p>
+<p>{$displayValue}</p>
 HTML;
         }
 
