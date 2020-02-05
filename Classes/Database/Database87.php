@@ -51,7 +51,11 @@ class Database87 implements Database
         if (!$demand->isValid()) {
             return [];
         }
-
+        $keyWhere = '';
+        if ($demand->getKeys()) {
+            $keyWhere = ' AND label.ukey IN (' . implode(',', $this->wrapArrayByQuote($demand->getKeys())) . ') ';
+        }
+        $languages = implode(',', count($demand->getLanguages()) ? $this->wrapArrayByQuote($demand->getLanguages()) : ['default']);
         $query = <<<SQL
 /* select labels from default language */
 (
@@ -62,11 +66,13 @@ SELECT
   0 AS parent_uid,
   label.text,
   label.ll_file,
-  label.tags
+  label.tags,
+  label.extension
 FROM tx_translatr_domain_model_label AS label
 WHERE label.language = "default" 
   AND label.deleted = 0
   AND label.extension = ?
+  $keyWhere
 ) UNION (
 /* select labels for specified languages */ 
 SELECT  
@@ -76,11 +82,12 @@ SELECT
   parent.uid AS parent_uid,
   label.text,
   label.ll_file,
-  label.tags
+  label.tags,
+  label.extension
 FROM tx_translatr_domain_model_label AS label 
   LEFT JOIN tx_translatr_domain_model_label AS parent
     ON (parent.language = "default" AND parent.ukey = label.ukey AND parent.ll_file = label.ll_file)
-WHERE label.language IN (?)  
+WHERE label.language IN ($languages)  
   AND label.deleted = 0
   AND parent.deleted = 0
   AND parent.extension = ?
@@ -92,11 +99,9 @@ SQL;
             $query,
             [
                 $demand->getExtension(),
-                implode(',', $demand->getLanguages() ?: ['default']),
                 $demand->getExtension()
             ],
             [
-                ParameterType::STRING,
                 ParameterType::STRING,
                 ParameterType::STRING,
             ]
@@ -168,5 +173,16 @@ SQL;
             ->from('tx_translatr_domain_model_label', 'label')
             ->groupBy('label.ll_file')
             ->execute()->fetchAll();
+    }
+
+    /**
+     * @param array $arr
+     * @return array
+     */
+    protected function wrapArrayByQuote(array $arr) : array
+    {
+        return array_map(function ($k) {
+            return '\'' . $k . '\'';
+        }, $arr);
     }
 }

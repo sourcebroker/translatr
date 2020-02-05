@@ -21,7 +21,7 @@ class YamlFileHandler
     /**
      * @var ObjectManager
      */
-    protected $objectManger;
+    protected $objectManager;
 
     /**
      * @var YamlFileLoader
@@ -38,9 +38,9 @@ class YamlFileHandler
      */
     public function __construct()
     {
-        $this->objectManger = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->packageManager = $this->objectManger->get(PackageManager::class);
-        $this->yamlFileLoader = $this->objectManger->get(YamlFileLoader::class);
+        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $this->packageManager = $this->objectManager->get(PackageManager::class);
+        $this->yamlFileLoader = $this->objectManager->get(YamlFileLoader::class);
     }
 
     /**

@@ -21,7 +21,7 @@ class ImportConfigurationCommand extends Command
     /**
      * @var ObjectManager
      */
-    protected $objectManger;
+    protected $objectManager;
 
     /**
      * @var ImportProcess
@@ -35,8 +35,8 @@ class ImportConfigurationCommand extends Command
     {
         $this->setAliases(['lang:import:config']);
         $this->setDescription('Import configuration from YAML into Translatr');
-        $this->objectManger = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->importProcessService = $this->objectManger->get(ImportProcess::class);
+        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $this->importProcessService = $this->objectManager->get(ImportProcess::class);
     }
 
     /**

@@ -33,6 +33,11 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $languages = null;
 
     /**
+     * @var array
+     */
+    protected $keys = null;
+
+    /**
      * BeLabelDemand constructor.
      */
     public function __construct()
@@ -80,5 +85,21 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     public function setLanguages($languages)
     {
         $this->languages = $languages;
+    }
+
+    /**
+     * @return array
+     */
+    public function getKeys(): ?array
+    {
+        return $this->keys;
+    }
+
+    /**
+     * @param array $keys
+     */
+    public function setKeys(array $keys): void
+    {
+        $this->keys = $keys;
     }
 }
