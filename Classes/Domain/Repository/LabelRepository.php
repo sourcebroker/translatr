@@ -210,6 +210,7 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     {
         /** @var Label $label */
         $label = GeneralUtility::makeInstance(Label::class);
+        $label->setPid(0);
         $label->setExtension($defaultLabel['extension']);
         $label->setText($translationFromFile);
         $label->setUkey($defaultLabel['ukey']);
