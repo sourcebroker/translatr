@@ -12,16 +12,11 @@ use TYPO3\CMS\Extbase\Object\ObjectManager;
  * Class YamlFileHandler
  * @package SourceBroker\Translatr\Service
  */
-class YamlFileHandler
+class YamlFileHandler extends BaseService
 {
     const LANG_FILE_PATH = '/Resources/Private/Language/';
     const ROOT_NAME = 'ext';
     const FILENAME = 'Configuration.yaml';
-
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
 
     /**
      * @var YamlFileLoader
@@ -38,7 +33,7 @@ class YamlFileHandler
      */
     public function __construct()
     {
-        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        parent::__construct();
         $this->packageManager = $this->objectManager->get(PackageManager::class);
         $this->yamlFileLoader = $this->objectManager->get(YamlFileLoader::class);
     }

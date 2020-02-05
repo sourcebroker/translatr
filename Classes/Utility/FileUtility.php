@@ -46,6 +46,7 @@ class FileUtility
         if (!is_dir($tempFolderPath)) {
             GeneralUtility::mkdir_deep($tempFolderPath);
         }
+
         return $tempFolderPath;
     }
 }

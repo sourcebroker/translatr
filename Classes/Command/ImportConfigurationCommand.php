@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SourceBroker\Translatr\Command;
 
+use SourceBroker\Translatr\Service\CacheCleaner;
 use SourceBroker\Translatr\Service\ImportProcess;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -29,6 +30,11 @@ class ImportConfigurationCommand extends Command
     protected $importProcessService;
 
     /**
+     * @var CacheCleaner
+     */
+    protected $cacheCleaner;
+
+    /**
      * Configure the command by defining the name, options and arguments
      */
     protected function configure(): void
@@ -37,6 +43,7 @@ class ImportConfigurationCommand extends Command
         $this->setDescription('Import configuration from YAML into Translatr');
         $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->importProcessService = $this->objectManager->get(ImportProcess::class);
+        $this->cacheCleaner = $this->objectManager->get(CacheCleaner::class);
     }
 
     /**
@@ -65,6 +72,7 @@ class ImportConfigurationCommand extends Command
             $progressBar->advance();
         }
         $output->writeln('Import finished');
+        $this->cacheCleaner->flushCache();
         $progressBar->finish();
 
         return 0;

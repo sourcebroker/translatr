@@ -3,7 +3,12 @@
 namespace SourceBroker\Translatr\Hooks;
 
 use SourceBroker\Translatr\Database\Database;
+use SourceBroker\Translatr\Service\CacheCleaner;
+use SourceBroker\Translatr\Utility\FileUtility;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -17,19 +22,18 @@ class TceMain
      * @param $table
      * @param $id
      * @param $value
-     * @param \TYPO3\CMS\Core\DataHandling\DataHandler $pObj
+     * @param DataHandler $pObj
      */
     public function processCmdmap_postProcess(
         $command,
         $table,
         $id,
         $value,
-        \TYPO3\CMS\Core\DataHandling\DataHandler &$pObj
+        DataHandler &$pObj
     ) {
         if ($table == 'tx_translatr_domain_model_label' && $command == 'delete') {
-            $record = BackendUtility::getRecord($table, $id);
-            $this->clearCacheForLanguage($record['language']);
-            \SourceBroker\Translatr\Utility\FileUtility::getTempFolderPath();
+            GeneralUtility::makeInstance(CacheCleaner::class)->flushCache();
+            FileUtility::getTempFolderPath();
         }
     }
 
@@ -38,14 +42,14 @@ class TceMain
      * @param $table
      * @param $id
      * @param array $fieldArray
-     * @param \TYPO3\CMS\Core\DataHandling\DataHandler $pObj
+     * @param DataHandler $pObj
      */
     public function processDatamap_afterDatabaseOperations(
         $status,
         $table,
         $id,
         array $fieldArray,
-        \TYPO3\CMS\Core\DataHandling\DataHandler &$pObj
+        DataHandler &$pObj
     ) {
         if ($table == 'tx_translatr_domain_model_label') {
             if ($status === 'new') {
@@ -56,17 +60,17 @@ class TceMain
             $db = GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database']);
 
             if (empty($record['ukey'])) {
-                /** @var \TYPO3\CMS\Core\Messaging\FlashMessage $message */
+                /** @var FlashMessage $message */
                 $message = GeneralUtility::makeInstance(
-                    \TYPO3\CMS\Core\Messaging\FlashMessage::class,
+                    FlashMessage::class,
                     'Ukey field value can\'t be empty',
                     'Translatr',
-                    \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR,
+                    FlashMessage::ERROR,
                     true
                 );
 
-                /** @var $flashMessageService \TYPO3\CMS\Core\Messaging\FlashMessageService */
-                $flashMessageService = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Messaging\FlashMessageService::class);
+                /** @var $flashMessageService FlashMessageService */
+                $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
                 $flashMessageService->getMessageQueueByIdentifier()->addMessage($message);
 
                 $db->update('tx_translatr_domain_model_label', ['deleted' => 1], ['uid' => (int)$id]);
@@ -81,22 +85,5 @@ class TceMain
             }
             $db->update('tx_translatr_domain_model_label', ['modify' => 1], ['uid' => (int)$id]);
         }
-    }
-
-    /**
-     *  Make atomic remove.
-     * @param $language
-     */
-    private function clearCacheForLanguage($language)
-    {
-        // TODO: clear only for language and not for all
-        $tempPath = \SourceBroker\Translatr\Utility\FileUtility::getTempFolderPath();
-        $tempPathRenamed = $tempPath . time();
-        rename($tempPath, $tempPathRenamed);
-        GeneralUtility::rmdir($tempPathRenamed, true);
-
-        /** @var \TYPO3\CMS\Core\Cache\Frontend\FrontendInterface $cacheFrontend */
-        $cacheFrontend = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager')->getCache('l10n');
-        $cacheFrontend->flush();
     }
 }

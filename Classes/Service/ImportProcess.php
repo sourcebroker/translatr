@@ -14,17 +14,12 @@ use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
  * Class ImportProcess
  * @package SourceBroker\Translatr\Service
  */
-class ImportProcess
+class ImportProcess extends BaseService
 {
     /**
      * Should contain comma separated values
      */
     const ALLOWED_PROPERTIES = ['tags'];
-
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
 
     /**
      * @var YamlFileHandler
@@ -41,7 +36,7 @@ class ImportProcess
      */
     public function __construct()
     {
-        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        parent::__construct();
         $this->yamlFileHandler = $this->objectManager->get(YamlFileHandler::class);
         $this->labelRepository = $this->objectManager->get(LabelRepository::class);
     }
