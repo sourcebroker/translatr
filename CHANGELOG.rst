@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+0.9.6
+~~~~~
+
+1) [FIX] Fix problem with missing tags after create new translation from BE.
+2) [FIX] Fix wrong extension name at creating new translation from BE.
+3) [FIX] Fix not working button to remove from list in TYPO3 9.x.
+4) [FEATURE] Implement flag to determine if record was edited from BE.
+5) [FEATURE] Implement common cache cleaner service for whole ext.
+
 0.9.5
 ~~~~~
 
