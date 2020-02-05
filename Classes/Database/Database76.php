@@ -56,7 +56,9 @@ SELECT
   label.ukey,
   0 AS parent_uid,
   label.text,
-  label.ll_file
+  label.ll_file,
+  label.tags,
+  label.extension
 FROM tx_translatr_domain_model_label AS label
 WHERE label.language = "default" 
   AND label.deleted = 0

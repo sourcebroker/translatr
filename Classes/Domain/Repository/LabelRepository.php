@@ -9,6 +9,7 @@ use SourceBroker\Translatr\Utility\FileUtility;
 use SourceBroker\Translatr\Utility\LanguageUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
 /***************************************************************
@@ -72,14 +73,15 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      * @param string $extKey
      *
      * @return void
-     * @todo Implement support for other translation files as currently only
-     *       the main FE translation file is supported
-     *       (EXT:{extKey}/Resources/Private/Language/locallang.xlf or
-     *       EXT:{extKey}/Resources/Private/Language/locallang.xml)
+     * @throws IllegalObjectTypeException
      * @todo When support for more files will be implemented, then indexing
      *       proces should be moved somewhere else to speed up the BE module
      *       (currently it's done on every request to keep labels up to date)
      *
+     * @todo Implement support for other translation files as currently only
+     *       the main FE translation file is supported
+     *       (EXT:{extKey}/Resources/Private/Language/locallang.xlf or
+     *       EXT:{extKey}/Resources/Private/Language/locallang.xml)
      */
     public function indexExtensionLabels($extKey)
     {
@@ -144,13 +146,11 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             'endtime',
         ]);
 
-        return $query->matching(
-                $query->logicalAnd([
-                    $query->equals('language', $label->getLanguage()),
-                    $query->equals('llFile', $label->getLlFile()),
-                    $query->equals('ukey', $label->getUkey()),
-                ])
-            )->count() > 0;
+        return $query->matching($query->logicalAnd([
+                $query->equals('language', $label->getLanguage()),
+                $query->equals('llFile', $label->getLlFile()),
+                $query->equals('ukey', $label->getUkey()),
+            ]))->count() > 0;
     }
 
     /**
@@ -167,7 +167,7 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      * @param string $extension
      * @param string $path
      */
-    public function updateSelectedRow(string $key, string $extension, string $path, array $values): void
+    public function updateSelectedRowInAllLanguages(string $key, string $extension, string $path, array $values): void
     {
         GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable(self::TABLE)
@@ -177,8 +177,50 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 [
                     'extension' => $extension,
                     'ukey' => $key,
-                    'll_file' => $path
+                    'll_file' => $path,
+                    'deleted' => 0,
+                    'hidden' => 0
                 ]
             );
+    }
+
+    /**
+     * @param int $uid
+     * @param array $values
+     */
+    public function updateSelectedRow(int $uid, array $values): void
+    {
+        GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable(self::TABLE)
+            ->update(
+                self::TABLE,
+                $values,
+                [
+                    'uid' => $uid,
+                ]
+            );
+    }
+
+    /**
+     * @param array $defaultLabel
+     * @param string $translationFromFile
+     * @param string $language
+     */
+    public function createLanguageChildFromDefault(array $defaultLabel, string $translationFromFile, string $language): void
+    {
+        /** @var Label $label */
+        $label = GeneralUtility::makeInstance(Label::class);
+        $label->setPid(0);
+        $label->setExtension($defaultLabel['extension']);
+        $label->setText($translationFromFile);
+        $label->setUkey($defaultLabel['ukey']);
+        $label->setLlFile($defaultLabel['ll_file']);
+        $label->setLlFileIndex(strrev($defaultLabel['ll_file']));
+        $label->setLanguage($language);
+        $label->setTags($defaultLabel['tags']);
+        try {
+            $this->add($label);
+        } catch (IllegalObjectTypeException $e) {
+        }
     }
 }

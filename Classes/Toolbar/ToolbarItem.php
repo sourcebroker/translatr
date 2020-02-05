@@ -14,6 +14,8 @@ namespace SourceBroker\Translatr\Toolbar;
  *
  * The TYPO3 project - inspiring people to share!
  */
+
+use SourceBroker\Translatr\Service\CacheCleaner;
 use SourceBroker\Translatr\Utility\MiscUtility;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -81,23 +83,13 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
     }
 
     /**
-     * Flushes the language cache (l10n).
-     *
-     * @return void
+     * @return HtmlResponse|null
      */
-    public function flushCache()
+    public function flushCache() : ?HtmlResponse
     {
-        $tempPath = \SourceBroker\Translatr\Utility\FileUtility::getTempFolderPath();
-        $tempPathRenamed = $tempPath . time();
-        rename($tempPath, $tempPathRenamed);
-        GeneralUtility::rmdir($tempPathRenamed, true);
+        $cache = GeneralUtility::makeInstance(CacheCleaner::class);
 
-        /** @var \TYPO3\CMS\Core\Cache\Frontend\FrontendInterface $cacheFrontend */
-        $cacheFrontend = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager')->getCache('l10n');
-        $cacheFrontend->flush();
-        if (MiscUtility::isTypo39up()) {
-            return new HtmlResponse('');
-        }
+        return $cache->flushCache();
     }
 
     /**
