@@ -73,7 +73,6 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      * @param string $extKey
      *
      * @return void
-     * @throws IllegalObjectTypeException
      * @todo When support for more files will be implemented, then indexing
      *       proces should be moved somewhere else to speed up the BE module
      *       (currently it's done on every request to keep labels up to date)
@@ -124,7 +123,10 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $obj->setLlFileIndex(strrev(FileUtility::getRelativePathFromAbsolute($llFile)));
                 $obj->setLanguage('default');
                 if (!$this->isLabelIndexed($obj)) {
-                    $this->add($obj);
+                    try {
+                        $this->add($obj);
+                    } catch (IllegalObjectTypeException $e) {
+                    }
                 }
                 unset($obj);
             }

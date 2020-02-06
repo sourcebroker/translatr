@@ -55,7 +55,8 @@ class ImportProcess extends BaseService
      */
     public function importDataFromSingleFile(string $extension, array $file): void
     {
-        $this->pushMissingKeyToDatabase($extension, $file['labels'], $file['path']);
+        $this->labelRepository->indexExtensionLabels($extension);
+        $this->pushMissingKeyTranslationsToDatabase($extension, $file['labels'], $file['path']);
         foreach ($file['labels'] as $key => $properties) {
             $values = [];
             foreach ($properties as $propertyName => $property) {
@@ -79,7 +80,7 @@ class ImportProcess extends BaseService
      * @param array $keys
      * @param string $path
      */
-    protected function pushMissingKeyToDatabase(string $extension, array $keys, string $path): void
+    protected function pushMissingKeyTranslationsToDatabase(string $extension, array $keys, string $path): void
     {
         $allLanguages = array_keys(LanguageUtility::getAvailableLanguages());
         $demand = $this->objectManager->get(BeLabelDemand::class);
