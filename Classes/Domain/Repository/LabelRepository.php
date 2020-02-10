@@ -10,6 +10,7 @@ use SourceBroker\Translatr\Utility\LanguageUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
+use TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
 /***************************************************************
@@ -117,16 +118,25 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             foreach ($labels as $labelKey => $label) {
                 $obj = new Label();
                 $obj->setExtension($extKey);
+                $obj->setPid(0);
                 $obj->setText($label);
                 $obj->setUkey($labelKey);
                 $obj->setLlFile(FileUtility::getRelativePathFromAbsolute($llFile));
                 $obj->setLlFileIndex(strrev(FileUtility::getRelativePathFromAbsolute($llFile)));
                 $obj->setLanguage('default');
-                if (!$this->isLabelIndexed($obj)) {
-                    try {
+                /** @var Label $indexedLabel */
+                $indexedLabel = $this->getIndexedLabel($obj);
+                try {
+                    if ($indexedLabel) {
+                        if (!$indexedLabel->getModify()) {
+                            $indexedLabel->setText($obj->getText());
+                            $this->update($indexedLabel);
+                        }
+                    } else {
                         $this->add($obj);
-                    } catch (IllegalObjectTypeException $e) {
                     }
+                } catch (IllegalObjectTypeException $e) {
+                } catch (UnknownObjectException $e) {
                 }
                 unset($obj);
             }
@@ -139,7 +149,7 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      *
      * @return bool
      */
-    protected function isLabelIndexed(Label $label)
+    protected function getIndexedLabel(Label $label)
     {
         $query = $this->createQuery();
 
@@ -152,7 +162,7 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $query->equals('language', $label->getLanguage()),
                 $query->equals('llFile', $label->getLlFile()),
                 $query->equals('ukey', $label->getUkey()),
-            ]))->count() > 0;
+            ]))->execute()->getFirst();
     }
 
     /**
