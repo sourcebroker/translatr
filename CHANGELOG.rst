@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+0.9.7
+~~~~~
+
+1) [FIX] Fix problem with rendering BE list when no language is selected.
+2) [FEATURE] Create missing default labels from extension before each task execution.
+
 0.9.6
 ~~~~~
 
