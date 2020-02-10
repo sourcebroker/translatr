@@ -55,7 +55,7 @@ class Database87 implements Database
         if ($demand->getKeys()) {
             $keyWhere = ' AND label.ukey IN (' . implode(',', $this->wrapArrayByQuote($demand->getKeys())) . ') ';
         }
-        $languages = implode(',', $this->wrapArrayByQuote(count($demand->getLanguages()) ? $demand->getLanguages() : ['default']));
+        $languages = implode(',', $this->wrapArrayByQuote($demand->getLanguages() ? $demand->getLanguages() : ['default']));
         $query = <<<SQL
 /* select labels from default language */
 (

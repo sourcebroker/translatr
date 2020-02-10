@@ -28,7 +28,7 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $extension = '';
 
     /**
-     * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage
+     * @var array
      */
     protected $languages = null;
 
@@ -36,14 +36,6 @@ class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
      * @var array
      */
     protected $keys = null;
-
-    /**
-     * BeLabelDemand constructor.
-     */
-    public function __construct()
-    {
-        $this->languages = new \TYPO3\CMS\Extbase\Persistence\ObjectStorage();
-    }
 
     /**
      * @return string
