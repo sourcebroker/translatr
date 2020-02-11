@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+0.9.8
+~~~~~
+
+1) [FEATURE] Override also labels in default language if flag modify doesn't exist
+
 0.9.7
 ~~~~~
 
