@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+1.0.0
+~~~~~
+
+1) [TASK] Fix composer.json validation.
+
 0.9.8
 ~~~~~
 
