@@ -1,6 +1,16 @@
 Changelog
 ---------
 
+1.0.0
+~~~~~
+
+1) [TASK] Fix composer.json validation.
+
+0.9.8
+~~~~~
+
+1) [FEATURE] Override also labels in default language if flag modify doesn't exist
+
 0.9.7
 ~~~~~
 
