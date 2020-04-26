@@ -4,7 +4,9 @@ Changelog
 master
 ~~~~~~
 
-1) [TASK] Increase vesrsion to ^10.4.
+1) [TASK] Increase version to TYPO3 10.4.
+2) [TASK][BREAKING] Disable language list by default in Configuration/TsConfig/Page/tx_translatr.tsconfig.
+3) [TASK][BREAKING] Drop support for TYPO3 8.7.
 
 1.0.0
 ~~~~~
