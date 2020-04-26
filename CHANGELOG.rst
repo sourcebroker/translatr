@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+master
+~~~~~~
+
+1) [TASK] Increase vesrsion to ^10.4.
+
 1.0.0
 ~~~~~
 
