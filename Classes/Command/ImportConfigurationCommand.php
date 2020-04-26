@@ -39,7 +39,7 @@ class ImportConfigurationCommand extends Command
      */
     protected function configure(): void
     {
-        $this->setAliases(['lang:import:config']);
+        $this->setAliases(['translatr:import:config']);
         $this->setDescription('Import configuration from YAML into Translatr');
         $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->importProcessService = $this->objectManager->get(ImportProcess::class);
