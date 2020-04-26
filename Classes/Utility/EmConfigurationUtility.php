@@ -6,7 +6,6 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
  * Utility class to get the settings from Extension Manager
- *
  */
 class EmConfigurationUtility
 {
@@ -20,12 +19,8 @@ class EmConfigurationUtility
     public static function getSettings()
     {
         $configuration = self::parseSettings();
-        require_once ExtensionManagementUtility::extPath('translatr')
-            . 'Classes/Domain/Model/Dto/EmConfiguration.php';
-        $settings
-            = new \SourceBroker\Translatr\Domain\Model\Dto\EmConfiguration($configuration);
-
-        return $settings;
+        require_once ExtensionManagementUtility::extPath('translatr') . 'Classes/Domain/Model/Dto/EmConfiguration.php';
+        return new \SourceBroker\Translatr\Domain\Model\Dto\EmConfiguration($configuration);
     }
 
     /**
@@ -35,13 +30,10 @@ class EmConfigurationUtility
      */
     public static function parseSettings()
     {
-        $settings
-            = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['translatr']);
-
+        $settings = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['translatr'], false);
         if (!is_array($settings)) {
             $settings = [];
         }
-
         return $settings;
     }
 }

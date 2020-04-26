@@ -7,7 +7,6 @@ return [
         'crdate' => 'crdate',
         'cruser_id' => 'cruser_id',
         'dividers2tabs' => true,
-        'delete' => 'deleted',
         'enablecolumns' => [
             'starttime' => 'starttime',
             'endtime' => 'endtime',
@@ -25,7 +24,7 @@ return [
         'showRecordFieldList' => 'extension, ukey, text, description, ll_file',
     ],
     'types' => [
-        '1' => ['showitem' => 'text, description, tags, language, extension, ll_file, ukey, modify, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
+        '1' => ['showitem' => 'text, description, --div--;Extra , tags, language, extension, ll_file, ll_file_index, ukey, modify, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
     ],
     'palettes' => [
         '1' => ['showitem' => ''],
@@ -70,7 +69,7 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.extension',
             'config' => [
                 'type' => 'user',
-                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class . '->display',
+                'renderType' => 'fieldHidden',
                 'eval' => 'required',
             ],
         ],
@@ -80,7 +79,7 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.ukey',
             'config' => [
                 'type' => 'user',
-                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class . '->display',
+                'renderType' => 'fieldHidden',
                 'eval' => 'trim,required',
             ],
         ],
@@ -110,12 +109,14 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.ll_file',
             'config' => [
                 'type' => 'user',
-                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class . '->display',
+                'renderType' => 'fieldHidden'
             ],
         ],
         'll_file_index' => [
+            'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.ll_file_index',
             'config' => [
-                'type' => 'passthrough',
+                'type' => 'user',
+                'renderType' => 'fieldHidden'
             ],
         ],
         'language' => [
@@ -123,7 +124,7 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.language',
             'config' => [
                 'type' => 'user',
-                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class . '->display',
+                'renderType' => 'fieldHidden'
             ],
         ],
         'tags' => [
@@ -131,7 +132,7 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.tags',
             'config' => [
                 'type' => 'user',
-                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class . '->display',
+                'renderType' => 'fieldHidden'
             ],
         ],
         'modify' => [
@@ -139,7 +140,7 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.modify',
             'config' => [
                 'type' => 'user',
-                'userFunc' => \SourceBroker\Translatr\UserFunc\TcaFieldHidden::class . '->display',
+                'renderType' => 'fieldHidden'
             ],
         ],
     ],

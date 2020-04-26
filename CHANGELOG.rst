@@ -7,6 +7,8 @@ master
 1) [TASK] Increase version to TYPO3 10.4.
 2) [TASK][BREAKING] Disable language list by default in Configuration/TsConfig/Page/tx_translatr.tsconfig.
 3) [TASK][BREAKING] Drop support for TYPO3 8.7.
+4) [TASK][BREAKING] Rename task name from ``lang:import:config`` to ``translatr:import:config``.
+5) [TASK] Refactor for TYPO3 10 / remove code support for TYPO3 8.7 and below.
 
 1.0.0
 ~~~~~

@@ -16,9 +16,7 @@ namespace SourceBroker\Translatr\Toolbar;
  */
 
 use SourceBroker\Translatr\Service\CacheCleaner;
-use SourceBroker\Translatr\Utility\MiscUtility;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -51,12 +49,8 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
         $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
 
         if ($this->getBackendUser()->isAdmin() || $this->getBackendUser()->getTSConfigVal('tx_translatr.clearCache.language')) {
-            if (MiscUtility::isTypo39up()) {
-                $href = (string)GeneralUtility::makeInstance(UriBuilder::class)
-                    ->buildUriFromRoute('translatr_toolbaritem_flushcache', []);
-            } else {
-                $href = /** @scrutinizer ignore-deprecated */ BackendUtility::getAjaxUrl('language_cache::flushCache');
-            }
+            $href = (string)GeneralUtility::makeInstance(UriBuilder::class)
+                ->buildUriFromRoute('translatr_toolbaritem_flushcache', []);
             if (VersionNumberUtility::convertVersionNumberToInteger(TYPO3_branch) >
                 VersionNumberUtility::convertVersionNumberToInteger('8.0.0')
             ) {
@@ -85,7 +79,7 @@ class ToolbarItem implements \TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInt
     /**
      * @return HtmlResponse|null
      */
-    public function flushCache() : ?HtmlResponse
+    public function flushCache(): ?HtmlResponse
     {
         $cache = GeneralUtility::makeInstance(CacheCleaner::class);
 

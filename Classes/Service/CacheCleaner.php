@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace SourceBroker\Translatr\Service;
 
 use SourceBroker\Translatr\Utility\FileUtility;
-use SourceBroker\Translatr\Utility\MiscUtility;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Http\HtmlResponse;
@@ -46,6 +45,6 @@ class CacheCleaner extends BaseService
         } catch (NoSuchCacheException $e) {
         }
 
-        return MiscUtility::isTypo39up() ? new HtmlResponse('') : null;
+        return new HtmlResponse('');
     }
 }

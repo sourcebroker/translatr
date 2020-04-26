@@ -1,8 +1,8 @@
 module.tx_translatr_web_translatrtranslate {
     view {
-        templateRootPaths.0 = {$module.tx_translatr_translate.view.templateRootPath}
-        partialRootPaths.0 = {$module.tx_translatr_translate.view.partialRootPath}
-        layoutRootPaths.0 = {$module.tx_translatr_translate.view.layoutRootPath}
+        templateRootPaths.0 = EXT:translatr/Resources/Private/Backend/Templates
+        partialRootPaths.0 = EXT:translatr/Resources/Private/Backend/Partials
+        layoutRootPaths.0 = EXT:translatr/Resources/Private/Backend/Layouts
     }
     persistence {
         storagePid = {$module.tx_translatr_translate.persistence.storagePid}

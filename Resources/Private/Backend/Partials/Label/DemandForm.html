@@ -5,18 +5,10 @@
       data-namespace-typo3-fluid="true"
 >
 
-<f:form object="{demand}" name="demand" method="get">
+<f:form action="list" object="{demand}" name="demand" method="get">
     <input type="hidden" name="id" value="{id}">
-    <f:if condition="{is9up}">
-        <f:then>
-            <input type="hidden" name="route" value="/web/TranslatrTranslate/">
-            <input type="hidden" name="token" value="{moduleToken}">
-        </f:then>
-        <f:else>
-            <input type="hidden" name="M" value="web_TranslatrTranslate">
-            <input type="hidden" name="moduleToken" value="{moduleToken}">
-        </f:else>
-    </f:if>
+    <input type="hidden" name="route" value="/module/web/TranslatrTranslate">
+    <input type="hidden" name="token" value="{moduleToken}">
 
     <div class="row">
         <div class="col-sm-6">

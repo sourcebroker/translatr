@@ -2,7 +2,7 @@
 
 namespace SourceBroker\Translatr\ViewHelpers\Be;
 
-use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentValueException;
 use TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList;
@@ -11,7 +11,7 @@ use TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList;
  * Class ActionLinkViewHelper
  *
  */
-class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
+class ActionLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper
 {
     const TABLE = 'tx_translatr_domain_model_label';
     const MODULE_NAME = 'web_TranslatrTranslate';
@@ -78,10 +78,7 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
      */
     public function renderNewLink($options)
     {
-        // currently all records are stored on pid 0
-        // $pid = (int)\TYPO3\CMS\Core\Utility\GeneralUtility::_GET('id');
         $pid = 0;
-
         $uriParameters = [
             'edit' => [
                 self::TABLE => [
@@ -94,8 +91,7 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
         if (isset($options['tcadefault'])) {
             $uriParameters['translatr_tcadefault'] = $options['tcadefault'];
         }
-
-        return BackendUtility::getModuleUrl('record_edit', $uriParameters);
+        return self::getModuleUrl('record_edit', $uriParameters);
     }
 
     /**
@@ -115,57 +111,7 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
             'returnUrl' => self::getReturnUrl(),
         ];
 
-        return BackendUtility::getModuleUrl('record_edit', $uriParameters);
-    }
-
-    /**
-     * @param array $label
-     * @param array $options
-     *
-     * @throws InvalidArgumentValueException
-     *
-     * @return string
-     */
-    public function renderLocalizeLink(array $label, array $options = [])
-    {
-        if (!isset($options['sysLanguageUid'])) {
-            throw new InvalidArgumentValueException(
-                '`sysLanguageUid` is required setting for localize link',
-                198237121456
-            );
-        }
-
-        $targetLanguageUid = intval($options['sysLanguageUid']);
-        $beUser = $GLOBALS['BE_USER'];
-
-        $uriParameters = [
-            'cmd' => [
-                self::TABLE => [
-                    $label['uid'] => [
-                        'localize' => $targetLanguageUid,
-                    ],
-                ],
-            ],
-            'vC' => $beUser->veriCode(),
-            'prErr' => 1,
-            'uPT' => 1,
-            'redirect' => GeneralUtility::getIndpEnv('REQUEST_URI'),
-        ];
-
-        return BackendUtility::getModuleUrl('tce_db', $uriParameters);
-    }
-
-    /**
-     * @param int $sysLanguageUid
-     *
-     * @return string
-     */
-    protected function getLanguageFlag($sysLanguageUid)
-    {
-        $databaseRecordList = self::getDatabaseRecordList();
-        $databaseRecordList->initializeLanguages();
-
-        return $databaseRecordList->languageFlag($sysLanguageUid);
+        return self::getModuleUrl('record_edit', $uriParameters);
     }
 
     /**
@@ -181,15 +127,15 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
      */
     protected static function getReturnUrl()
     {
-        return self::getModuleUrl(self::getCurrentParameters());
+        return self::getThisModuleUrl(self::getCurrentParameters());
     }
 
     /**
      * @return string
      */
-    public static function getModuleUrl($urlParameters = [])
+    public static function getThisModuleUrl($urlParameters = [])
     {
-        return BackendUtility::getModuleUrl(self::MODULE_NAME, $urlParameters);
+        return self::getModuleUrl(self::MODULE_NAME, $urlParameters);
     }
 
     /**
@@ -215,5 +161,16 @@ class ActionLinkViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractView
         }
 
         return $parameters;
+    }
+
+    public static function getModuleUrl($moduleName, $urlParameters = [])
+    {
+        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        try {
+            $uri = $uriBuilder->buildUriFromRoute($moduleName, $urlParameters);
+        } catch (\TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException $e) {
+            $uri = $uriBuilder->buildUriFromRoutePath($moduleName, $urlParameters);
+        }
+        return (string)$uri;
     }
 }

@@ -12,6 +12,19 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Database87 implements Database
 {
+    public function delete($table, array $condition)
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder->delete($table);
+        foreach ($condition as $key => $value) {
+            $queryBuilder
+                ->andWhere(sprintf('%s = :%s', $key, $key))
+                ->setParameter($key, $value);
+        }
+        $queryBuilder->execute();
+    }
+
     public function update($table, array $set, array $condition)
     {
         /** @var QueryBuilder $queryBuilder */
@@ -66,6 +79,7 @@ SELECT
   0 AS parent_uid,
   label.text,
   label.ll_file,
+  label.ll_file_index,
   label.tags,
   label.extension,
   label.modify
@@ -83,6 +97,7 @@ SELECT
   parent.uid AS parent_uid,
   label.text,
   label.ll_file,
+  label.ll_file_index,
   label.tags,
   label.extension,
   label.modify

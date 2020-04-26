@@ -1,21 +1,15 @@
 <?php
 
-namespace SourceBroker\Translatr\UserFunc;
+namespace SourceBroker\Translatr\Form\Element;
 
-/**
- * Class LanguageItemsProcFunc
- *
- */
-class TcaFieldHidden
+use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
+
+class TcaFieldHidden extends AbstractFormElement
 {
-
-    /**
-     * @param $config
-     * @return string
-     */
-    public function display(&$config)
+    public function render(): array
     {
-        $value = $config['itemFormElValue'];
+        $config = $this->data;
+        $value = $config['databaseRow'][$config['fieldName']];
 
         while (is_array($value)) {
             $value = array_shift($value);
@@ -29,11 +23,12 @@ class TcaFieldHidden
                 $displayValue = $value === 0 ? 'No' : 'Yes';
             }
             $returnValue = <<<HTML
-<input type="hidden" value="{$value}" name="{$config['itemFormElName']}" />
+<input type="hidden" value="{$value}" name="data{$config['elementBaseName']}" />
 <p>{$displayValue}</p>
 HTML;
         }
-
-        return $returnValue;
+        $result = $this->initializeResultArray();
+        $result['html'] = $returnValue;
+        return $result;
     }
 }
