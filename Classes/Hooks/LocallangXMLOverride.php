@@ -194,7 +194,7 @@ class LocallangXMLOverride
             $isoCode = explode('/', substr($fullPath, strlen($this->overrideFilesBaseDirectoryPath . '/')))[1];
             $translationOverrideFiles[$isoCode][] = [
                 'overwritten' => $this->transformPathFromLocallangOverridesToLocallang($fullPath),
-                'overwriteWith' => $fullPath
+                'overwriteWith' => str_replace(Environment::getPublicPath() . '/', '', $fullPath)
             ];
         }
         return $translationOverrideFiles;
