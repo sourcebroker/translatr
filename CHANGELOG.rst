@@ -1,8 +1,8 @@
 Changelog
 ---------
 
-master
-~~~~~~
+2.0.0
+~~~~~
 
 1) [TASK] Increase version to TYPO3 10.4.
 2) [TASK][BREAKING] Disable language list by default in Configuration/TsConfig/Page/tx_translatr.tsconfig.
