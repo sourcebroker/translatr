@@ -2,8 +2,6 @@
 
 namespace SourceBroker\Translatr\Hooks;
 
-use SourceBroker\Translatr\Domain\Model\Dto\EmConfiguration;
-use SourceBroker\Translatr\Utility\EmConfigurationUtility;
 use SourceBroker\Translatr\Utility\ExceptionUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -28,18 +26,12 @@ class LocallangXMLOverride
      */
     protected $overrideFilesExtDirectoryPath;
 
-    /**
-     * @var EmConfiguration
-     */
-    protected $emConfiguration = null;
 
     /**
      *
      */
     public function initialize()
     {
-        $this->setEmConfiguration();
-
         $this->setOverrideFilesLoaderFilePath();
         $this->setOverrideFilesBaseDirectoryPath();
         $this->setOverrideFilesExtDirectoryPath();
@@ -59,14 +51,6 @@ class LocallangXMLOverride
         }
 
         include $this->overrideFilesLoaderFilePath;
-    }
-
-    /**
-     * @return void
-     */
-    protected function setEmConfiguration()
-    {
-        $this->emConfiguration = EmConfigurationUtility::getSettings();
     }
 
     /**
