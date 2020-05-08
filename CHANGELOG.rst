@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+2.0.1
+~~~~~
+
+1) [BUGFIX] Fix missing class.
+
 2.0.0
 ~~~~~
 
