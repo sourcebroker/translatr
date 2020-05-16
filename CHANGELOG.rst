@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+2.0.2
+~~~~~
+
+1) [BUGFIX] Fix deprecated TCA.
+
 2.0.1
 ~~~~~
 
