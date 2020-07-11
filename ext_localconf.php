@@ -13,8 +13,8 @@ call_user_func(
                 = \SourceBroker\Translatr\Hooks\LocallangXMLOverride::class . '->initialize';
         }
 
-        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['additionalBackendItems']['cacheActions']['translatr']
-            = \SourceBroker\Translatr\Toolbar\ToolbarItem::class;
+        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearCachePostProc'][]
+            =  \SourceBroker\Translatr\Service\CacheCleaner::class . '->flushCache';
 
         if (TYPO3_MODE !== 'FE') {
             // Used to remove 'save and new'. Can be removed when inline editing will be done.

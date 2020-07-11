@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+master
+~~~~~~
+
+1) [TASK][BREAKING] Remove special toolbar menu item to remove cache of translations. Cache is clean now on every cache clean (pages, all, system).
+
 2.0.2
 ~~~~~
 
