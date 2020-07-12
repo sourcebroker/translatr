@@ -4,6 +4,9 @@ namespace SourceBroker\Translatr\Hooks;
 
 use SourceBroker\Translatr\Utility\ExceptionUtility;
 use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Locking\Exception\LockAcquireWouldBlockException;
+use TYPO3\CMS\Core\Locking\LockFactory;
+use TYPO3\CMS\Core\Locking\LockingStrategyInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -34,23 +37,29 @@ class LocallangXMLOverride
     public function initialize()
     {
         $this->setOverrideFilesLoaderFilePath();
-        $this->setOverrideFilesBaseDirectoryPath();
-        $this->setOverrideFilesExtDirectoryPath();
+        if (!file_exists($this->overrideFilesLoaderFilePath)) {
+            $lockFactory = GeneralUtility::makeInstance(LockFactory::class);
+            $locker = $lockFactory->createLocker('tx_translatr');
+            if ($locker->acquire()) {
+                if (!file_exists($this->overrideFilesLoaderFilePath)) {
+                    $this->setOverrideFilesBaseDirectoryPath();
+                    $this->setOverrideFilesExtDirectoryPath();
+                    $this->createNotExistingLocallangOverrideFiles();
+                    $this->createOverrideFilesLoaderFileIfNotExists();
 
-        $this->createNotExistingLocallangOverrideFiles();
-        $this->createOverrideFilesLoaderFileIfNotExists();
-
-        if (!$this->overrideFilesLoaderFileExists()) {
-            ExceptionUtility::throwException(
-                \RuntimeException::class,
-                'Could not create locallang XML Override file in path '
-                . $this->overrideFilesLoaderFilePath . ' due to unknown reason.',
-                82347523
-            );
-
-            return;
+                    if (!$this->overrideFilesLoaderFileExists()) {
+                        ExceptionUtility::throwException(
+                            \RuntimeException::class,
+                            'Could not create locallang XML Override file in path '
+                            . $this->overrideFilesLoaderFilePath . ' due to unknown reason.',
+                            82347523
+                        );
+                        return;
+                    }
+                    $locker->release();
+                }
+            }
         }
-
         include $this->overrideFilesLoaderFilePath;
     }
 
@@ -113,15 +122,16 @@ class LocallangXMLOverride
                     . $fileData['overwritten'] . '\'][] = \'' . $fileData['overwriteWith'] . '\';' . PHP_EOL;
             }
         }
-
-        if (!file_put_contents($this->overrideFilesLoaderFilePath, $code)) {
+        $tempFilename = $this->overrideFilesLoaderFilePath . '.tmp';
+        if (!file_put_contents($tempFilename, $code)) {
             ExceptionUtility::throwException(
                 \RuntimeException::class,
-                'Could not write file in ' . $this->overrideFilesLoaderFilePath,
+                'Could not write file in ' . $tempFilename,
                 390847534
             );
         }
-        GeneralUtility::fixPermissions($this->overrideFilesLoaderFilePath, true);
+        GeneralUtility::fixPermissions($tempFilename, true);
+        rename($tempFilename, $this->overrideFilesLoaderFilePath);
     }
 
     /**
