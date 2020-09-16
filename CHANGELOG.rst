@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+3.0.1
+~~~~~
+
+1) [BUGFIX] Fix creating new records form cli level.
+
 3.0.0
 ~~~~~
 
