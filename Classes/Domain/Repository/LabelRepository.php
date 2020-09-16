@@ -125,6 +125,7 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $obj->setLlFile(FileUtility::getRelativePathFromAbsolute($llFile));
                 $obj->setLlFileIndex(strrev(FileUtility::getRelativePathFromAbsolute($llFile)));
                 $obj->setLanguage('default');
+                $obj->setModify(0);
                 /** @var Label $indexedLabel */
                 $indexedLabel = $this->getIndexedLabel($obj);
                 try {
@@ -231,6 +232,7 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         $label->setLlFileIndex(strrev($defaultLabel['ll_file']));
         $label->setLanguage($language);
         $label->setTags($defaultLabel['tags']);
+        $label->setModify(0);
         try {
             $this->add($label);
         } catch (IllegalObjectTypeException $e) {
