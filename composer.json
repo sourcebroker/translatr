@@ -6,7 +6,8 @@
     "GPL-2.0-or-later"
   ],
   "require": {
-    "typo3/cms-core": "^8.7 || ^9.5",
+    "php": "^7.2",
+    "typo3/cms-core": "^9.5 || ^10.4",
     "fluidtypo3/vhs": "^5.0 || ^6.0"
   },
   "autoload": {

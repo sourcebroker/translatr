@@ -1,6 +1,31 @@
 Changelog
 ---------
 
+3.0.0
+~~~~~
+
+1) [TASK][BREAKING] Remove special toolbar menu item to remove cache of translations. Cache is clean now on every cache clean (pages, all, system).
+2) [TASK] Add lock when creating files.
+
+2.0.2
+~~~~~
+
+1) [BUGFIX] Fix deprecated TCA.
+
+2.0.1
+~~~~~
+
+1) [BUGFIX] Fix missing class.
+
+2.0.0
+~~~~~
+
+1) [TASK] Increase version to TYPO3 10.4.
+2) [TASK][BREAKING] Disable language list by default in Configuration/TsConfig/Page/tx_translatr.tsconfig.
+3) [TASK][BREAKING] Drop support for TYPO3 8.7.
+4) [TASK][BREAKING] Rename task name from ``lang:import:config`` to ``translatr:import:config``.
+5) [TASK] Refactor for TYPO3 10 / remove code support for TYPO3 8.7 and below.
+
 1.0.0
 ~~~~~
 

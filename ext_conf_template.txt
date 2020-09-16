@@ -1,2 +1,0 @@
-# cat=basic; type=string; label=Iso Code of the default language
-defaultLanguageIsoCode = en

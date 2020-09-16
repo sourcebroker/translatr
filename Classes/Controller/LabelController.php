@@ -6,7 +6,7 @@ use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Repository\LabelRepository;
 use SourceBroker\Translatr\Domain\Repository\LanguageRepository;
 use SourceBroker\Translatr\Utility\LanguageUtility;
-use SourceBroker\Translatr\Utility\MiscUtility;
+use TYPO3\CMS\Backend\View\BackendTemplateView;
 use TYPO3\CMS\Core\FormProtection\FormProtectionFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -41,6 +41,20 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 {
+    /**
+     * BackendTemplateContainer
+     *
+     * @var BackendTemplateView
+     */
+    protected $view;
+
+    /**
+     * Backend Template Container
+     *
+     * @var BackendTemplateView
+     */
+    protected $defaultViewObjectName = BackendTemplateView::class;
+
 
     /**
      * labelRepository
@@ -75,12 +89,10 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      *
      * @return void
      *
-     * @ignorevalidation $demand
      */
-    public function listAction(
-        \SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand $demand = null
-    ) {
-        if (is_null($demand)) {
+    public function listAction(\SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand $demand = null)
+    {
+        if ($demand === null) {
             $demand = $this->objectManager->get(BeLabelDemand::class);
         }
 
@@ -103,7 +115,6 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Backend/AjaxDataHandler');
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/Translatr/Translatr');
-
         $pageRenderer->addRequireJsConfiguration(
             [
                 'paths' => [
@@ -119,7 +130,6 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
             'demand' => $demand,
             'moduleToken' => $this->getToken(true),
             'id' => GeneralUtility::_GET('id'),
-            'is9up' => MiscUtility::isTypo39up()
         ]);
     }
 
@@ -131,13 +141,8 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      */
     protected function getToken($tokenOnly)
     {
-        if (MiscUtility::isTypo39up()) {
-            $tokenParameterName = 'token';
-            $token = FormProtectionFactory::get('backend')->generateToken('route', 'web_TranslatrTranslate');
-        } else {
-            $tokenParameterName = 'moduleToken';
-            $token = FormProtectionFactory::get()->generateToken('moduleCall', 'web_TranslatrTranslate');
-        }
+        $tokenParameterName = 'token';
+        $token = FormProtectionFactory::get('backend')->generateToken('route', 'web_TranslatrTranslate');
         if ($tokenOnly) {
             return $token;
         }

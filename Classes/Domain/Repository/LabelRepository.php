@@ -7,6 +7,7 @@ use SourceBroker\Translatr\Domain\Model\Label;
 use SourceBroker\Translatr\Utility\ExtensionsUtility;
 use SourceBroker\Translatr\Utility\FileUtility;
 use SourceBroker\Translatr\Utility\LanguageUtility;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
@@ -85,7 +86,7 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      */
     public function indexExtensionLabels($extKey)
     {
-        $llDirectoryPath = PATH_site . 'typo3conf/ext/' . $extKey . '/Resources/Private/Language/';
+        $llDirectoryPath = Environment::getPublicPath() . '/' . 'typo3conf/ext/' . $extKey . '/Resources/Private/Language/';
         $llFilesFrontend = glob($llDirectoryPath . 'locallang.{xml,xlf}', GLOB_BRACE);
         $llFilesBackend = glob($llDirectoryPath . 'locallang_db.{xml,xlf}', GLOB_BRACE);
         $llFiles = array_merge($llFilesFrontend, $llFilesBackend);

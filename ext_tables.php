@@ -1,15 +1,12 @@
 <?php
-/** @var string $_EXTKEY */
+
 defined('TYPO3_MODE') || die('Access denied.');
 
 call_user_func(
-    function ($extKey) {
+    function () {
         if (TYPO3_MODE === 'BE') {
-            /**
-             * Registers a Backend Module
-             */
             \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
-                'SourceBroker.' . $extKey,
+                'SourceBroker.translatr',
                 'web',
                 'translate',
                 '',
@@ -18,20 +15,19 @@ call_user_func(
                 ],
                 [
                     'access' => 'user,group',
-                    'icon' => 'EXT:' . $extKey
-                        . '/Resources/Public/Backend/Icons/translate.svg',
-                    'labels' => 'LLL:EXT:' . $extKey
-                        . '/Resources/Private/Language/locallang_translate.xlf',
+                    'icon' => 'EXT:translatr/Resources/Public/Icons/Extension.svg',
+                    'labels' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_translate.xlf',
+                    'navigationComponentId' => '',
+                    'inheritNavigationComponentFromMainModule' => false
                 ]
             );
-            unset($GLOBALS['TBE_MODULES']['_configuration']['web_TranslatrTranslate']['navigationComponentId']);
         }
 
         $GLOBALS['TBE_STYLES']['skins']['translatr'] = [
             'name' => 'translatr',
             'stylesheetDirectories' => [
-                'select2' => 'EXT:' . $extKey . '/Resources/Public/JavaScript/jquery.select2/dist/css/',
-                'css' => 'EXT:' . $extKey . '/Resources/Public/Css/'
+                'select2' => 'EXT:translatr/Resources/Public/JavaScript/jquery.select2/dist/css/',
+                'css' => 'EXT:translatr/Resources/Public/Css/'
             ],
         ];
 
@@ -47,6 +43,5 @@ call_user_func(
                 \TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRowInitializeNew::class,
             ],
         ];
-    },
-    $_EXTKEY
+    }
 );

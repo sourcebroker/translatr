@@ -28,14 +28,7 @@ class LanguageUtility
      */
     public static function parseLanguageLabels($file, $language)
     {
-        if (MiscUtility::isTypo39up()) {
-            $languageFactory = GeneralUtility::makeInstance(LocalizationFactory::class);
-            $parsedLabels = $languageFactory->getParsedData($file, $language);
-        } else {
-            $parsedLabels = $GLOBALS['LANG']
-                ->parserFactory
-                ->getParsedData($file, $language);
-        }
-        return $parsedLabels;
+        $languageFactory = GeneralUtility::makeInstance(LocalizationFactory::class);
+        return $languageFactory->getParsedData($file, $language);
     }
 }

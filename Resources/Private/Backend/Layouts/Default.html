@@ -1,10 +1,11 @@
-<f:be.container>
-    <div class="typo3-fullDoc">
-        <div id="typo3-docbody" class="translatr-container">
-            <div id="typo3-inner-docbody">
-                <f:flashMessages/>
-                <f:render section="content"/>
-            </div>
-        </div>
-    </div>
-</f:be.container>
+<html xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+      xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+      xmlns:sbt="http://typo3.org/ns/SourceBroker/Translatr/ViewHelpers"
+      xmlns:v="http://typo3.org/ns/FluidTYPO3/Vhs/ViewHelpers"
+      data-namespace-typo3-fluid="true"
+>
+
+<f:flashMessages/>
+<f:render section="content"/>
+
+</html>

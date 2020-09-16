@@ -7,7 +7,7 @@
  *
  */
 return [
-    'language:import:configuration' => [
+    'translatr:import:configuration' => [
         'class' => \SourceBroker\Translatr\Command\ImportConfigurationCommand::class
     ],
 ];

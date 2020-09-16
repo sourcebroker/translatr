@@ -2,6 +2,7 @@
 
 namespace SourceBroker\Translatr\Utility;
 
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -21,19 +22,17 @@ class FileUtility
     {
         if (GeneralUtility::isAbsPath($path)) {
             $replacements = [
-                PATH_site . 'typo3conf' . DIRECTORY_SEPARATOR . 'ext'
+                Environment::getPublicPath() . DIRECTORY_SEPARATOR . 'typo3conf' . DIRECTORY_SEPARATOR . 'ext'
                 . DIRECTORY_SEPARATOR => 'EXT:',
-                PATH_site . 'typo3conf' . DIRECTORY_SEPARATOR => 'typo3conf',
-                PATH_site => '',
+                Environment::getPublicPath() . DIRECTORY_SEPARATOR . 'typo3conf' . DIRECTORY_SEPARATOR => 'typo3conf',
+                Environment::getPublicPath() . DIRECTORY_SEPARATOR => '',
             ];
-
             foreach ($replacements as $replaceFrom => $replaceTo) {
                 if (GeneralUtility::isFirstPartOfStr($path, $replaceFrom)) {
                     $path = str_replace($replaceFrom, $replaceTo, $path);
                 }
             }
         }
-
         return $path;
     }
 
@@ -42,7 +41,7 @@ class FileUtility
      */
     public static function getTempFolderPath()
     {
-        $tempFolderPath = PATH_site . 'uploads/tx_translatr';
+        $tempFolderPath = Environment::getPublicPath() . '/' . 'uploads/tx_translatr';
         if (!is_dir($tempFolderPath)) {
             GeneralUtility::mkdir_deep($tempFolderPath);
         }

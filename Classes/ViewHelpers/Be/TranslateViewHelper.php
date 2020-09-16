@@ -4,18 +4,8 @@ namespace SourceBroker\Translatr\ViewHelpers\Be;
 
 use SourceBroker\Translatr\Utility\LanguageUtility;
 
-/**
- * Class TranslateViewHelper
- *
- */
-class TranslateViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
+class TranslateViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper
 {
-
-    /**
-     * @throws \TYPO3\CMS\Fluid\Core\ViewHelper\Exception
-     *
-     * @return void
-     */
     public function initializeArguments()
     {
         $this->registerArgument('llFile', 'string', 'Path to the locallang file', true);
@@ -41,7 +31,7 @@ class TranslateViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewH
     }
 
     /**
-     * @return \TYPO3\CMS\Lang\LanguageService
+     * @return \TYPO3\CMS\Core\Localization\LanguageService
      */
     protected function getLanguageService()
     {

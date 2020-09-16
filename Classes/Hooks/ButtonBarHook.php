@@ -2,46 +2,24 @@
 
 namespace SourceBroker\Translatr\Hooks;
 
-use SourceBroker\Translatr\Xclass\TranslatrSplitButton;
+use TYPO3\CMS\Backend\Template\Components\Buttons\LinkButton;
 
-/**
- * Class ButtonBarHook
- *
- * Used to remove 'save and new'. Can be removed when inline editing will be done.
- *
- */
 class ButtonBarHook
 {
-    /**
-     * @param array $params
-     * @return array
-     */
     public function modify(array $params)
     {
-        if (empty($params['buttons']) || !isset($params['buttons']['left'])) {
+        if (empty($params['buttons']['left'])) {
             return $params['buttons'];
         }
-        foreach ($params['buttons']['left'] as &$items) {
+        foreach ($params['buttons']['left'] as $key => &$items) {
             foreach ($items as &$button) {
-                if ($button instanceof TranslatrSplitButton) {
-                    $options = $button->getOptionButtons();
-
-                    foreach ($options as $optionKey => $option) {
-                        if ($option->getName() == '_savedoknew') {
-                            unset($options[$optionKey]);
-                        }
+                if ($button instanceof LinkButton) {
+                    if ($button->getClasses() === 't3js-editform-new') {
+                        unset($params['buttons']['left'][$key]);
                     }
-
-                    $changedSplitButton = [
-                        'primary' => $button->getPrimaryButton(),
-                        'options' => $options
-                    ];
-
-                    $button->setItems($changedSplitButton);
                 }
             }
         }
-
         return $params['buttons'];
     }
 }
