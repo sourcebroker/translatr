@@ -7,7 +7,6 @@ use SourceBroker\Translatr\Domain\Repository\LabelRepository;
 use SourceBroker\Translatr\Domain\Repository\LanguageRepository;
 use SourceBroker\Translatr\Utility\LanguageUtility;
 use TYPO3\CMS\Backend\View\BackendTemplateView;
-use TYPO3\CMS\Core\FormProtection\FormProtectionFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -92,8 +91,8 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
      */
     public function listAction(\SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand $demand = null)
     {
-        if ($demand === null) {
-            $demand = $this->objectManager->get(BeLabelDemand::class);
+        if (!$demand) {
+            $demand = GeneralUtility::makeInstance(BeLabelDemand::class);
         }
 
         if ($demand->getExtension()) {
@@ -107,8 +106,7 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         if (is_array($demand->getLanguages())) {
             $GLOBALS['BE_USER']->pushModuleData('translatr/recentlySelectedLanguages', $demand->getLanguages());
         } else {
-            $demand->setLanguages(is_array($GLOBALS['BE_USER']
-                ->getModuleData('translatr/recentlySelectedLanguages'))
+            $demand->setLanguages(is_array($GLOBALS['BE_USER']->getModuleData('translatr/recentlySelectedLanguages'))
                 ? $GLOBALS['BE_USER']->getModuleData('translatr/recentlySelectedLanguages') : []);
         }
 
@@ -128,24 +126,7 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
             'extensions' => $this->labelRepository->getExtensionsItems(),
             'languages' => LanguageUtility::getAvailableLanguages(),
             'demand' => $demand,
-            'moduleToken' => $this->getToken(true),
             'id' => GeneralUtility::_GET('id'),
         ]);
-    }
-
-    /**
-     * Get a CSRF token
-     *
-     * @param bool $tokenOnly Set it to TRUE to get only the token, otherwise including the &moduleToken= as prefix
-     * @return string
-     */
-    protected function getToken($tokenOnly)
-    {
-        $tokenParameterName = 'token';
-        $token = FormProtectionFactory::get('backend')->generateToken('route', 'web_TranslatrTranslate');
-        if ($tokenOnly) {
-            return $token;
-        }
-        return '&' . $tokenParameterName . '=' . $token;
     }
 }
