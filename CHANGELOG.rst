@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+3.0.3
+~~~~~
+
+1) [BUGFIX] Fix version in ext_emconf.php
+
 3.0.2
 ~~~~~
 
