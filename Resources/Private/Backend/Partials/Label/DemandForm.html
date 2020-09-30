@@ -5,11 +5,8 @@
       data-namespace-typo3-fluid="true"
 >
 
-<f:form action="list" object="{demand}" name="demand" method="get">
+<f:form action="list" object="{demand}" class="js-translatr-form" name="demand" method="get">
     <input type="hidden" name="id" value="{id}">
-    <input type="hidden" name="route" value="/web/TranslatrTranslate/">
-    <input type="hidden" name="token" value="{moduleToken}">
-
     <div class="row">
         <div class="col-sm-6">
             <div class="form-group">
@@ -17,7 +14,6 @@
                     Extension
                 </label>
                 <f:form.select property="extension" id="field-extension" options="{extensions}" class="form-control"
-                               additionalAttributes="{onchange: 'this.form.submit();'}"
                 />
             </div>
         </div>
