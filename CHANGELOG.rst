@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+3.0.2
+~~~~~
+
+1) [BUGFIX] Bugfix not working editing on TYPO3 10.
+
 3.0.1
 ~~~~~
 
