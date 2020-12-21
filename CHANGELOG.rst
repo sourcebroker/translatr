@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+3.0.4
+~~~~~
+
+1) [BUGFIX] Fix path to TsConfig.
+
 3.0.3
 ~~~~~
 

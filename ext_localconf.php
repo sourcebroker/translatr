@@ -27,7 +27,7 @@ call_user_func(
                 = \SourceBroker\Translatr\Hooks\TceMain::class;
 
             \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(
-                '<INCLUDE_TYPOSCRIPT: source="FILE:EXT:transltr/Configuration/TsConfig/Page/tx_translatr.tsconfig">'
+                '<INCLUDE_TYPOSCRIPT: source="FILE:EXT:translatr/Configuration/TsConfig/Page/tx_translatr.tsconfig">'
             );
 
             $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1587914575905] = [
