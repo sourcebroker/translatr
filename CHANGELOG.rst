@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+master
+~~~~~~
+
+1) [BUGFIX] Change from Hook to Middleware to fix not working hook in TYPO3 10.
+
 3.0.4
 ~~~~~
 

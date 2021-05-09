@@ -1,6 +1,6 @@
 <?php
 
-namespace SourceBroker\Translatr\Hooks;
+namespace SourceBroker\Translatr\Service;
 
 use SourceBroker\Translatr\Utility\ExceptionUtility;
 use TYPO3\CMS\Core\Core\Environment;
@@ -13,7 +13,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Class LocallangXMLOverride
  *
  */
-class LocallangXMLOverride
+class GenerateLanguageFiles
 {
     /**
      * @var string

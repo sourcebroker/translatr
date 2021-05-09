@@ -6,8 +6,6 @@ defined('TYPO3_MODE') || die('Access denied.');
 
 call_user_func(
     function () {
-        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_fe.php']['connectToDB']['transltr']
-            = \SourceBroker\Translatr\Hooks\LocallangXMLOverride::class . '->initialize';
 
         if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 8007000) {
             $GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database'] = \SourceBroker\Translatr\Database\Database76::class;
