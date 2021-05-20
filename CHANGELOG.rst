@@ -5,6 +5,7 @@ Changelog
 ~~~~~
 
 1) [BUGFIX] Fix missing "extension-key" in composer.json.
+2) [TASK] Add ddev.
 
 3.0.6
 ~~~~~
