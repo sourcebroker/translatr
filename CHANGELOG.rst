@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+3.0.7
+~~~~~
+
+1) [BUGFIX] Fix missing "extension-key" in composer.json.
+
 3.0.6
 ~~~~~
 
