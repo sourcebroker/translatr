@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+3.0.6
+~~~~~
+
+1) [BUGFIX] Add support for using full label path (without "EXT:")
+
+
 3.0.5
 ~~~~~
 

@@ -116,10 +116,10 @@ class GenerateLanguageFiles
         $this->createOverrideFilesLoaderFileDirectoryIfNotExists();
         $this->createOverrideFilesDirectories();
         $code = '<?php' . PHP_EOL;
-        foreach ($this->getTranslationOverrideFiles() as $isocode => $fileDatas) {
-            foreach ($fileDatas as $fileData) {
-                $code .= '$GLOBALS[\'TYPO3_CONF_VARS\'][\'SYS\'][\'locallangXMLOverride\'][\'' . $isocode . '\'][\''
-                    . $fileData['overwritten'] . '\'][] = \'' . $fileData['overwriteWith'] . '\';' . PHP_EOL;
+        foreach ($this->getTranslationOverrideFiles() as $isoCode => $fileDatasets) {
+            foreach ($fileDatasets as $fileData) {
+                $code .= $this->getFinalOverrideRow($isoCode, $fileData['overwritten'], $fileData['overwriteWith']);
+                $code .= $this->getFinalOverrideRow($isoCode, str_replace('EXT:', 'typo3conf/ext/', $fileData['overwritten']), $fileData['overwriteWith']);
             }
         }
         $tempFilename = $this->overrideFilesLoaderFilePath . '.tmp';
@@ -132,6 +132,12 @@ class GenerateLanguageFiles
         }
         GeneralUtility::fixPermissions($tempFilename, true);
         rename($tempFilename, $this->overrideFilesLoaderFilePath);
+    }
+
+    protected function getFinalOverrideRow($isoCode, $overwritten, $overwriteWith)
+    {
+        return '$GLOBALS[\'TYPO3_CONF_VARS\'][\'SYS\'][\'locallangXMLOverride\'][\'' . $isoCode . '\'][\''
+            . $overwritten . '\'][] = \'' . $overwriteWith . '\';' . PHP_EOL;
     }
 
     /**
