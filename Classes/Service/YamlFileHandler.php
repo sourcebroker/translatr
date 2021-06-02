@@ -92,6 +92,9 @@ class YamlFileHandler extends BaseService
             if (!key_exists($langFile, $configuration)) {
                 $configuration[$langFile] = [];
             }
+            if (!is_array($rows)) {
+                continue;
+            }
             foreach ($rows as $key => $properties) {
                 if (!key_exists($key, $configuration[$langFile])) {
                     $configuration[$langFile][$key] = [];

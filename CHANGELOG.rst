@@ -5,6 +5,7 @@ master
 ~~~~~~
 
 1) [BUGFIX] Fix sql strict error for grouping.
+2) [BUGFIX] Check for languages node.
 
 3.0.7
 ~~~~~
