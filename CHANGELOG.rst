@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+master
+~~~~~~
+
+1) [BUGFIX] Fix sql strict error for grouping.
+
 3.0.7
 ~~~~~
 

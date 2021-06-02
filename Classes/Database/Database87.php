@@ -188,7 +188,7 @@ SQL;
         return $queryBuilder
             ->select('label.ll_file', 'label.language')
             ->from('tx_translatr_domain_model_label', 'label')
-            ->groupBy('label.ll_file')
+            ->groupBy('label.ll_file', 'label.language')
             ->execute()->fetchAll();
     }
 
