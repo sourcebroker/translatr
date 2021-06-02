@@ -260,7 +260,7 @@ class GenerateLanguageFiles
         if (false === file_exists($this->overrideFilesLoaderFilePath)) {
             $locallangFiles =
                 GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database'])
-                    ->getLocallanfFiles();
+                    ->getLocallangFiles();
             if (!$locallangFiles) {
                 return;
             }

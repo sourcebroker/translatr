@@ -15,7 +15,8 @@ class Database87 implements Database
     public function delete($table, array $condition)
     {
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable($table);
         $queryBuilder->delete($table);
         foreach ($condition as $key => $value) {
             $queryBuilder
@@ -28,7 +29,8 @@ class Database87 implements Database
     public function update($table, array $set, array $condition)
     {
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable($table);
         $queryBuilder
             ->update($table);
 
@@ -49,7 +51,8 @@ class Database87 implements Database
     public function getRootPage()
     {
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('pages');
         return $queryBuilder
             ->select('uid')
             ->from('pages')
@@ -68,7 +71,7 @@ class Database87 implements Database
         if ($demand->getKeys()) {
             $keyWhere = ' AND label.ukey IN (' . implode(',', $this->wrapArrayByQuote($demand->getKeys())) . ') ';
         }
-        $languages = implode(',', $this->wrapArrayByQuote($demand->getLanguages() ? $demand->getLanguages() : ['default']));
+        $languages = implode(',', $this->wrapArrayByQuote($demand->getLanguages() ?: ['default']));
         $query = <<<SQL
 /* select labels from default language */
 (
@@ -111,7 +114,8 @@ WHERE label.language IN ($languages)
 );
 SQL;
         /** @var Connection $connection */
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default');
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionByName('Default');
         $stmt = $connection->executeQuery(
             $query,
             [
@@ -124,7 +128,7 @@ SQL;
             ]
         );
 
-        $resultAssoc = $stmt->fetchAll();
+        $resultAssoc = $stmt->fetchAllAssociative();
         $results = ArrayUtility::combineWithSubarrayFieldAsKey(
             $resultAssoc,
             'uid'
@@ -149,6 +153,17 @@ SQL;
         }
 
         return $processedResults;
+    }
+
+    /**
+     * @param array $arr
+     * @return array
+     */
+    protected function wrapArrayByQuote(array $arr): array
+    {
+        return array_map(function ($k) {
+            return '\'' . $k . '\'';
+        }, $arr);
     }
 
     public function getLabelsByLocallangFile($locallangFile)
@@ -178,28 +193,19 @@ SQL;
                 ParameterType::STRING
             ]
         );
-        return $stmt->fetchAll();
+        return $stmt->fetchAllAssociative();
     }
 
-    public function getLocallanfFiles()
+    public function getLocallangFiles()
     {
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_translatr_domain_model_label');
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('tx_translatr_domain_model_label');
         return $queryBuilder
             ->select('label.ll_file', 'label.language')
             ->from('tx_translatr_domain_model_label', 'label')
-            ->groupBy('label.ll_file')
-            ->execute()->fetchAll();
-    }
-
-    /**
-     * @param array $arr
-     * @return array
-     */
-    protected function wrapArrayByQuote(array $arr): array
-    {
-        return array_map(function ($k) {
-            return '\'' . $k . '\'';
-        }, $arr);
+            ->groupBy('label.ll_file', 'label.language')
+            ->execute()
+            ->fetchAllAssociative();
     }
 }
