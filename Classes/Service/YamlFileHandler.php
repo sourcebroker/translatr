@@ -5,8 +5,6 @@ namespace SourceBroker\Translatr\Service;
 
 use TYPO3\CMS\Core\Configuration\Loader\YamlFileLoader;
 use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
  * Class YamlFileHandler
@@ -89,15 +87,19 @@ class YamlFileHandler extends BaseService
     protected function populateRows(array &$configuration, array $files): void
     {
         foreach ($files as $langFile => $rows) {
-            if (!key_exists($langFile, $configuration)) {
+            if (!array_key_exists($langFile, $configuration)) {
                 $configuration[$langFile] = [];
             }
+            if (!is_array($rows)) {
+                continue;
+            }
+
             foreach ($rows as $key => $properties) {
-                if (!key_exists($key, $configuration[$langFile])) {
+                if (!array_key_exists($key, $configuration[$langFile])) {
                     $configuration[$langFile][$key] = [];
                 }
                 foreach ($properties as $property => $values) {
-                    if (!key_exists($property, $configuration[$langFile][$key])) {
+                    if (!array_key_exists($property, $configuration[$langFile][$key])) {
                         $configuration[$langFile][$key][$property] = $values;
                     } else {
                         $configuration[$langFile][$key][$property] = array_unique(
