@@ -1,0 +1,12 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  SourceBroker\Translatr\Command\ImportConfigurationCommand:
+    tags:
+      - name: 'console.command'
+        command: 'translatr:import:configuration'
+        description: 'Import configuration for labels for ext:translatr'
+

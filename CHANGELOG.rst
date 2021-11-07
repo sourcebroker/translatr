@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+4.0.1
+~~~~~
+
+1) [BUGFIX] Fix command not registered in TYPO3 11 because lack of Services.yaml config.
+
 4.0.0
 ~~~~~
 
