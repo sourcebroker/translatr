@@ -4,13 +4,6 @@ defined('TYPO3_MODE') || die('Access denied.');
 
 call_user_func(
     function () {
-
-        if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) < 8007000) {
-            $GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database'] = \SourceBroker\Translatr\Database\Database76::class;
-        } else {
-            $GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database'] = \SourceBroker\Translatr\Database\Database87::class;
-        }
-
         if (TYPO3_MODE !== 'FE') {
             $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearCachePostProc'][]
                 =  \SourceBroker\Translatr\Service\CacheCleaner::class . '->flushCache';

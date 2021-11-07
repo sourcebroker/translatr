@@ -2,6 +2,7 @@
 
 namespace SourceBroker\Translatr\Domain\Repository;
 
+use SourceBroker\Translatr\Database\Database;
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Model\Label;
 use SourceBroker\Translatr\Utility\ExtensionsUtility;
@@ -54,7 +55,7 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     public function findDemandedForBe(BeLabelDemand $demand)
     {
         return
-            GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database'])
+            GeneralUtility::makeInstance(Database::class)
                 ->findDemandedForBe($demand);
     }
 

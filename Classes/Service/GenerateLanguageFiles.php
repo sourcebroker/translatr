@@ -2,6 +2,7 @@
 
 namespace SourceBroker\Translatr\Service;
 
+use SourceBroker\Translatr\Database\Database;
 use SourceBroker\Translatr\Utility\ExceptionUtility;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Locking\Exception\LockAcquireWouldBlockException;
@@ -259,7 +260,7 @@ class GenerateLanguageFiles
     {
         if (false === file_exists($this->overrideFilesLoaderFilePath)) {
             $locallangFiles =
-                GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database'])
+                GeneralUtility::makeInstance(Database::class)
                     ->getLocallanfFiles();
             if (!$locallangFiles) {
                 return;
@@ -385,7 +386,7 @@ class GenerateLanguageFiles
     protected function getLabelsByLocallangFile($locallangFile)
     {
         return
-            GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database'])
+            GeneralUtility::makeInstance(Database::class)
                 ->getLabelsByLocallangFile($locallangFile);
     }
 }

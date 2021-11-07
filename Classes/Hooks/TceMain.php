@@ -3,6 +3,7 @@
 namespace SourceBroker\Translatr\Hooks;
 
 use SourceBroker\Translatr\Database\Database;
+use SourceBroker\Translatr\Database\DatabaseInterface;
 use SourceBroker\Translatr\Service\CacheCleaner;
 use SourceBroker\Translatr\Utility\FileUtility;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -37,8 +38,8 @@ class TceMain
         DataHandler $pObj
     ) {
         if ($table === 'tx_translatr_domain_model_label') {
-            /** @var Database $db */
-            $db = GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database']);
+            /** @var DatabaseInterface $db */
+            $db = GeneralUtility::makeInstance(Database::class);
             if ($status === 'new') {
                 $id = $pObj->substNEWwithIDs[$id];
                 if (empty($fieldArray['ukey'])) {

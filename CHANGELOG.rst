@@ -9,6 +9,7 @@ master
 3) [BUGFIX] Remove not needed use declaration.
 4) [FEATURE] Add ddev for testing extension with different TYPO3 versions.
 5) [BUGFIX] Fix compatibility for TYPO3 9.5 for registering backend module.
+6) [TASK] Remove support for database operation for TYPO3 before 8.7.
 
 3.0.7
 ~~~~~

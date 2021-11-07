@@ -25,6 +25,7 @@ namespace SourceBroker\Translatr\Configuration;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use SourceBroker\Translatr\Database\Database;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -47,7 +48,7 @@ class Configurator
         } else {
             $rootPageForTsConfig = null;
             $rootPageForTsConfigRow
-                = GeneralUtility::makeInstance($GLOBALS['TYPO3_CONF_VARS']['EXT']['EXTCONF']['translatr']['database'])->getRootPage();
+                = GeneralUtility::makeInstance(Database::class)->getRootPage();
             if ($rootPageForTsConfigRow !== null) {
                 $rootPageForTsConfig = $rootPageForTsConfigRow['uid'];
             }
