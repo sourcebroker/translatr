@@ -116,7 +116,7 @@ class LabelController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
         $pageRenderer->addRequireJsConfiguration(
             [
                 'paths' => [
-                    'select2' => '../typo3conf/ext/translatr/Resources/Public/JavaScript/jquery.select2/dist/js/select2',
+                    'select2' => '/typo3conf/ext/translatr/Resources/Public/JavaScript/jquery.select2/dist/js/select2',
                 ]
             ]
         );
