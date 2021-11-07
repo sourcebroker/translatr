@@ -8,6 +8,7 @@ master
 2) [BUGFIX] Check for languages node.
 3) [BUGFIX] Remove not needed use declaration.
 4) [FEATURE] Add ddev for testing extension with different TYPO3 versions.
+5) [BUGFIX] Fix compatibility for TYPO3 9.5 for registering backend module.
 
 3.0.7
 ~~~~~

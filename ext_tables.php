@@ -11,7 +11,9 @@ call_user_func(
                 'translate',
                 '',
                 [
-                    'Label' => 'list',
+                    \TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) > 10004000 ?
+                        SourceBroker\Translatr\Controller\LabelController::class
+                        : 'Label' => 'list',
                 ],
                 [
                     'access' => 'user,group',
