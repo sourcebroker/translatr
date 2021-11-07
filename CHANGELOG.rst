@@ -7,6 +7,7 @@ master
 1) [BUGFIX] Fix sql strict error for grouping.
 2) [BUGFIX] Check for languages node.
 3) [BUGFIX] Remove not needed use declaration.
+4) [FEATURE] Add ddev for testing extension with different TYPO3 versions.
 
 3.0.7
 ~~~~~
