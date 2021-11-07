@@ -10,6 +10,7 @@ master
 4) [FEATURE] Add ddev for testing extension with different TYPO3 versions.
 5) [BUGFIX] Fix compatibility for TYPO3 9.5 for registering backend module.
 6) [TASK] Remove support for database operation for TYPO3 before 8.7.
+7) [TASK] Remove dependency to vhs. Remove dependency to php. Add dependency to TYPO3 11.
 
 3.0.7
 ~~~~~

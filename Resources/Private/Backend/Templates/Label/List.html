@@ -1,7 +1,6 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
       xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
       xmlns:sbt="http://typo3.org/ns/SourceBroker/Translatr/ViewHelpers"
-      xmlns:v="http://typo3.org/ns/FluidTYPO3/Vhs/ViewHelpers"
       data-namespace-typo3-fluid="true"
 >
 
@@ -43,9 +42,7 @@
                     </td>
                     <f:for each="{demand.languages}" as="language">
                         <td>
-                            {label.language_childs -> v:iterator.filter(propertyName: 'language', filter: language) ->
-                            v:iterator.first() -> v:variable.set(name: 'childLabel')}
-
+                            <f:variable name="childLabel" value="{sbt:be.getChildlLang(language: language, label: label)}" />
                             <f:if condition="{childLabel}">
                                 <f:then>
                                     <f:render partial="Label/ActionButtons"
@@ -55,7 +52,7 @@
                                 </f:then>
                                 <f:else>
                                     {sbt:be.translate(llFile: label.ll_file, language: language, key: label.ukey) ->
-                                    v:variable.set(name: 'labelText')}
+                                    f:variable(name: 'labelText')}
 
                                     <f:render partial="Label/ActionButtons/New" arguments="{
                                         language: language,
