@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+4.0.2
+~~~~~
+
+1) [BUGFIX] In TYPO3 11 there is possibility to drop ``ext_emconf.php``. ext:translator was using ``ext_emconf.php`` to
+   build some extended info about extensions, mainly to show ``[ext name] ([ext title])`` pair. With TYPO3 11 and
+   possibility to drop ``ext_emconf.php`` there is no longer ``title`` so the pair ``[ext name] ([ext title])`` can not be
+   guaranteed. This allows to drop ``ExtensionsUtility.php`` and move extension list get directly to ``LabelRepository.php``
+
+
 4.0.1
 ~~~~~
 

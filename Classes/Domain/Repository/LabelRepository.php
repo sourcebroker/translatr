@@ -2,14 +2,15 @@
 
 namespace SourceBroker\Translatr\Domain\Repository;
 
+use SourceBroker\Translatr\Configuration\Configurator;
 use SourceBroker\Translatr\Database\Database;
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Model\Label;
-use SourceBroker\Translatr\Utility\ExtensionsUtility;
 use SourceBroker\Translatr\Utility\FileUtility;
 use SourceBroker\Translatr\Utility\LanguageUtility;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
 use TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException;
@@ -64,12 +65,10 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      */
     public function getExtensionsItems()
     {
-        $extensions = [''];
-        foreach (ExtensionsUtility::getExtensionsWithMetaData() as $extData) {
-            $extensions[$extData['extensionKey']] = $extData['extensionKey'] . ' (' . ($extData['title']) . ')';
-        }
-        ksort($extensions);
-        return $extensions;
+        $config = GeneralUtility::makeInstance(Configurator::class);
+        $extensions = array_intersect($config->getOption('extensions'), ExtensionManagementUtility::getLoadedExtensionListArray());
+        sort($extensions);
+        return array_combine($extensions, $extensions);
     }
 
     /**
@@ -162,10 +161,10 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         ]);
 
         return $query->matching($query->logicalAnd([
-                $query->equals('language', $label->getLanguage()),
-                $query->equals('llFile', $label->getLlFile()),
-                $query->equals('ukey', $label->getUkey()),
-            ]))->execute()->getFirst();
+            $query->equals('language', $label->getLanguage()),
+            $query->equals('llFile', $label->getLlFile()),
+            $query->equals('ukey', $label->getUkey()),
+        ]))->execute()->getFirst();
     }
 
     /**
