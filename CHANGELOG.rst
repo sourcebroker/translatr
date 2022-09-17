@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+4.0.3
+~~~~~
+
+1) [BUGFIX] Fix not validating composer.json.
+
 4.0.2
 ~~~~~
 
