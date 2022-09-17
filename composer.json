@@ -13,10 +13,6 @@
       "SourceBroker\\Translatr\\": "Classes/"
     }
   },
-  "replace": {
-    "sourcebroker/translatr": "self.version",
-    "typo3-ter/translatr": "self.version"
-  },
   "config": {
     "vendor-dir": ".Build/vendor",
     "bin-dir": ".Build/bin"
