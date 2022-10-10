@@ -41,7 +41,7 @@ class FileUtility
      */
     public static function getTempFolderPath()
     {
-        $tempFolderPath = Environment::getPublicPath() . '/' . 'uploads/tx_translatr';
+        $tempFolderPath = Environment::getVarPath() . '/tx_translatr';
         if (!is_dir($tempFolderPath)) {
             GeneralUtility::mkdir_deep($tempFolderPath);
         }
