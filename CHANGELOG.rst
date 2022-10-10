@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+5.0.0
+~~~~~
+
+1) [BREAKING] Show edit ability for default language always.
+2) [BREAKING] Move generated files path to Environment::getVarPath() . '/tx_translatr'. Breaking as this files
+   can be shared in deploys.
+
 4.0.3
 ~~~~~
 
