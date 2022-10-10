@@ -35,9 +35,7 @@
                         </f:if>
                     </td>
                     <td>
-                        <f:if condition="{demand.languages -> f:count()} == 0">
-                            <f:render partial="Label/ActionButtons" arguments="{label: label}"/>
-                        </f:if>
+                        <f:render partial="Label/ActionButtons" arguments="{label: label}"/>
                         {label.text}
                     </td>
                     <f:for each="{demand.languages}" as="language">
