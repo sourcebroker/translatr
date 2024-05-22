@@ -2,7 +2,7 @@
 
 return [
     'translatr' => [
-        'parent' => 'tools',
+        'parent' => 'web',
         'position' => ['before' => '*'],
         'access' => 'group,user',
         'iconIdentifier' => 'ext-translatr',
