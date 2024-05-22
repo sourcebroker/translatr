@@ -8,11 +8,11 @@ interface DatabaseInterface
 {
     public function update($table, array $set, array $condition);
 
-    public function getRootPage();
+    public function getRootPage(): int;
 
     public function findDemandedForBe(BeLabelDemand $demand);
 
-    public function getLabelsByLocallangFile($locallangFile);
+    public function getLabelsByLocallangFile($locallangFile): ?array;
 
-    public function getLocallanfFiles();
+    public function getLocallangFiles(): ?array;
 }

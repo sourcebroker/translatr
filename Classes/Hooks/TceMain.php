@@ -2,6 +2,7 @@
 
 namespace SourceBroker\Translatr\Hooks;
 
+use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use SourceBroker\Translatr\Database\Database;
 use SourceBroker\Translatr\Database\DatabaseInterface;
 use SourceBroker\Translatr\Service\CacheCleaner;
@@ -11,10 +12,6 @@ use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * Class TceMain
- *
- */
 class TceMain
 {
     public function processCmdmap_postProcess(
@@ -36,7 +33,7 @@ class TceMain
         $id,
         array $fieldArray,
         DataHandler $pObj
-    ) {
+    ): void {
         if ($table === 'tx_translatr_domain_model_label') {
             /** @var DatabaseInterface $db */
             $db = GeneralUtility::makeInstance(Database::class);
@@ -48,7 +45,7 @@ class TceMain
                         FlashMessage::class,
                         'Ukey field value can\'t be empty',
                         'Translatr',
-                        FlashMessage::ERROR,
+                        AbstractMessage::ERROR,
                         true
                     );
                     /** @var $flashMessageService FlashMessageService */

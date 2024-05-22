@@ -2,9 +2,11 @@
 
 namespace SourceBroker\Translatr\ViewHelpers\Be;
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use SourceBroker\Translatr\Utility\LanguageUtility;
 
-class TranslateViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper
+class TranslateViewHelper extends AbstractViewHelper
 {
     public function initializeArguments()
     {
@@ -15,9 +17,8 @@ class TranslateViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractView
 
     /**
      * We don't need the cache of parse files, because it's done on the parser factory already
-     * @return string
      */
-    public function render()
+    public function render(): string
     {
         /** @var string $language */
         $language = $this->arguments['language'];
@@ -27,13 +28,11 @@ class TranslateViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractView
         $key = $this->arguments['key'];
 
         $parsedLabels = LanguageUtility::parseLanguageLabels($llFile, $language);
-        return $parsedLabels[$language][$key][0]['target'] ?: '';
+
+        return $parsedLabels[$language][$key][0]['target'] ?? '';
     }
 
-    /**
-     * @return \TYPO3\CMS\Core\Localization\LanguageService
-     */
-    protected function getLanguageService()
+    protected function getLanguageService(): LanguageService
     {
         return $GLOBALS['LANG'];
     }

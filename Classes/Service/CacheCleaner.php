@@ -11,25 +11,15 @@ use TYPO3\CMS\Core\Service\OpcodeCacheService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
 
-/**
- * Class CacheCleaner
- * @package SourceBroker\Translatr\Service
- */
 class CacheCleaner extends BaseService
 {
 
-    /**
-     * @var CacheManager
-     */
     protected $cacheManager;
 
-    /**
-     * CacheCleaner constructor.
-     */
     public function __construct()
     {
         parent::__construct();
-        $this->cacheManager = $this->objectManager->get(CacheManager::class);
+        $this->cacheManager = GeneralUtility::makeInstance(CacheManager::class);
     }
 
     public function flushCache(): void

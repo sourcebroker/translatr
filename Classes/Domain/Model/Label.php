@@ -2,256 +2,127 @@
 
 namespace SourceBroker\Translatr\Domain\Model;
 
-/***************************************************************
- *
- *  Copyright notice
- *
- *  (c) 2017
- *
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- ***************************************************************/
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
-/**
- * Label
- */
-class Label extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
+class Label extends AbstractEntity
 {
 
     /**
      * Extension from which the labels comes from
-     *
-     * @var string
      */
-    protected $extension = '';
+    protected string $extension = '';
 
     /**
      * Unique key of the translation
-     *
-     * @var string
      */
-    protected $ukey = '';
+    protected string $ukey = '';
 
     /**
      * Translated label
-     *
-     * @var string
      */
-    protected $text = '';
+    protected string $text = '';
 
-    /**
-     * description
-     *
-     * @var string
-     */
-    protected $description = '';
+    protected string $description = '';
 
-    /**
-     * tags
-     *
-     * @var string
-     */
-    protected $tags = '';
+    protected string $tags = '';
 
-    /**
-     * @var string
-     */
-    protected $language;
+    protected string $language = '';
 
-    /**
-     * @var string
-     */
-    protected $llFile = '';
+    protected string $llFile = '';
 
-    /**
-     * @var string
-     */
-    protected $llFileIndex = '';
+    protected string $llFileIndex = '';
 
-    /**
-     * @var int
-     */
-    protected $modify = '';
+    protected ?int $modify = null;
 
     /**
      * Returns the extension
-     *
-     * @return string $extension
      */
-    public function getExtension()
+    public function getExtension(): string
     {
         return $this->extension;
     }
 
-    /**
-     * Sets the extension
-     *
-     * @param string $extension
-     *
-     * @return void
-     */
-    public function setExtension($extension)
+    public function setExtension(string $extension): void
     {
         $this->extension = $extension;
     }
 
-    /**
-     * Returns the ukey
-     *
-     * @return string $ukey
-     */
-    public function getUkey()
+    public function getUkey(): string
     {
         return $this->ukey;
     }
 
-    /**
-     * Sets the ukey
-     *
-     * @param string $ukey
-     *
-     * @return void
-     */
-    public function setUkey($ukey)
+    public function setUkey(string $ukey): void
     {
         $this->ukey = $ukey;
     }
 
-    /**
-     * Returns the text
-     *
-     * @return string $text
-     */
-    public function getText()
+    public function getText(): string
     {
         return $this->text;
     }
 
-    /**
-     * Sets the text
-     *
-     * @param string $text
-     *
-     * @return void
-     */
-    public function setText($text)
+    public function setText(string $text)
     {
         $this->text = $text;
     }
 
-    /**
-     * Returns the description
-     *
-     * @return string $description
-     */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * Sets the description
-     *
-     * @param string $description
-     *
-     * @return void
-     */
-    public function setDescription($description)
+    public function setDescription(string $description)
     {
         $this->description = $description;
     }
 
-    /**
-     * @return string
-     */
-    public function getLlFile()
+    public function getLlFile(): string
     {
         return $this->llFile;
     }
 
-    /**
-     * @param string $llFile
-     */
-    public function setLlFile($llFile)
+    public function setLlFile(string $llFile)
     {
         $this->llFile = $llFile;
     }
 
-    /**
-     * @return string
-     */
-    public function getLlFileIndex()
+    public function getLlFileIndex(): string
     {
         return $this->llFileIndex;
     }
 
-    /**
-     * @param string llFileIndex
-     */
-    public function setLlFileIndex($llFileIndex)
+    public function setLlFileIndex(string $llFileIndex)
     {
         $this->llFileIndex = $llFileIndex;
     }
 
-    /**
-     * @return string
-     */
-    public function getLanguage()
+    public function getLanguage(): string
     {
         return $this->language;
     }
 
-    /**
-     * @param string $language
-     */
-    public function setLanguage($language)
+    public function setLanguage(string $language)
     {
         $this->language = $language;
     }
 
-    /**
-     * @return string
-     */
-    public function getTags()
+    public function getTags(): string
     {
         return $this->tags;
     }
 
-    /**
-     * @param string $tags
-     */
-    public function setTags($tags)
+    public function setTags(string $tags)
     {
         $this->tags = $tags;
     }
 
-    /**
-     * @return int
-     */
-    public function getModify()
+    public function getModify(): ?int
     {
         return $this->modify;
     }
 
-    /**
-     * @param int $modify
-     */
-    public function setModify(int $modify)
+    public function setModify(?int $modify)
     {
         $this->modify = $modify;
     }

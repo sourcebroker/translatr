@@ -2,26 +2,24 @@
 
 namespace SourceBroker\Translatr\ViewHelpers\Be;
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+use TYPO3Fluid\Fluid\Core\ViewHelper\Exception;
+use TYPO3\CMS\Backend\RecordList\DatabaseRecordList;
+use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentValueException;
-use TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList;
 
-/**
- * Class ActionLinkViewHelper
- *
- */
-class ActionLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper
+class ActionLinkViewHelper extends AbstractViewHelper
 {
     const TABLE = 'tx_translatr_domain_model_label';
-    const MODULE_NAME = 'web_TranslatrTranslate';
+    const MODULE_NAME = 'translatr';
 
     /**
-     * @throws \TYPO3\CMS\Fluid\Core\ViewHelper\Exception
+     * @throws Exception
      *
-     * @return void
      */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument(
             'type',
@@ -33,22 +31,19 @@ class ActionLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractVie
             'label',
             'array',
             'Label on which action should be taken.',
-            false
         );
         $this->registerArgument(
             'options',
             'array',
             'Additional options.',
-            false
         );
     }
 
     /**
      * @throws InvalidArgumentValueException
      *
-     * @return string
      */
-    public function render()
+    public function render(): string
     {
         if (!isset($this->arguments['options'])) {
             $this->arguments['options'] = [];
@@ -71,12 +66,7 @@ class ActionLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractVie
         }
     }
 
-    /**
-     * @param array $options
-     *
-     * @return string
-     */
-    public function renderNewLink($options)
+    public function renderNewLink(array $options): string
     {
         $pid = 0;
         $uriParameters = [
@@ -94,13 +84,7 @@ class ActionLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractVie
         return self::getModuleUrl('record_edit', $uriParameters);
     }
 
-    /**
-     * @param array $label
-     * @param array $options
-     *
-     * @return string
-     */
-    public function renderEditLink(array $label, array $options = [])
+    public function renderEditLink(array $label, array $options = []): string
     {
         $uriParameters = [
             'edit' => [
@@ -114,34 +98,22 @@ class ActionLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractVie
         return self::getModuleUrl('record_edit', $uriParameters);
     }
 
-    /**
-     * @return DatabaseRecordList
-     */
-    protected static function getDatabaseRecordList()
+    protected static function getDatabaseRecordList(): DatabaseRecordList
     {
         return GeneralUtility::makeInstance(DatabaseRecordList::class);
     }
 
-    /**
-     * @return string
-     */
-    protected static function getReturnUrl()
+    protected static function getReturnUrl(): string
     {
         return self::getThisModuleUrl(self::getCurrentParameters());
     }
 
-    /**
-     * @return string
-     */
-    public static function getThisModuleUrl($urlParameters = [])
+    public static function getThisModuleUrl($urlParameters = []): string
     {
         return self::getModuleUrl(self::MODULE_NAME, $urlParameters);
     }
 
-    /**
-     * @return array
-     */
-    public static function getCurrentParameters($getParameters = [])
+    public static function getCurrentParameters($getParameters = []): array
     {
         if (empty($getParameters)) {
             $getParameters = GeneralUtility::_GET();
@@ -165,11 +137,11 @@ class ActionLinkViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractVie
 
     public static function getModuleUrl($moduleName, $urlParameters = [])
     {
+        $uri = '';
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
         try {
-            $uri = $uriBuilder->buildUriFromRoute($moduleName, $urlParameters);
-        } catch (\TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException $e) {
-            $uri = $uriBuilder->buildUriFromRoutePath($moduleName, $urlParameters);
+            $uri = (string)$uriBuilder->buildUriFromRoute($moduleName, $urlParameters);
+        } catch (RouteNotFoundException $e) {
         }
         return (string)$uri;
     }

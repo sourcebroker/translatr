@@ -5,23 +5,11 @@ namespace SourceBroker\Translatr\Backend\FormDataProvider;
 use TYPO3\CMS\Backend\Form\FormDataProviderInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * Class LabelRowInitializeNew
- *
- */
 class LabelRowInitializeNew implements FormDataProviderInterface
 {
-    /**
-     * @var array
-     */
-    private $data = [];
+    private array $data = [];
 
-    /**
-     * @param array $data
-     *
-     * @return array
-     */
-    public function addData(array $data)
+    public function addData(array $data): array
     {
         $this->setData($data);
 
@@ -36,34 +24,22 @@ class LabelRowInitializeNew implements FormDataProviderInterface
         return $this->data;
     }
 
-    /**
-     * @param array $data
-     */
     private function setData(array $data)
     {
         $this->data = $data;
     }
 
-    /**
-     * @return bool
-     */
-    private function isNewRecord()
+    private function isNewRecord(): bool
     {
         return 'new' === $this->data['command'];
     }
 
-    /**
-     * @return bool
-     */
-    private function isTranslateLabelTable()
+    private function isTranslateLabelTable(): bool
     {
         return 'tx_translatr_domain_model_label' === $this->data['tableName'];
     }
 
-    /**
-     * @return void
-     */
-    private function setDefaultDatabaseRowData()
+    private function setDefaultDatabaseRowData(): void
     {
         $defaultTcaData = $this->getDefaultTcaData();
         $defaultTcaData = is_array($defaultTcaData) ? $defaultTcaData : [];
@@ -74,10 +50,7 @@ class LabelRowInitializeNew implements FormDataProviderInterface
         );
     }
 
-    /**
-     * @return mixed
-     */
-    private function getDefaultTcaData()
+    private function getDefaultTcaData(): mixed
     {
         return GeneralUtility::_GP('translatr_tcadefault');
     }

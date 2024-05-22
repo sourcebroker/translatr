@@ -5,8 +5,6 @@ return [
         'label' => 'text',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
-        'cruser_id' => 'cruser_id',
-        'dividers2tabs' => true,
         'enablecolumns' => [
             'starttime' => 'starttime',
             'endtime' => 'endtime',
@@ -20,11 +18,8 @@ return [
             'ignoreRootLevelRestriction' => true,
         ],
     ],
-    'interface' => [
-        'showRecordFieldList' => 'extension, ukey, text, description, ll_file',
-    ],
     'types' => [
-        '1' => ['showitem' => 'text, description, --div--;Extra , tags, language, extension, ll_file, ll_file_index, ukey, modify, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access, starttime, endtime'],
+        '1' => ['showitem' => 'text, description, --div--;Extra , tags, language, extension, ll_file, ll_file_index, ukey, modify, --div--;LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:tabs.access, starttime, endtime'],
     ],
     'palettes' => [
         '1' => ['showitem' => ''],
@@ -33,7 +28,7 @@ return [
         'starttime' => [
             'exclude' => 1,
             'l10n_mode' => 'exclude',
-            'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.starttime',
+            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.starttime',
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
@@ -44,7 +39,7 @@ return [
         'endtime' => [
             'exclude' => 1,
             'l10n_mode' => 'exclude',
-            'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.endtime',
+            'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.endtime',
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
@@ -59,7 +54,8 @@ return [
             'config' => [
                 'type' => 'user',
                 'renderType' => 'fieldHidden',
-                'eval' => 'required',
+                'required' => true,
+                'required' => true,
             ],
         ],
         'ukey' => [
@@ -69,7 +65,8 @@ return [
             'config' => [
                 'type' => 'user',
                 'renderType' => 'fieldHidden',
-                'eval' => 'trim,required',
+                'eval' => 'trim',
+                'required' => true,
             ],
         ],
         'text' => [

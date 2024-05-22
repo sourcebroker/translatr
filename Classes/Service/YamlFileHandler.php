@@ -6,41 +6,24 @@ namespace SourceBroker\Translatr\Service;
 use TYPO3\CMS\Core\Configuration\Loader\YamlFileLoader;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
-/**
- * Class YamlFileHandler
- * @package SourceBroker\Translatr\Service
- */
 class YamlFileHandler extends BaseService
 {
-    const LANG_FILE_PATH = '/Resources/Private/Language/';
-    const ROOT_NAME = 'ext';
-    const FILENAME = 'Configuration.yaml';
+    public const LANG_FILE_PATH = '/Resources/Private/Language/';
+    public const ROOT_NAME = 'ext';
+    public const FILENAME = 'Configuration.yaml';
 
-    /**
-     * @var YamlFileLoader
-     */
-    protected $yamlFileLoader;
+    protected YamlFileLoader $yamlFileLoader;
 
-    /**
-     * @var PackageManager
-     */
-    protected $packageManager;
+    protected PackageManager $packageManager;
 
-    /**
-     * YamlFileHandler constructor.
-     */
     public function __construct()
     {
         parent::__construct();
-        $this->packageManager = $this->objectManager->get(PackageManager::class);
-        $this->yamlFileLoader = $this->objectManager->get(YamlFileLoader::class);
+        $this->packageManager = GeneralUtility::makeInstance(PackageManager::class);
+        $this->yamlFileLoader = GeneralUtility::makeInstance(YamlFileLoader::class);
     }
 
-    /**
-     * @return array
-     */
     public function getConfiguration(): array
     {
         $configuration = [];
@@ -60,9 +43,6 @@ class YamlFileHandler extends BaseService
         return $configuration;
     }
 
-    /**
-     * @return array
-     */
     protected function getGlobalConfiguration(): array
     {
         $configuration = [];
@@ -81,11 +61,6 @@ class YamlFileHandler extends BaseService
         return $configuration;
     }
 
-    /**
-     * Merge and create configuration
-     * @param array $configuration
-     * @param array $files
-     */
     protected function populateRows(array &$configuration, array $files): void
     {
         foreach ($files as $langFile => $rows) {
@@ -112,18 +87,11 @@ class YamlFileHandler extends BaseService
         }
     }
 
-    /**
-     * @param string $file
-     * @return array
-     */
     protected function readSingleFile(string $file): array
     {
         return $this->yamlFileLoader->load($file, 0);
     }
 
-    /**
-     * @return array
-     */
     protected function getYamlFilesFromPackages(): array
     {
         $files = [];
@@ -136,5 +104,4 @@ class YamlFileHandler extends BaseService
 
         return $files;
     }
-
 }

@@ -2,94 +2,47 @@
 
 namespace SourceBroker\Translatr\Domain\Model\Dto;
 
-/**
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
-/**
- * Administration Demand model
- *
- */
-class BeLabelDemand extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
+class BeLabelDemand extends AbstractEntity
 {
 
-    /**
-     * @var string
-     */
-    protected $extension = '';
+    protected string $extension = '';
 
-    /**
-     * @var array
-     */
-    protected $languages = null;
+    protected ?array $languages = null;
 
-    /**
-     * @var array
-     */
-    protected $keys = null;
+    protected ?array $keys = null;
 
-    /**
-     * @return string
-     */
-    public function getExtension()
+    public function getExtension(): string
     {
         return $this->extension;
     }
 
-    /**
-     * @param string $extension
-     */
-    public function setExtension($extension)
+    public function setExtension(string $extension)
     {
         $this->extension = $extension;
     }
 
-    /**
-     * Checks if all required properties are set
-     *
-     * @return bool
-     */
-    public function isValid()
+    public function isValid(): bool
     {
-        return $this->getExtension();
+        return !empty($this->extension);
     }
 
-    /**
-     * @return array
-     */
-    public function getLanguages()
+    public function getLanguages(): ?array
     {
         return $this->languages;
     }
 
-    /**
-     * @param array
-     */
-    public function setLanguages($languages)
+    public function setLanguages(?array $languages): void
     {
         $this->languages = $languages;
     }
 
-    /**
-     * @return array
-     */
     public function getKeys(): ?array
     {
         return $this->keys;
     }
 
-    /**
-     * @param array $keys
-     */
     public function setKeys(array $keys): void
     {
         $this->keys = $keys;

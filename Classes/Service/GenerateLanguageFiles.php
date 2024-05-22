@@ -2,6 +2,8 @@
 
 namespace SourceBroker\Translatr\Service;
 
+use SourceBroker\Translatr\Utility\FileUtility;
+use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use SourceBroker\Translatr\Database\Database;
 use SourceBroker\Translatr\Utility\ExceptionUtility;
 use TYPO3\CMS\Core\Core\Environment;
@@ -10,97 +12,63 @@ use TYPO3\CMS\Core\Locking\LockFactory;
 use TYPO3\CMS\Core\Locking\LockingStrategyInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-/**
- * Class LocallangXMLOverride
- *
- */
 class GenerateLanguageFiles
 {
-    /**
-     * @var string
-     */
-    protected $overrideFilesLoaderFilePath;
 
-    /**
-     * @var string
-     */
-    protected $overrideFilesBaseDirectoryPath;
-
-    /**
-     * @var
-     */
-    protected $overrideFilesExtDirectoryPath;
+    protected array $locks = [];
+    protected string $overrideFilesLoaderFilePath;
+    protected string $overrideFilesBaseDirectoryPath;
+    protected string $overrideFilesExtDirectoryPath;
 
 
-    /**
-     *
-     */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setOverrideFilesLoaderFilePath();
         if (!file_exists($this->overrideFilesLoaderFilePath)) {
-            $lockFactory = GeneralUtility::makeInstance(LockFactory::class);
-            $locker = $lockFactory->createLocker('tx_translatr');
-            if ($locker->acquire()) {
-                if (!file_exists($this->overrideFilesLoaderFilePath)) {
-                    $this->setOverrideFilesBaseDirectoryPath();
-                    $this->setOverrideFilesExtDirectoryPath();
-                    $this->createNotExistingLocallangOverrideFiles();
-                    $this->createOverrideFilesLoaderFileIfNotExists();
-
-                    if (!$this->overrideFilesLoaderFileExists()) {
-                        ExceptionUtility::throwException(
-                            \RuntimeException::class,
-                            'Could not create locallang XML Override file in path '
-                            . $this->overrideFilesLoaderFilePath . ' due to unknown reason.',
-                            82347523
-                        );
-                        return;
-                    }
-                    $locker->release();
+            $this->acquireLock('tx_translatr', 'tx_translatr_key');
+            if (!file_exists($this->overrideFilesLoaderFilePath)) {
+                $this->setOverrideFilesBaseDirectoryPath();
+                $this->setOverrideFilesExtDirectoryPath();
+                $this->createNotExistingLocallangOverrideFiles();
+                $this->createOverrideFilesLoaderFileIfNotExists();
+                if (!$this->overrideFilesLoaderFileExists()) {
+                    ExceptionUtility::throwException(
+                        \RuntimeException::class,
+                        'Could not create locallang XML Override file in path '
+                        . $this->overrideFilesLoaderFilePath . ' due to unknown reason.',
+                        82347523
+                    );
+                    $this->releaseLock('tx_translatr');
+                    return;
                 }
             }
+            $this->releaseLock('tx_translatr');
         }
         include $this->overrideFilesLoaderFilePath;
     }
 
-    /**
-     * @return void
-     */
-    protected function setOverrideFilesLoaderFilePath()
+    protected function setOverrideFilesLoaderFilePath(): void
     {
-        $this->overrideFilesLoaderFilePath = \SourceBroker\Translatr\Utility\FileUtility::getTempFolderPath()
+        $this->overrideFilesLoaderFilePath = FileUtility::getTempFolderPath()
             . '/locallangOverrideLoader.php';
     }
 
-    /**
-     * @return void
-     */
-    protected function setOverrideFilesBaseDirectoryPath()
+    protected function setOverrideFilesBaseDirectoryPath(): void
     {
-        $this->overrideFilesBaseDirectoryPath = \SourceBroker\Translatr\Utility\FileUtility::getTempFolderPath() . '/overrides';
+        $this->overrideFilesBaseDirectoryPath = FileUtility::getTempFolderPath() . '/overrides';
     }
 
-    /**
-     * @return void
-     */
-    protected function setOverrideFilesExtDirectoryPath()
+    protected function setOverrideFilesExtDirectoryPath(): void
     {
         $this->overrideFilesExtDirectoryPath = $this->overrideFilesBaseDirectoryPath . '/ext';
     }
 
-    /**
-     * @return bool
-     */
-    protected function overrideFilesLoaderFileExists()
+    protected function overrideFilesLoaderFileExists(): bool
     {
         return file_exists($this->overrideFilesLoaderFilePath);
     }
 
-    /**
-     * @return void
-     */
-    protected function createOverrideFilesLoaderFileIfNotExists()
+    protected function createOverrideFilesLoaderFileIfNotExists(): void
     {
         if ($this->overrideFilesLoaderFileExists()) {
             return;
@@ -109,18 +77,17 @@ class GenerateLanguageFiles
         $this->createOverrideFilesLoaderFile();
     }
 
-    /**
-     * @return void
-     */
-    protected function createOverrideFilesLoaderFile()
+    protected function createOverrideFilesLoaderFile(): void
     {
+
         $this->createOverrideFilesLoaderFileDirectoryIfNotExists();
         $this->createOverrideFilesDirectories();
         $code = '<?php' . PHP_EOL;
         foreach ($this->getTranslationOverrideFiles() as $isoCode => $fileDatasets) {
             foreach ($fileDatasets as $fileData) {
                 $code .= $this->getFinalOverrideRow($isoCode, $fileData['overwritten'], $fileData['overwriteWith']);
-                $code .= $this->getFinalOverrideRow($isoCode, str_replace('EXT:', 'typo3conf/ext/', $fileData['overwritten']), $fileData['overwriteWith']);
+                $code .= $this->getFinalOverrideRow($isoCode,
+                    str_replace('EXT:', 'typo3conf/ext/', $fileData['overwritten']), $fileData['overwriteWith']);
             }
         }
         $tempFilename = $this->overrideFilesLoaderFilePath . '.tmp';
@@ -141,43 +108,28 @@ class GenerateLanguageFiles
             . $overwritten . '\'][] = \'' . $overwriteWith . '\';' . PHP_EOL;
     }
 
-    /**
-     * @return void
-     */
-    protected function createOverrideFilesLoaderFileDirectoryIfNotExists()
+    protected function createOverrideFilesLoaderFileDirectoryIfNotExists(): void
     {
         $this->createDirectoryIfNotExists(dirname($this->overrideFilesLoaderFilePath));
     }
 
-    /**
-     * @return void
-     */
-    protected function createOverrideFilesDirectories()
+    protected function createOverrideFilesDirectories(): void
     {
         $this->createOverrideFilesBaseDirectoryIfNotExists();
         $this->createOverrideFilesExtDirectoryIfNotExists();
     }
 
-    /**
-     * @return void
-     */
-    protected function createOverrideFilesBaseDirectoryIfNotExists()
+    protected function createOverrideFilesBaseDirectoryIfNotExists(): void
     {
         $this->createDirectoryIfNotExists($this->overrideFilesExtDirectoryPath);
     }
 
-    /**
-     * @return void
-     */
-    protected function createOverrideFilesExtDirectoryIfNotExists()
+    protected function createOverrideFilesExtDirectoryIfNotExists(): void
     {
         $this->createDirectoryIfNotExists($this->overrideFilesExtDirectoryPath);
     }
 
-    /**
-     * @param string $directoryPath Directory absolute path
-     */
-    protected function createDirectoryIfNotExists($directoryPath)
+    protected function createDirectoryIfNotExists(string $directoryPath): void
     {
         if (!is_dir($directoryPath)) {
             GeneralUtility::mkdir_deep($directoryPath);
@@ -192,11 +144,9 @@ class GenerateLanguageFiles
     }
 
     /**
-     * @return array
-     *
      * @todo check if return of relative path (in element value path) works fine. It will be better to return relative path to avoid problems with some specific server settings
      */
-    protected function getTranslationOverrideFiles()
+    protected function getTranslationOverrideFiles(): array
     {
         $translationOverrideFiles = [];
 
@@ -218,10 +168,7 @@ class GenerateLanguageFiles
         return $translationOverrideFiles;
     }
 
-    /**
-     * @return string
-     */
-    protected function transformPathFromLocallangOverridesToLocallang($fullPath)
+    protected function transformPathFromLocallangOverridesToLocallang(string $fullPath): string
     {
         $replacements = [
             $this->overrideFilesExtDirectoryPath => 'EXT:',
@@ -240,28 +187,20 @@ class GenerateLanguageFiles
         return 'EXT:' . $pathNoIso . '/' . $nameNoIso;
     }
 
-    /**
-     * @param string $locallangPath
-     *
-     * @return string
-     */
-    protected function transformPathFromLocallangToLocallangOverrides($locallangPath, $isocode)
+    protected function transformPathFromLocallangToLocallangOverrides(string $locallangPath, string $isocode): string
     {
-        if (GeneralUtility::isFirstPartOfStr($locallangPath, 'EXT:')) {
+        if (\str_starts_with($locallangPath, 'EXT:')) {
             return str_replace('EXT:', $this->overrideFilesExtDirectoryPath . '/' . $isocode . '/', $locallangPath);
         }
         return $this->overrideFilesBaseDirectoryPath . '/' . $locallangPath;
     }
 
-    /**
-     * @return void
-     */
-    protected function createNotExistingLocallangOverrideFiles()
+    protected function createNotExistingLocallangOverrideFiles(): void
     {
         if (false === file_exists($this->overrideFilesLoaderFilePath)) {
             $locallangFiles =
                 GeneralUtility::makeInstance(Database::class)
-                    ->getLocallanfFiles();
+                    ->getLocallangFiles();
             if (!$locallangFiles) {
                 return;
             }
@@ -271,11 +210,7 @@ class GenerateLanguageFiles
         }
     }
 
-    /**
-     * @param string $locallangFile
-     * @param $isoCode
-     */
-    protected function createLocallangOverrideFileIfNotExist($locallangFile, $isoCode)
+    protected function createLocallangOverrideFileIfNotExist(string $locallangFile, string $isoCode): void
     {
         $locallangOverrideFilePath = $this->transformPathFromLocallangToLocallangOverrides($locallangFile, $isoCode);
         if (!is_file($locallangOverrideFilePath)) {
@@ -283,10 +218,7 @@ class GenerateLanguageFiles
         }
     }
 
-    /**
-     * @param string $locallangFile
-     */
-    protected function createLocallangOverrideFile($locallangFile)
+    protected function createLocallangOverrideFile(string $locallangFile): void
     {
         $labels = $this->getLabelsByLocallangFile($locallangFile);
         $groupedLabels = [];
@@ -316,12 +248,7 @@ class GenerateLanguageFiles
         }
     }
 
-    /**
-     * @param array $labels
-     *
-     * @return \DOMDocument
-     */
-    protected function createXlfFileForLabels(array $labels)
+    protected function createXlfFileForLabels(array $labels): \DOMDocument
     {
         $xml = new \DOMDocument('1.0', 'utf-8');
         $root = $xml->createElement('xliff');
@@ -365,28 +292,78 @@ class GenerateLanguageFiles
         return $xml;
     }
 
-    /**
-     * @param string $filePath
-     * @param string $isoCode
-     *
-     * @return string
-     */
-    protected function prependLocallangFileNameWithIsoCode($filePath, $isoCode)
+    protected function prependLocallangFileNameWithIsoCode(string $filePath, string $isoCode): string
     {
         $fileName = basename($filePath);
         $dirname = dirname($filePath);
         return $dirname . '/' . $isoCode . '.' . $fileName;
     }
 
-    /**
-     * @param string $locallangFile
-     *
-     * @return array
-     */
-    protected function getLabelsByLocallangFile($locallangFile)
+    protected function getLabelsByLocallangFile(string $locallangFile): array
     {
         return
             GeneralUtility::makeInstance(Database::class)
                 ->getLabelsByLocallangFile($locallangFile);
     }
+
+    protected function acquireLock(string $type, string $key)
+    {
+        $lockFactory = GeneralUtility::makeInstance(LockFactory::class);
+        $this->locks[$type]['accessLock'] = $lockFactory->createLocker($type);
+
+        $this->locks[$type]['pageLock'] = $lockFactory->createLocker(
+            $key,
+            LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE | LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK
+        );
+
+        do {
+            if (!$this->locks[$type]['accessLock']->acquire()) {
+                throw new \RuntimeException('Could not acquire access lock for "' . $type . '"".', 1294586098);
+            }
+
+            try {
+                $locked = $this->locks[$type]['pageLock']->acquire(
+                    LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE | LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK
+                );
+            } catch (LockAcquireWouldBlockException $e) {
+                // somebody else has the lock, we keep waiting
+
+                // first release the access lock
+                $this->locks[$type]['accessLock']->release();
+                // now lets make a short break (100ms) until we try again, since
+                // the page generation by the lock owner will take a while anyways
+                usleep(100000);
+                continue;
+            }
+            $this->locks[$type]['accessLock']->release();
+            if ($locked) {
+                break;
+            }
+            throw new \RuntimeException('Could not acquire page lock for ' . $key . '.', 1460975877);
+        } while (true);
+    }
+
+    /**
+     * Release a page specific lock
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws NoSuchCacheException
+     */
+    protected function releaseLock(string $type): void
+    {
+        if ($this->locks[$type]['accessLock'] ?? false) {
+            if (!$this->locks[$type]['accessLock']->acquire()) {
+                throw new \RuntimeException('Could not acquire access lock for "' . $type . '"".', 1460975902);
+            }
+
+            $this->locks[$type]['pageLock']->release();
+            $this->locks[$type]['pageLock']->destroy();
+            $this->locks[$type]['pageLock'] = null;
+
+            $this->locks[$type]['accessLock']->release();
+            $this->locks[$type]['accessLock'] = null;
+        }
+    }
+
 }

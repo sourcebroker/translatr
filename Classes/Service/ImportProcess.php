@@ -7,13 +7,8 @@ use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Repository\LabelRepository;
 use SourceBroker\Translatr\Utility\LanguageUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
-/**
- * Class ImportProcess
- * @package SourceBroker\Translatr\Service
- */
 class ImportProcess extends BaseService
 {
     /**
@@ -21,38 +16,22 @@ class ImportProcess extends BaseService
      */
     const ALLOWED_PROPERTIES = ['tags'];
 
-    /**
-     * @var YamlFileHandler
-     */
-    protected $yamlFileHandler;
+    protected YamlFileHandler $yamlFileHandler;
 
-    /**
-     * @var LabelRepository
-     */
-    protected $labelRepository;
+    protected LabelRepository $labelRepository;
 
-    /**
-     * ImportProcess constructor.
-     */
     public function __construct()
     {
         parent::__construct();
-        $this->yamlFileHandler = $this->objectManager->get(YamlFileHandler::class);
-        $this->labelRepository = $this->objectManager->get(LabelRepository::class);
+        $this->yamlFileHandler = GeneralUtility::makeInstance(YamlFileHandler::class);
+        $this->labelRepository = GeneralUtility::makeInstance(LabelRepository::class);
     }
 
-    /**
-     * @return array
-     */
     public function getDataToImport(): array
     {
         return $this->yamlFileHandler->getConfiguration();
     }
 
-    /**
-     * @param string $extension
-     * @param array $file
-     */
     public function importDataFromSingleFile(string $extension, array $file): void
     {
         $this->labelRepository->indexExtensionLabels($extension);
@@ -75,15 +54,10 @@ class ImportProcess extends BaseService
         }
     }
 
-    /**
-     * @param string $extension
-     * @param array $keys
-     * @param string $path
-     */
     protected function pushMissingKeyTranslationsToDatabase(string $extension, array $keys, string $path): void
     {
         $allLanguages = array_keys(LanguageUtility::getAvailableLanguages());
-        $demand = $this->objectManager->get(BeLabelDemand::class);
+        $demand = GeneralUtility::makeInstance(BeLabelDemand::class);
         $demand->setExtension($extension);
         $demand->setKeys(array_keys($keys));
         $demand->setLanguages($allLanguages);
@@ -110,6 +84,6 @@ class ImportProcess extends BaseService
                 }
             }
         }
-        $this->objectManager->get(PersistenceManager::class)->persistAll();
+        GeneralUtility::makeInstance(PersistenceManager::class)->persistAll();
     }
 }

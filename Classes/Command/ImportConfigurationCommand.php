@@ -11,47 +11,21 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 
-/**
- * Class ImportConfigurationCommand
- * @package SourceBroker\Translatr\Command
- */
 class ImportConfigurationCommand extends Command
 {
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
+    protected ImportProcess $importProcessService;
 
-    /**
-     * @var ImportProcess
-     */
-    protected $importProcessService;
+    protected CacheCleaner $cacheCleaner;
 
-    /**
-     * @var CacheCleaner
-     */
-    protected $cacheCleaner;
-
-    /**
-     * Configure the command by defining the name, options and arguments
-     */
     protected function configure(): void
     {
         $this->setAliases(['translatr:import:config']);
         $this->setDescription('Import configuration for labels for ext:translatr');
-        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->importProcessService = $this->objectManager->get(ImportProcess::class);
-        $this->cacheCleaner = $this->objectManager->get(CacheCleaner::class);
+        $this->importProcessService = GeneralUtility::makeInstance(ImportProcess::class);
+        $this->cacheCleaner = GeneralUtility::makeInstance(CacheCleaner::class);
     }
 
-    /**
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Import of Translatr Configuration started');
@@ -75,6 +49,6 @@ class ImportConfigurationCommand extends Command
         $this->cacheCleaner->flushCache();
         $progressBar->finish();
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

@@ -2,97 +2,42 @@
 
 namespace SourceBroker\Translatr\Domain\Model;
 
-/***************************************************************
- *
- *  Copyright notice
- *
- *  (c) 2017
- *
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- ***************************************************************/
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
-/**
- * Class Language
- *
- */
-class Language extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
+class Language extends AbstractEntity
 {
+    protected string $title;
 
-    /**
-     * @var string
-     */
-    protected $title;
+    protected string $flag;
 
-    /**
-     * @var string
-     */
-    protected $flag;
+    protected string $isoCode;
 
-    /**
-     * @var string
-     */
-    protected $isoCode;
-
-    /**
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * @param string $title
-     */
-    public function setTitle($title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
-    /**
-     * @return string
-     */
-    public function getFlag()
+    public function getFlag(): string
     {
         return $this->flag;
     }
 
-    /**
-     * @param string $flag
-     */
-    public function setFlag($flag)
+    public function setFlag(string $flag): void
     {
         $this->flag = $flag;
     }
 
-    /**
-     * @return string
-     */
-    public function getIsoCode()
+    public function getIsoCode(): string
     {
         return $this->isoCode;
     }
 
-    /**
-     * @param string $isoCode
-     */
-    public function setIsoCode($isoCode)
+    public function setIsoCode(string $isoCode): void
     {
         $this->isoCode = $isoCode;
     }

@@ -2,13 +2,14 @@
 
 namespace SourceBroker\Translatr\Domain\Repository;
 
+use TYPO3\CMS\Extbase\Persistence\Repository;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use SourceBroker\Translatr\Configuration\Configurator;
 use SourceBroker\Translatr\Database\Database;
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Model\Label;
 use SourceBroker\Translatr\Utility\FileUtility;
 use SourceBroker\Translatr\Utility\LanguageUtility;
-use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -16,65 +17,27 @@ use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
 use TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
-/***************************************************************
- *
- *  Copyright notice
- *
- *  (c) 2015
- *
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- ***************************************************************/
-
-/**
- * The repository for Labels
- */
-class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
+class LabelRepository extends Repository
 {
     const TABLE = 'tx_translatr_domain_model_label';
 
-    /**
-     * @param BeLabelDemand $demand
-     *
-     * @return array
-     */
-    public function findDemandedForBe(BeLabelDemand $demand)
+    public function findDemandedForBe(BeLabelDemand $demand): array
     {
         return
             GeneralUtility::makeInstance(Database::class)
                 ->findDemandedForBe($demand);
     }
 
-    /**
-     * @return array
-     */
-    public function getExtensionsItems()
+    public function getExtensionsItems(): array
     {
         $config = GeneralUtility::makeInstance(Configurator::class);
-        $extensions = array_intersect($config->getOption('extensions'), ExtensionManagementUtility::getLoadedExtensionListArray());
+        $extensions = array_intersect((array)$config->getOption('extensions'),
+            ExtensionManagementUtility::getLoadedExtensionListArray());
         sort($extensions);
         return array_combine($extensions, $extensions);
     }
 
     /**
-     * @param string $extKey
-     *
-     * @return void
      * @todo When support for more files will be implemented, then indexing
      *       proces should be moved somewhere else to speed up the BE module
      *       (currently it's done on every request to keep labels up to date)
@@ -84,9 +47,9 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      *       (EXT:{extKey}/Resources/Private/Language/locallang.xlf or
      *       EXT:{extKey}/Resources/Private/Language/locallang.xml)
      */
-    public function indexExtensionLabels($extKey)
+    public function indexExtensionLabels(string $extKey): void
     {
-        $llDirectoryPath = Environment::getPublicPath() . '/' . 'typo3conf/ext/' . $extKey . '/Resources/Private/Language/';
+        $llDirectoryPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($extKey) . 'Resources/Private/Language/';
         $llFilesFrontend = glob($llDirectoryPath . 'locallang.{xml,xlf}', GLOB_BRACE);
         $llFilesBackend = glob($llDirectoryPath . 'locallang_db.{xml,xlf}', GLOB_BRACE);
         $llFiles = array_merge($llFilesFrontend, $llFilesBackend);
@@ -122,8 +85,8 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 $obj->setPid(0);
                 $obj->setText($label);
                 $obj->setUkey($labelKey);
-                $obj->setLlFile(FileUtility::getRelativePathFromAbsolute($llFile));
-                $obj->setLlFileIndex(strrev(FileUtility::getRelativePathFromAbsolute($llFile)));
+                $obj->setLlFile(FileUtility::getRelativePathFromAbsolute($llFile, $extKey));
+                $obj->setLlFileIndex(strrev(FileUtility::getRelativePathFromAbsolute($llFile, $extKey)));
                 $obj->setLanguage('default');
                 $obj->setModify(0);
                 /** @var Label $indexedLabel */
@@ -142,16 +105,11 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                 }
                 unset($obj);
             }
-            $this->objectManager->get(PersistenceManager::class)->persistAll();
+            GeneralUtility::makeInstance(PersistenceManager::class)->persistAll();
         }
     }
 
-    /**
-     * @param Label $label
-     *
-     * @return bool
-     */
-    protected function getIndexedLabel(Label $label)
+    protected function getIndexedLabel(Label $label): ?object
     {
         $query = $this->createQuery();
 
@@ -160,27 +118,18 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             'endtime',
         ]);
 
-        return $query->matching($query->logicalAnd([
+        return $query->matching($query->logicalAnd(
             $query->equals('language', $label->getLanguage()),
             $query->equals('llFile', $label->getLlFile()),
             $query->equals('ukey', $label->getUkey()),
-        ]))->execute()->getFirst();
+        ))->execute()->getFirst();
     }
 
-    /**
-     * @return \TYPO3\CMS\Lang\LanguageService
-     */
-    protected function getLanguageService()
+    protected function getLanguageService(): LanguageService
     {
         return $GLOBALS['LANG'];
     }
 
-    /**
-     * @param string $key
-     * @param array $values
-     * @param string $extension
-     * @param string $path
-     */
     public function updateSelectedRowInAllLanguages(string $key, string $extension, string $path, array $values): void
     {
         GeneralUtility::makeInstance(ConnectionPool::class)
@@ -198,10 +147,6 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             );
     }
 
-    /**
-     * @param int $uid
-     * @param array $values
-     */
     public function updateSelectedRow(int $uid, array $values): void
     {
         GeneralUtility::makeInstance(ConnectionPool::class)
@@ -215,13 +160,11 @@ class LabelRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             );
     }
 
-    /**
-     * @param array $defaultLabel
-     * @param string $translationFromFile
-     * @param string $language
-     */
-    public function createLanguageChildFromDefault(array $defaultLabel, string $translationFromFile, string $language): void
-    {
+    public function createLanguageChildFromDefault(
+        array $defaultLabel,
+        string $translationFromFile,
+        string $language
+    ): void {
         /** @var Label $label */
         $label = GeneralUtility::makeInstance(Label::class);
         $label->setPid(0);

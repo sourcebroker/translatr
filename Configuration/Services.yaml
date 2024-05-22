@@ -4,6 +4,10 @@ services:
     autoconfigure: true
     public: false
 
+  SourceBroker\Translatr\:
+    resource: '../Classes/*'
+    exclude: '../Classes/Domain/{Model,Event,Exception}/*'
+
   SourceBroker\Translatr\Command\ImportConfigurationCommand:
     tags:
       - name: 'console.command'

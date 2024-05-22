@@ -4,11 +4,10 @@
       data-namespace-typo3-fluid="true"
 >
 
-<f:layout name="Default"/>
+<f:layout name="Module"/>
 
-<f:section name="content">
+<f:section name="Content">
 
-    <f:flashMessages/>
 
     <f:render partial="Label/DemandForm" arguments="{_all}"/>
     <f:if condition="{labels}">
@@ -49,8 +48,7 @@
                                     {childLabel.text}
                                 </f:then>
                                 <f:else>
-                                    {sbt:be.translate(llFile: label.ll_file, language: language, key: label.ukey) ->
-                                    f:variable(name: 'labelText')}
+                                    {sbt:be.translate(llFile: label.ll_file, language: language, key: label.ukey) -> f:variable(name: 'labelText')}
 
                                     <f:render partial="Label/ActionButtons/New" arguments="{
                                         language: language,
@@ -69,7 +67,7 @@
                                         }
                                     }"/>
 
-                                    {labelText}
+                                    <span style="color: {f:if(condition:labelText, then: '#eeeeee', else: 'red')}">{labelText}</span>
                                 </f:else>
                             </f:if>
                         </td>

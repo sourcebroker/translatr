@@ -1,10 +1,10 @@
 Changelog
 ---------
 
-5.0.1
+master
 ~~~~~
 
-1) [BUGFIX] Use Environment::getContext() instead of GeneralUtility::getApplicationContext()
+1) [BREAKING] Support only TYPO3 12
 
 5.0.0
 ~~~~~
