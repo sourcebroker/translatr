@@ -50,8 +50,10 @@ class LabelController extends ActionController
             $this->labelRepository->indexExtensionLabels($demand->getExtension());
             $GLOBALS['BE_USER']->pushModuleData('translatr/recentlySelectedModule', $demand->getExtension());
         } else {
-            $demand->setExtension($GLOBALS['BE_USER']->getModuleData('translatr/recentlySelectedModule'));
-            $this->labelRepository->indexExtensionLabels($demand->getExtension());
+            if(!empty($GLOBALS['BE_USER']->getModuleData('translatr/recentlySelectedModule'))) {
+                $demand->setExtension($GLOBALS['BE_USER']->getModuleData('translatr/recentlySelectedModule'));
+                $this->labelRepository->indexExtensionLabels($demand->getExtension());
+            }
         }
 
         if (is_array($demand->getLanguages())) {
@@ -61,7 +63,6 @@ class LabelController extends ActionController
                 ? $GLOBALS['BE_USER']->getModuleData('translatr/recentlySelectedLanguages') : []);
         }
 
-//        $this->pageRenderer->loadRequireJsModule('TYPO3/CMS/Translatr/Translatr');
         $this->moduleTemplate->assignMultiple([
             'labels' => $this->labelRepository->findDemandedForBe($demand),
             'extensions' => $this->labelRepository->getExtensionsItems(),

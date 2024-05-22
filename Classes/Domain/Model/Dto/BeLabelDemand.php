@@ -7,18 +7,18 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 class BeLabelDemand extends AbstractEntity
 {
 
-    protected string $extension = '';
+    protected ?string $extension = '';
 
     protected ?array $languages = null;
 
     protected ?array $keys = null;
 
-    public function getExtension(): string
+    public function getExtension(): ?string
     {
         return $this->extension;
     }
 
-    public function setExtension(string $extension)
+    public function setExtension(?string $extension)
     {
         $this->extension = $extension;
     }

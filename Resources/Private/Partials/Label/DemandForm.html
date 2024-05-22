@@ -6,41 +6,64 @@
 
 <f:form action="index" object="{demand}" class="js-translatr-form" name="demand" method="post">
     <input type="hidden" name="id" value="{id}">
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="form-group">
-                <label for="field-extension" class="control-label">
-                    Extension
-                </label>
-                <f:form.select property="extension" id="field-extension" options="{extensions}"
-                               class="form-select form-select-sm"/>
+    <f:if condition="{extensions->f:count()} === 0">
+        <f:then>
+            <div class="alert alert-warning">
+                <span style="color: red">No proper configuration for Translatr extension.</span><br><br>
+                Configure TSConfig like below example:
+<pre>
+tx_translatr {
+     languages {
+        de = German
+        pl = Polish
+    }
+    extensions {
+        10 = news
+        20 = ke_search
+    }
+}
+</pre>
             </div>
-        </div>
-        <div class="col-sm-6">
-            <div class="form-group">
-                <label for="field-sys_language_uid" class="control-label">
-                    Language
-                </label>
-                <f:form.select property="languages" id="field-sys_language_uid" options="{languages}"
-                               optionValueField="uid" optionLabelField="title"
-                               class="form-select form-select-sm"
-                               size="{languages -> f:count()}"
-                               multiple="1"
-                               style="height: 100px;"
-                />
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-4 form-horizontal">
-            <div class="form-group">
-                <div class="col-sm-8">
-                    <f:form.button type="submit" name="operation" value="list" class="btn btn-default">
-                        Submit
-                    </f:form.button>
+        </f:then>
+        <f:else>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="field-extension" class="control-label">
+                            Extension
+                        </label>
+                        <f:form.select property="extension" id="field-extension" options="{extensions}"
+                                       class="form-select form-select-sm"/>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="field-sys_language_uid" class="control-label">
+                            Language
+                        </label>
+                        <f:form.select property="languages" id="field-sys_language_uid" options="{languages}"
+                                       optionValueField="uid" optionLabelField="title"
+                                       class="form-select form-select-sm"
+                                       size="{languages -> f:count()}"
+                                       multiple="1"
+                                       style="height: 100px;"
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <div class="row">
+                <div class="col-sm-4 form-horizontal">
+                    <div class="form-group">
+                        <div class="col-sm-8">
+                            <f:form.button type="submit" name="operation" value="list" class="btn btn-default">
+                                Submit
+                            </f:form.button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:else>
+    </f:if>
 </f:form>
+

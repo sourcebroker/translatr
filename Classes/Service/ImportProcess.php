@@ -56,34 +56,37 @@ class ImportProcess extends BaseService
 
     protected function pushMissingKeyTranslationsToDatabase(string $extension, array $keys, string $path): void
     {
-        $allLanguages = array_keys(LanguageUtility::getAvailableLanguages());
-        $demand = GeneralUtility::makeInstance(BeLabelDemand::class);
-        $demand->setExtension($extension);
-        $demand->setKeys(array_keys($keys));
-        $demand->setLanguages($allLanguages);
-        foreach ($this->labelRepository->findDemandedForBe($demand) as $label) {
-            foreach ($allLanguages as $language) {
-                $parsedLabels = LanguageUtility::parseLanguageLabels($path, $language);
-                if (isset($parsedLabels[$language], $parsedLabels[$language][$label['ukey']]) && !empty($parsedLabels[$language][$label['ukey']][0]['target'])) {
-                    if (isset($label['language_childs'][$language])) {
-                        if (empty($label['language_childs'][$language]['modify'])) {
-                            $this->labelRepository->updateSelectedRow(
-                                $label['language_childs'][$language]['uid'],
-                                [
-                                    'text' => $parsedLabels[$language][$label['ukey']][0]['target']
-                                ]
+        $availableLanguages = LanguageUtility::getAvailableLanguages();
+        if (is_array($availableLanguages)) {
+            $allLanguages = array_keys($availableLanguages);
+            $demand = GeneralUtility::makeInstance(BeLabelDemand::class);
+            $demand->setExtension($extension);
+            $demand->setKeys(array_keys($keys));
+            $demand->setLanguages($allLanguages);
+            foreach ($this->labelRepository->findDemandedForBe($demand) as $label) {
+                foreach ($allLanguages as $language) {
+                    $parsedLabels = LanguageUtility::parseLanguageLabels($path, $language);
+                    if (isset($parsedLabels[$language], $parsedLabels[$language][$label['ukey']]) && !empty($parsedLabels[$language][$label['ukey']][0]['target'])) {
+                        if (isset($label['language_childs'][$language])) {
+                            if (empty($label['language_childs'][$language]['modify'])) {
+                                $this->labelRepository->updateSelectedRow(
+                                    $label['language_childs'][$language]['uid'],
+                                    [
+                                        'text' => $parsedLabels[$language][$label['ukey']][0]['target']
+                                    ]
+                                );
+                            }
+                        } else {
+                            $this->labelRepository->createLanguageChildFromDefault(
+                                $label,
+                                $parsedLabels[$language][$label['ukey']][0]['target'],
+                                $language
                             );
                         }
-                    } else {
-                        $this->labelRepository->createLanguageChildFromDefault(
-                            $label,
-                            $parsedLabels[$language][$label['ukey']][0]['target'],
-                            $language
-                        );
                     }
                 }
             }
+            GeneralUtility::makeInstance(PersistenceManager::class)->persistAll();
         }
-        GeneralUtility::makeInstance(PersistenceManager::class)->persistAll();
     }
 }

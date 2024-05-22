@@ -8,7 +8,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LanguageUtility
 {
-    public static function getAvailableLanguages(): array
+    public static function getAvailableLanguages(): ?array
     {
         $conf = GeneralUtility::makeInstance(Configurator::class);
         return $conf->getOption('languages');

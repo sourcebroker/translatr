@@ -141,8 +141,6 @@ class LabelRepository extends Repository
                     'extension' => $extension,
                     'ukey' => $key,
                     'll_file' => $path,
-                    'deleted' => 0,
-                    'hidden' => 0
                 ]
             );
     }

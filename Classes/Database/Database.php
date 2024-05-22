@@ -83,7 +83,6 @@ SELECT
   label.modify
 FROM tx_translatr_domain_model_label AS label
 WHERE label.language = "default"
-  AND label.deleted = 0
   AND label.extension = ?
   $keyWhere
 ) UNION (
@@ -103,8 +102,6 @@ FROM tx_translatr_domain_model_label AS label
   LEFT JOIN tx_translatr_domain_model_label AS parent
     ON (parent.language = "default" AND parent.ukey = label.ukey AND parent.ll_file = label.ll_file)
 WHERE label.language IN ($languages)
-  AND label.deleted = 0
-  AND parent.deleted = 0
   AND parent.extension = ?
 );
 SQL;
@@ -161,9 +158,7 @@ SELECT
   label.extension AS extension,
   label.language AS isocode
 FROM tx_translatr_domain_model_label AS label
-WHERE label.deleted = 0
-  AND label.hidden = 0
-  AND label.ll_file = ?
+WHERE label.ll_file = ?
 ;
 SQL;
         $stmt = $connection->executeQuery(
