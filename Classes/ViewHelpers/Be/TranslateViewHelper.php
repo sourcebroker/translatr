@@ -31,9 +31,4 @@ class TranslateViewHelper extends AbstractViewHelper
 
         return $parsedLabels[$language][$key][0]['target'] ?? '';
     }
-
-    protected function getLanguageService(): LanguageService
-    {
-        return $GLOBALS['LANG'];
-    }
 }

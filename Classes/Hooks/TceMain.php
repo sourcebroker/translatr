@@ -10,6 +10,7 @@ use SourceBroker\Translatr\Utility\FileUtility;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class TceMain
@@ -38,20 +39,22 @@ class TceMain
             /** @var DatabaseInterface $db */
             $db = GeneralUtility::makeInstance(Database::class);
             if ($status === 'new') {
-                $id = $pObj->substNEWwithIDs[$id];
+                $id = $pObj->substNEWwithIDs[$id] ?? null;
                 if (empty($fieldArray['ukey'])) {
                     /** @var FlashMessage $message */
                     $message = GeneralUtility::makeInstance(
                         FlashMessage::class,
                         'Ukey field value can\'t be empty',
                         'Translatr',
-                        AbstractMessage::ERROR,
+                        ContextualFeedbackSeverity::ERROR,
                         true
                     );
                     /** @var $flashMessageService FlashMessageService */
                     $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
                     $flashMessageService->getMessageQueueByIdentifier()->addMessage($message);
                     $db->delete('tx_translatr_domain_model_label', ['uid' => (int)$id]);
+
+                    return;
                 }
             }
             $db->update('tx_translatr_domain_model_label', ['modify' => 1], ['uid' => (int)$id]);

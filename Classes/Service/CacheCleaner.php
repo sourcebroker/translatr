@@ -11,14 +11,13 @@ use TYPO3\CMS\Core\Service\OpcodeCacheService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
 
-class CacheCleaner extends BaseService
+class CacheCleaner
 {
 
     protected $cacheManager;
 
     public function __construct()
     {
-        parent::__construct();
         $this->cacheManager = GeneralUtility::makeInstance(CacheManager::class);
     }
 

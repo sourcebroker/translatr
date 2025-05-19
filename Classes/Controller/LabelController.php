@@ -68,7 +68,6 @@ class LabelController extends ActionController
             'extensions' => $this->labelRepository->getExtensionsItems(),
             'languages' => LanguageUtility::getAvailableLanguages(),
             'demand' => $demand,
-            'id' => (int)GeneralUtility::_GET('id'),
         ]);
         return $this->moduleTemplate->renderResponse('Label/List');
 

@@ -3,7 +3,6 @@
 namespace SourceBroker\Translatr\Domain\Repository;
 
 use TYPO3\CMS\Extbase\Persistence\Repository;
-use TYPO3\CMS\Core\Localization\LanguageService;
 use SourceBroker\Translatr\Configuration\Configurator;
 use SourceBroker\Translatr\Database\Database;
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
@@ -123,11 +122,6 @@ class LabelRepository extends Repository
             $query->equals('llFile', $label->getLlFile()),
             $query->equals('ukey', $label->getUkey()),
         ))->execute()->getFirst();
-    }
-
-    protected function getLanguageService(): LanguageService
-    {
-        return $GLOBALS['LANG'];
     }
 
     public function updateSelectedRowInAllLanguages(string $key, string $extension, string $path, array $values): void

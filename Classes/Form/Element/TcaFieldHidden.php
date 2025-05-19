@@ -3,6 +3,7 @@
 namespace SourceBroker\Translatr\Form\Element;
 
 use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
+use TYPO3\CMS\Core\Utility\StringUtility;
 
 class TcaFieldHidden extends AbstractFormElement
 {
@@ -46,7 +47,10 @@ class TcaFieldHidden extends AbstractFormElement
 
     protected function prepareInput(string $value, string $displayValue, string $baseName): string
     {
+        $labelHtml = $this->renderLabel(StringUtility::getUniqueId('translatr-hidden-field-input-'));
+
         return <<<HTML
+{$labelHtml}
 <input type="hidden" value="{$value}" name="data{$baseName}" />
 <p>{$displayValue}</p>
 HTML;

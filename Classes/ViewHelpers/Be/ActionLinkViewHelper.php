@@ -116,7 +116,7 @@ class ActionLinkViewHelper extends AbstractViewHelper
     public static function getCurrentParameters($getParameters = []): array
     {
         if (empty($getParameters)) {
-            $getParameters = GeneralUtility::_GET();
+            $getParameters = $GLOBALS['TYPO3_REQUEST']->getQueryParams();
         }
         $parameters = [];
         $ignoreKeys = [

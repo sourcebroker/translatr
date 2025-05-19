@@ -7,7 +7,7 @@ use TYPO3\CMS\Core\Configuration\Loader\YamlFileLoader;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class YamlFileHandler extends BaseService
+class YamlFileHandler
 {
     public const LANG_FILE_PATH = '/Resources/Private/Language/';
     public const ROOT_NAME = 'ext';
@@ -19,7 +19,6 @@ class YamlFileHandler extends BaseService
 
     public function __construct()
     {
-        parent::__construct();
         $this->packageManager = GeneralUtility::makeInstance(PackageManager::class);
         $this->yamlFileLoader = GeneralUtility::makeInstance(YamlFileLoader::class);
     }

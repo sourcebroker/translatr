@@ -3,10 +3,6 @@
 namespace SourceBroker\Translatr\ViewHelpers\Be;
 
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
-use TYPO3Fluid\Fluid\Core\ViewHelper\Exception;
-use TYPO3\CMS\Backend\Routing\UriBuilder;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentValueException;
 
 class GetChildlLangViewHelper extends AbstractViewHelper
 {

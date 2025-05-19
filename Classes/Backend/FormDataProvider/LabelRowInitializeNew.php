@@ -52,6 +52,6 @@ class LabelRowInitializeNew implements FormDataProviderInterface
 
     private function getDefaultTcaData(): mixed
     {
-        return GeneralUtility::_GP('translatr_tcadefault');
+        return $GLOBALS['TYPO3_REQUEST']->getQueryParams()['translatr_tcadefault'] ?? [];
     }
 }

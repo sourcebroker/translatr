@@ -1,7 +1,12 @@
 Changelog
 ---------
 
-master
+7.0.0
+~~~~~
+
+1) [BREAKING] Support for TYPO3 13
+
+6.0.0
 ~~~~~
 
 1) [BREAKING] Support only TYPO3 12

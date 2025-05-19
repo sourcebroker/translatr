@@ -22,7 +22,7 @@ class Database implements DatabaseInterface
                 ->andWhere(sprintf('%s = :%s', $key, $key))
                 ->setParameter($key, $value);
         }
-        $queryBuilder->execute();
+        $queryBuilder->executeStatement();
     }
 
     public function update($table, array $set, array $condition): void
@@ -43,7 +43,7 @@ class Database implements DatabaseInterface
                 ->setParameter($key, $value);
         }
 
-        $queryBuilder->execute();
+        $queryBuilder->executeStatement();
     }
 
     public function getRootPage(): int
@@ -119,7 +119,7 @@ SQL;
             ]
         );
 
-        $resultAssoc = $stmt->fetchAll();
+        $resultAssoc = $stmt->fetchAllAssociative();
         $results = ArrayUtility::combineWithSubarrayFieldAsKey(
             $resultAssoc,
             'uid'
@@ -149,7 +149,7 @@ SQL;
     public function getLabelsByLocallangFile($locallangFile): ?array
     {
         /** @var Connection $connection */
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default');
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_translatr_domain_model_label');
         $query = <<<SQL
 /* select labels from default language */
 SELECT
@@ -171,7 +171,7 @@ SQL;
                 ParameterType::STRING
             ]
         );
-        return $stmt->fetchAll();
+        return $stmt->fetchAllAssociative();
     }
 
     public function getLocallangFiles(): ?array
@@ -181,7 +181,7 @@ SQL;
         return $queryBuilder
             ->select('label.ll_file', 'label.language')
             ->from('tx_translatr_domain_model_label', 'label')->groupBy('label.ll_file',
-                'label.language')->executeQuery()->fetchAll();
+                'label.language')->executeQuery()->fetchAllAssociative();
     }
 
     protected function wrapArrayByQuote(array $arr): array

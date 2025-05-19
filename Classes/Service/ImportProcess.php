@@ -9,11 +9,8 @@ use SourceBroker\Translatr\Utility\LanguageUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
-class ImportProcess extends BaseService
+class ImportProcess
 {
-    /**
-     * Should contain comma separated values
-     */
     const ALLOWED_PROPERTIES = ['tags'];
 
     protected YamlFileHandler $yamlFileHandler;
@@ -22,7 +19,6 @@ class ImportProcess extends BaseService
 
     public function __construct()
     {
-        parent::__construct();
         $this->yamlFileHandler = GeneralUtility::makeInstance(YamlFileHandler::class);
         $this->labelRepository = GeneralUtility::makeInstance(LabelRepository::class);
     }
