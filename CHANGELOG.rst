@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+master
+~~~~~~
+
+1) [BUGFIX] Fix existence check of generated locallang override files. The check used a path without the iso code
+   prefix and with ``.xml`` extension while the generated file is prefixed with the iso code and saved as ``.xlf``.
+   Generation is now limited to the requested language.
+
 7.0.0
 ~~~~~
 

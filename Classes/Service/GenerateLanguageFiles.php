@@ -213,12 +213,15 @@ class GenerateLanguageFiles
     protected function createLocallangOverrideFileIfNotExist(string $locallangFile, string $isoCode): void
     {
         $locallangOverrideFilePath = $this->transformPathFromLocallangToLocallangOverrides($locallangFile, $isoCode);
-        if (!is_file($locallangOverrideFilePath)) {
-            $this->createLocallangOverrideFile($locallangFile);
+        $finalFilePath = $this->prependLocallangFileNameWithIsoCode($locallangOverrideFilePath, $isoCode);
+        $finalFilePath = preg_replace('/\.xml$/i', '.xlf', $finalFilePath);
+
+        if (!is_file($finalFilePath)) {
+            $this->createLocallangOverrideFile($locallangFile, $isoCode);
         }
     }
 
-    protected function createLocallangOverrideFile(string $locallangFile): void
+    protected function createLocallangOverrideFile(string $locallangFile, ?string $isoCode = null): void
     {
         $labels = $this->getLabelsByLocallangFile($locallangFile);
         $groupedLabels = [];
@@ -228,15 +231,22 @@ class GenerateLanguageFiles
         }
 
         unset($labels);
-        foreach ($groupedLabels as $isoCode => $labels) {
+
+        $languagesToProcess = $isoCode !== null ? [$isoCode => $groupedLabels[$isoCode] ?? []] : $groupedLabels;
+
+        foreach ($languagesToProcess as $currentIsoCode => $labels) {
+            if (empty($labels)) {
+                continue;
+            }
+
             $xml = $this->createXlfFileForLabels($labels);
             $xml->formatOutput = true;
             $defaultLocallangOverrideFile = $this->transformPathFromLocallangToLocallangOverrides(
                 $locallangFile,
-                $isoCode
+                $currentIsoCode
             );
             $outputFiles = [
-                $this->prependLocallangFileNameWithIsoCode($defaultLocallangOverrideFile, $isoCode)
+                $this->prependLocallangFileNameWithIsoCode($defaultLocallangOverrideFile, $currentIsoCode)
             ];
             foreach ($outputFiles as $outputFile) {
                 $this->createDirectoryIfNotExists(dirname($outputFile));
