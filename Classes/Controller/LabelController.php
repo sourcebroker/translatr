@@ -36,7 +36,7 @@ class LabelController extends ActionController
     {
         $this->moduleData = $this->request->getAttribute('moduleData');
         $this->moduleTemplate = $this->moduleTemplateFactory->create($this->request);
-        $this->moduleTemplate->setTitle(LocalizationUtility::translate('LLL:EXT:beuser/Resources/Private/Language/locallang_mod.xlf:mlang_tabs_tab'));
+        $this->moduleTemplate->setTitle(LocalizationUtility::translate('LLL:EXT:translatr/Resources/Private/Language/locallang_label.xlf:mlang_tabs_tab') ?? 'Translate');
         $this->moduleTemplate->setFlashMessageQueue($this->getFlashMessageQueue());
     }
 

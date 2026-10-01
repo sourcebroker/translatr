@@ -6,6 +6,7 @@ Changelog
 
 1) [TASK] Support for TYPO3 14
 2) [TASK] Add ddev testing envs.
+3) [BUGFIX] Fix the module title.
 
 7.0.1
 ~~~~~
