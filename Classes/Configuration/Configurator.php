@@ -33,7 +33,7 @@ class Configurator
     /**
      * Return option from configuration array with support for nested comma separated notation as "option1.suboption"
      */
-    public function getOption(string $name = null, $overwriteConfig = null): array|null|string
+    public function getOption(?string $name = null, $overwriteConfig = null): array|null|string
     {
         $config = null;
         if (is_string($name)) {

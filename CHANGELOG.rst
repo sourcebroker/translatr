@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+7.1.0
+~~~~~
+
+1) [TASK] Support for TYPO3 14
+
 7.0.1
 ~~~~~
 

@@ -1,1 +1,1 @@
-@import 'EXT:translatr/Configuration/TsConfig/Page/tx_translatr.tsconfig'
+@import "EXT:translatr/Configuration/TsConfig/Page/tx_translatr.tsconfig"

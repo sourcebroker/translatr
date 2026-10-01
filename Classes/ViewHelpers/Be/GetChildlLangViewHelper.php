@@ -19,7 +19,7 @@ class GetChildlLangViewHelper extends AbstractViewHelper
         );
         $this->registerArgument(
             'language',
-            'sting',
+            'string',
             'Language.',
             false
         );

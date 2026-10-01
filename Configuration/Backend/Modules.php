@@ -1,12 +1,15 @@
 <?php
 
+use TYPO3\CMS\Core\Information\Typo3Version;
+
 return [
     'translatr' => [
-        'parent' => 'web',
+        // TYPO3 14 renamed the "web" main module to "content" (#107628); parent aliases are not resolved
+        'parent' => (new Typo3Version())->getMajorVersion() >= 14 ? 'content' : 'web',
         'position' => ['before' => '*'],
-        'access' => 'group,user',
+        'access' => 'user',
         'iconIdentifier' => 'ext-translatr',
-        'labels' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_label.xlf:mlang_tabs_tab',
+        'labels' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_label.xlf',
         'inheritNavigationComponentFromMainModule' => false,
         'extensionName' => 'Translatr',
         'controllerActions' => [

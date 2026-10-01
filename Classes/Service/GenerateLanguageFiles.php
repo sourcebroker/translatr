@@ -7,6 +7,7 @@ use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use SourceBroker\Translatr\Database\Database;
 use SourceBroker\Translatr\Utility\ExceptionUtility;
 use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Locking\Exception\LockAcquireWouldBlockException;
 use TYPO3\CMS\Core\Locking\LockFactory;
 use TYPO3\CMS\Core\Locking\LockingStrategyInterface;
@@ -104,7 +105,11 @@ class GenerateLanguageFiles
 
     protected function getFinalOverrideRow($isoCode, $overwritten, $overwriteWith)
     {
-        return '$GLOBALS[\'TYPO3_CONF_VARS\'][\'SYS\'][\'locallangXMLOverride\'][\'' . $isoCode . '\'][\''
+        // TYPO3 14 moved SYS/locallangXMLOverride to LANG/resourceOverrides (#107436)
+        $overridesPath = (new Typo3Version())->getMajorVersion() >= 14
+            ? '[\'LANG\'][\'resourceOverrides\']'
+            : '[\'SYS\'][\'locallangXMLOverride\']';
+        return '$GLOBALS[\'TYPO3_CONF_VARS\']' . $overridesPath . '[\'' . $isoCode . '\'][\''
             . $overwritten . '\'][] = \'' . $overwriteWith . '\';' . PHP_EOL;
     }
 
@@ -239,7 +244,7 @@ class GenerateLanguageFiles
                 continue;
             }
 
-            $xml = $this->createXlfFileForLabels($labels);
+            $xml = $this->createXlfFileForLabels($labels, $currentIsoCode);
             $xml->formatOutput = true;
             $defaultLocallangOverrideFile = $this->transformPathFromLocallangToLocallangOverrides(
                 $locallangFile,
@@ -258,7 +263,7 @@ class GenerateLanguageFiles
         }
     }
 
-    protected function createXlfFileForLabels(array $labels): \DOMDocument
+    protected function createXlfFileForLabels(array $labels, string $isoCode = 'default'): \DOMDocument
     {
         $xml = new \DOMDocument('1.0', 'utf-8');
         $root = $xml->createElement('xliff');
@@ -268,6 +273,10 @@ class GenerateLanguageFiles
         $file = $xml->createElement('file');
         $root->appendChild($file);
         $file->setAttribute('source-language', 'en');
+        if ($isoCode !== 'default') {
+            // TYPO3 14 reads <target> only from files with a "target-language" attribute, <source> otherwise
+            $file->setAttribute('target-language', $isoCode);
+        }
         $file->setAttribute('datatype', 'plaintext');
         $file->setAttribute('original', 'messages');
         $file->setAttribute('date', (new \DateTime())->format('c'));

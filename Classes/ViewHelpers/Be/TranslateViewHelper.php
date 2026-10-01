@@ -8,7 +8,7 @@ use SourceBroker\Translatr\Utility\LanguageUtility;
 
 class TranslateViewHelper extends AbstractViewHelper
 {
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument('llFile', 'string', 'Path to the locallang file', true);
         $this->registerArgument('language', 'string', 'Translation target language', true);
