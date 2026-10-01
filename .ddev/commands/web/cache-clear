@@ -1,4 +1,12 @@
 #!/bin/bash
 
-/usr/bin/php /var/www/html/v9/vendor/bin/typo3cms cache:flush
-/usr/bin/php /var/www/html/v10/vendor/bin/typo3cms cache:flush
+## Description: Flush caches of all installed TYPO3 instances
+## Usage: cache-clear
+## Example: ddev cache-clear
+
+for v in v13 v14; do
+    if [ -x /var/www/html/$v/vendor/bin/typo3 ]; then
+        echo "Flushing $v"
+        /var/www/html/$v/vendor/bin/typo3 cache:flush
+    fi
+done

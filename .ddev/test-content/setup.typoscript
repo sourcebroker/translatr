@@ -1,0 +1,28 @@
+# Frontend of the TYPO3 test instances (installed by install-version.sh)
+page = PAGE
+page {
+    10 = COA
+    10 {
+        stdWrap.wrap = <main style="max-width: 800px; margin: 2em auto; font-family: sans-serif;">|</main>
+        # Language menu
+        5 = HMENU
+        5 {
+            special = language
+            special.value = 0,1,2
+            wrap = <nav class="language-menu">|</nav>
+            1 = TMENU
+            1.NO.allWrap = | &nbsp;
+        }
+        10 = CONTENT
+        10 {
+            table = tt_content
+            select {
+                orderBy = sorting
+                where = {#colPos}=0
+            }
+        }
+    }
+}
+
+
+# plugin.tx_news.settings.startingpoint (news storage folder) is appended by create-content.php

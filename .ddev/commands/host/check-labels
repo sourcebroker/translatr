@@ -1,0 +1,15 @@
+#!/bin/bash
+
+## Description: Show the EXT:news "Read more" label (news locallang.xlf:more-link) rendered in the frontend per TYPO3 version and language
+## Usage: check-labels
+## Example: ddev check-labels
+
+for VERSION in v13 v14; do
+    for LANG_PATH in / /pl/ /de/; do
+        URL="https://${VERSION}.${DDEV_SITENAME}.ddev.site${LANG_PATH}"
+        HTML=$(curl -sk "$URL")
+        STATUS=$(curl -sk -o /dev/null -w '%{http_code}' "$URL")
+        LABEL=$(printf '%s' "$HTML" | tr '\n' ' ' | grep -o '<a [^>]*class="more"[^>]*>[^<]*' | head -1 | sed 's/.*>[[:space:]]*//; s/[[:space:]]*$//')
+        printf '%-4s %-5s HTTP %s  more-link: %s\n' "$VERSION" "$LANG_PATH" "$STATUS" "${LABEL:-<not found>}"
+    done
+done

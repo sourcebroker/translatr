@@ -1,0 +1,35 @@
+# Site configuration of the TYPO3 test instances (installed by install-version.sh).
+# ###BASE### is replaced with https://v{VERSION}.translatr.ddev.site/
+base: '###BASE###'
+rootPageId: 1
+dependencies:
+  - typo3/fluid-styled-content
+  - georgringer/news
+languages:
+  - title: English
+    enabled: true
+    languageId: 0
+    base: /
+    locale: en_US.UTF-8
+    navigationTitle: English
+    flag: us
+  - title: Polski
+    enabled: true
+    languageId: 1
+    base: /pl/
+    locale: pl_PL.UTF-8
+    navigationTitle: Polski
+    flag: pl
+    fallbackType: fallback
+    fallbacks: '0'
+  - title: Deutsch
+    enabled: true
+    languageId: 2
+    base: /de/
+    locale: de_DE.UTF-8
+    navigationTitle: Deutsch
+    flag: de
+    fallbackType: fallback
+    fallbacks: '0'
+errorHandling: {  }
+routes: {  }

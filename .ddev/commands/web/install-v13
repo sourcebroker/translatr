@@ -1,0 +1,7 @@
+#!/bin/bash
+
+## Description: Install TYPO3 13 LTS with EXT:translatr
+## Usage: install-v13
+## Example: ddev install-v13
+
+/mnt/ddev_config/commands/web/install-version.sh 13

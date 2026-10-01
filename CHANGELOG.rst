@@ -5,6 +5,7 @@ Changelog
 ~~~~~
 
 1) [TASK] Support for TYPO3 14
+2) [TASK] Add ddev testing envs.
 
 7.0.1
 ~~~~~

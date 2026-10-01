@@ -1,7 +1,9 @@
 #!/bin/bash
 
-ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}/.")"
+## Description: Install TYPO3 13 and 14 LTS with EXT:translatr
+## Usage: install-all
+## Example: ddev install-all
 
-$ABSOLUTE_PATH/install-v9
-$ABSOLUTE_PATH/install-v10
-$ABSOLUTE_PATH/install-v11s
+set -e
+/mnt/ddev_config/commands/web/install-version.sh 13
+/mnt/ddev_config/commands/web/install-version.sh 14
