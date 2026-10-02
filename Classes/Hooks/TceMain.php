@@ -6,6 +6,7 @@ use SourceBroker\Translatr\Database\Database;
 use SourceBroker\Translatr\Database\DatabaseInterface;
 use SourceBroker\Translatr\Service\CacheCleaner;
 use SourceBroker\Translatr\Utility\FileUtility;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
@@ -58,7 +59,8 @@ class TceMain
                         'Ukey field value can\'t be empty',
                         'Translatr',
                         ContextualFeedbackSeverity::ERROR,
-                        true
+                        // CLI users have no session to store the message in
+                        !Environment::isCli()
                     );
                     /** @var FlashMessageService $flashMessageService */
                     $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
