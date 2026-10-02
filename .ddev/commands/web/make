@@ -1,0 +1,8 @@
+#!/bin/bash
+
+## Description: Run a target of the extension Makefile (code checks and fixes) in the web container
+## Usage: make [target]
+## Example: ddev make ci
+
+cd /var/www/$EXTENSION_KEY
+exec make "$@"

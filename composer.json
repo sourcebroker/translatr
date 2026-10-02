@@ -38,6 +38,15 @@
     "ssch/typo3-rector": "^3.16"
   },
   "scripts": {
+    "ci": [
+      "@ci:php:cs-fixer",
+      "@ci:php:rector",
+      "@ci:php:stan"
+    ],
+    "fix": [
+      "@fix:php:rector",
+      "@fix:php:cs-fixer"
+    ],
     "ci:php:stan": ".Build/bin/phpstan analyse --no-progress",
     "ci:php:cs-fixer": ".Build/bin/php-cs-fixer fix --dry-run --diff",
     "ci:php:rector": ".Build/bin/rector process --dry-run",

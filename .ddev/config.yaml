@@ -18,3 +18,4 @@ additional_fqdns: []
 use_dns_when_possible: true
 webimage_extra_packages:
     - imagemagick
+    - make

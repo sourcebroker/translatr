@@ -13,6 +13,8 @@ Changelog
    record saved with DataHandler. Add database indexes, fetch the labels once per file and parse the language files
    once per language.
 7) [TASK] Refactor SQL of the label filter in the backend module.
+8) [TASK] Add composer scripts ``ci`` and ``fix`` running all code checks / fixes, a Makefile with code quality targets
+   and the ``ddev make`` command running it in the web container (e.g. ``ddev make ci``).
 
 7.0.1
 ~~~~~
