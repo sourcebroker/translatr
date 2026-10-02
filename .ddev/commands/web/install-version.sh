@@ -56,6 +56,9 @@ PHP
 # Site with en / pl / de and the frontend rendering of the test content (see .ddev/test-content/)
 sed "s#\#\#\#BASE\#\#\##${SITE_URL}#" /mnt/ddev_config/test-content/config.yaml > config/sites/main/config.yaml
 cp /mnt/ddev_config/test-content/setup.typoscript config/sites/main/setup.typoscript
+# TYPO3 13 "setup --create-site" also creates a sys_template record ("Welcome to TYPO3" page, clear=3) which
+# overrides the site TypoScript above; TYPO3 14 does not. Remove it so both versions render the same frontend.
+mysql -h db -u root -proot $VERSION -e "DELETE FROM sys_template;"
 
 # translatr configuration (read from page TSconfig of the root page)
 EXTENSIONS="        10 = translatr"
