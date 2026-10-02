@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-return [
+use TYPO3\CMS\Core\Information\Typo3Version;
+
+$tca = [
     'ctrl' => [
         'title' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label',
         'label' => 'text',
@@ -12,7 +14,6 @@ return [
             'starttime' => 'starttime',
             'endtime' => 'endtime',
         ],
-        'searchFields' => 'extension,ukey,text,description,',
         'iconfile' => 'EXT:translatr/Resources/Public/Icons/tx_translatr_domain_model_label.gif',
         'hideTable' => true,
         'rootLevel' => 1,
@@ -36,6 +37,7 @@ return [
                 'type' => 'datetime',
                 'format' => 'datetime',
                 'default' => 0,
+                'searchable' => false,
             ],
         ],
         'endtime' => [
@@ -46,6 +48,7 @@ return [
                 'type' => 'datetime',
                 'format' => 'datetime',
                 'default' => 0,
+                'searchable' => false,
             ],
         ],
         'extension' => [
@@ -77,6 +80,7 @@ return [
                 'cols' => 40,
                 'rows' => 3,
                 'eval' => 'trim',
+                'default' => '',
             ],
         ],
         'description' => [
@@ -88,6 +92,7 @@ return [
                 'cols' => 40,
                 'rows' => 2,
                 'eval' => 'trim',
+                'default' => '',
             ],
         ],
         'll_file' => [
@@ -119,6 +124,7 @@ return [
             'config' => [
                 'type' => 'user',
                 'renderType' => 'fieldHidden',
+                'default' => '',
             ],
         ],
         'modify' => [
@@ -131,3 +137,10 @@ return [
         ],
     ],
 ];
+
+// TYPO3 14 no longer evaluates "searchFields", the fields are searchable based on their type
+if ((new Typo3Version())->getMajorVersion() < 14) {
+    $tca['ctrl']['searchFields'] = 'extension,ukey,text,description';
+}
+
+return $tca;

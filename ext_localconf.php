@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use SourceBroker\Translatr\Backend\FormDataProvider\LabelRowInitializeNew;
 use SourceBroker\Translatr\Form\Element\TcaFieldHidden;
 use SourceBroker\Translatr\Hooks\TceMain;
 use SourceBroker\Translatr\Service\CacheCleaner;
+use TYPO3\CMS\Backend\Form\FormDataProvider\DatabaseRowInitializeNew;
 
 defined('TYPO3') || die('Access denied.');
 
@@ -20,6 +22,12 @@ call_user_func(
             'nodeName' => 'fieldHidden',
             'priority' => 40,
             'class' => TcaFieldHidden::class,
+        ];
+
+        $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['formDataGroup']['tcaDatabaseRecord'][LabelRowInitializeNew::class] = [
+            'depends' => [
+                DatabaseRowInitializeNew::class,
+            ],
         ];
     }
 );

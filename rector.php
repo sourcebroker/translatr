@@ -22,7 +22,6 @@ return RectorConfig::configure()
         __DIR__ . '/Configuration',
         __DIR__ . '/ext_emconf.php',
         __DIR__ . '/ext_localconf.php',
-        __DIR__ . '/ext_tables.php',
     ])
     ->withCache(__DIR__ . '/.Build/.cache/rector')
     ->withPhpVersion(PhpVersion::PHP_82)

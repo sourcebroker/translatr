@@ -9,4 +9,3 @@ parameters:
         - Classes
         - Configuration
         - ext_localconf.php
-        - ext_tables.php

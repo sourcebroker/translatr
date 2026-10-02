@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+7.1.1
+~~~~~
+
+1) [TASK] Move the FormEngine data provider registration from ``ext_tables.php`` (deprecated in TYPO3 14.3) to
+   ``ext_localconf.php``. Use TCA ``searchFields`` only for TYPO3 13 and the ``searchable`` field option instead.
+2) [BUGFIX] Add TCA defaults for the ``text``, ``description`` and ``tags`` fields, so labels can be created with
+   DataHandler without them (columns are ``NOT NULL`` without database default).
+3) [BUGFIX] Do not store the "empty ukey" flash message in the session on CLI, where there is no user session.
+
 7.1.0
 ~~~~~
 
