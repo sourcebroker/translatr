@@ -2,24 +2,22 @@
 
 namespace SourceBroker\Translatr\Controller;
 
-use TYPO3\CMS\Backend\Module\ModuleData;
-use TYPO3\CMS\Backend\Template\ModuleTemplate;
-use TYPO3\CMS\Backend\View\BackendViewFactory;
-use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use Psr\Http\Message\ResponseInterface;
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Repository\LabelRepository;
 use SourceBroker\Translatr\Domain\Repository\LanguageRepository;
 use SourceBroker\Translatr\Utility\LanguageUtility;
-use TYPO3\CMS\Backend\View\BackendTemplateView;
+use TYPO3\CMS\Backend\Module\ModuleData;
+use TYPO3\CMS\Backend\Template\ModuleTemplate;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
+use TYPO3\CMS\Backend\View\BackendViewFactory;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 class LabelController extends ActionController
 {
-
     private ModuleTemplate $moduleTemplate;
     protected ?ModuleData $moduleData = null;
 
@@ -29,8 +27,7 @@ class LabelController extends ActionController
         protected readonly LanguageRepository $languageRepository,
         protected readonly BackendViewFactory $backendViewFactory,
         protected readonly PageRenderer $pageRenderer,
-    ) {
-    }
+    ) {}
 
     public function initializeAction(): void
     {
@@ -42,7 +39,7 @@ class LabelController extends ActionController
 
     public function indexAction(?BeLabelDemand $demand = null): ResponseInterface
     {
-        if (!$demand) {
+        if (!$demand instanceof BeLabelDemand) {
             $demand = GeneralUtility::makeInstance(BeLabelDemand::class);
         }
 
@@ -50,7 +47,7 @@ class LabelController extends ActionController
             $this->labelRepository->indexExtensionLabels($demand->getExtension());
             $GLOBALS['BE_USER']->pushModuleData('translatr/recentlySelectedModule', $demand->getExtension());
         } else {
-            if(!empty($GLOBALS['BE_USER']->getModuleData('translatr/recentlySelectedModule'))) {
+            if (!empty($GLOBALS['BE_USER']->getModuleData('translatr/recentlySelectedModule'))) {
                 $demand->setExtension($GLOBALS['BE_USER']->getModuleData('translatr/recentlySelectedModule'));
                 $this->labelRepository->indexExtensionLabels($demand->getExtension());
             }
@@ -71,8 +68,6 @@ class LabelController extends ActionController
         ]);
         return $this->moduleTemplate->renderResponse('Label/List');
 
-
     }
-
 
 }

@@ -40,7 +40,7 @@ class Locker
                 $locked = $this->lock->acquire(
                     LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE | LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK
                 );
-            } catch (LockAcquireWouldBlockException $e) {
+            } catch (LockAcquireWouldBlockException) {
                 // somebody else has the lock, we keep waiting
 
                 // first release the access lock
@@ -60,7 +60,7 @@ class Locker
 
     public function release(): void
     {
-        if ($this->accessLock === null || $this->lock === null) {
+        if (!$this->accessLock instanceof LockingStrategyInterface || !$this->lock instanceof LockingStrategyInterface) {
             return;
         }
         if (!$this->accessLock->acquire()) {

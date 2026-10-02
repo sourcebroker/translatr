@@ -7,6 +7,9 @@ use TYPO3\CMS\Core\Utility\StringUtility;
 
 class TcaFieldHidden extends AbstractFormElement
 {
+    /**
+     * @return array<string, mixed>
+     */
     public function render(): array
     {
         $config = $this->data;
@@ -32,10 +35,8 @@ class TcaFieldHidden extends AbstractFormElement
             if (empty($value)) {
                 $returnValue = '<p></p>';
             } else {
-                $displayValue = $value;
-                if (is_numeric($value)) {
-                    $displayValue = $value === 0 ? 'No' : 'Yes';
-                }
+                // Numeric values are flags, "0" is handled as empty value above
+                $displayValue = is_numeric($value) ? 'Yes' : $value;
                 $returnValue = $this->prepareInput($value, $displayValue, $config['elementBaseName']);
             }
         }

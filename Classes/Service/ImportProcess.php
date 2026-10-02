@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SourceBroker\Translatr\Service;
@@ -11,7 +12,7 @@ use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 
 class ImportProcess
 {
-    const ALLOWED_PROPERTIES = ['tags'];
+    public const ALLOWED_PROPERTIES = ['tags'];
 
     protected YamlFileHandler $yamlFileHandler;
 
@@ -23,11 +24,17 @@ class ImportProcess
         $this->labelRepository = GeneralUtility::makeInstance(LabelRepository::class);
     }
 
+    /**
+     * @return list<array{extension: string, files?: list<array{fileName: string, path: string, labels: array<string, mixed>}>}>
+     */
     public function getDataToImport(): array
     {
         return $this->yamlFileHandler->getConfiguration();
     }
 
+    /**
+     * @param array{fileName: string, path: string, labels: array<string, mixed>} $file
+     */
     public function importDataFromSingleFile(string $extension, array $file): void
     {
         $this->labelRepository->indexExtensionLabels($extension);
@@ -36,7 +43,7 @@ class ImportProcess
             $values = [];
             foreach ($properties as $propertyName => $property) {
                 if (in_array($propertyName, self::ALLOWED_PROPERTIES)) {
-                    $values[$propertyName] = implode(',', array_map('trim', $property));
+                    $values[$propertyName] = implode(',', array_map(trim(...), $property));
                 }
             }
             if (count($values)) {
@@ -50,6 +57,9 @@ class ImportProcess
         }
     }
 
+    /**
+     * @param array<string, mixed> $keys
+     */
     protected function pushMissingKeyTranslationsToDatabase(string $extension, array $keys, string $path): void
     {
         $availableLanguages = LanguageUtility::getAvailableLanguages();
@@ -68,7 +78,7 @@ class ImportProcess
                                 $this->labelRepository->updateSelectedRow(
                                     $label['language_childs'][$language]['uid'],
                                     [
-                                        'text' => $parsedLabels[$language][$label['ukey']][0]['target']
+                                        'text' => $parsedLabels[$language][$label['ukey']][0]['target'],
                                     ]
                                 );
                             }

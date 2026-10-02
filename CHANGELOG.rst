@@ -8,6 +8,7 @@ Changelog
 2) [TASK] Add ddev testing envs.
 3) [BUGFIX] Fix the module title.
 4) [BUGFIX] Fix race condition between the cache flush and the generation of the locallang override files.
+5) [TASK] Add PHPStan (level 6), PHP-CS-Fixer and Rector, apply their fixes.
 
 7.0.1
 ~~~~~

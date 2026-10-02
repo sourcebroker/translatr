@@ -2,7 +2,6 @@
 
 namespace SourceBroker\Translatr\Domain\Repository;
 
-use TYPO3\CMS\Extbase\Persistence\Repository;
 use SourceBroker\Translatr\Configuration\Configurator;
 use SourceBroker\Translatr\Database\Database;
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
@@ -15,11 +14,18 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
 use TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+use TYPO3\CMS\Extbase\Persistence\Repository;
 
+/**
+ * @extends Repository<Label>
+ */
 class LabelRepository extends Repository
 {
-    const TABLE = 'tx_translatr_domain_model_label';
+    public const TABLE = 'tx_translatr_domain_model_label';
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function findDemandedForBe(BeLabelDemand $demand): array
     {
         return
@@ -27,11 +33,16 @@ class LabelRepository extends Repository
                 ->findDemandedForBe($demand);
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getExtensionsItems(): array
     {
         $config = GeneralUtility::makeInstance(Configurator::class);
-        $extensions = array_intersect((array)$config->getOption('extensions'),
-            ExtensionManagementUtility::getLoadedExtensionListArray());
+        $extensions = array_intersect(
+            (array)$config->getOption('extensions'),
+            ExtensionManagementUtility::getLoadedExtensionListArray()
+        );
         sort($extensions);
         return array_combine($extensions, $extensions);
     }
@@ -48,23 +59,19 @@ class LabelRepository extends Repository
      */
     public function indexExtensionLabels(string $extKey): void
     {
-        $llDirectoryPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($extKey) . 'Resources/Private/Language/';
-        $llFilesFrontend = glob($llDirectoryPath . 'locallang.{xml,xlf}', GLOB_BRACE);
-        $llFilesBackend = glob($llDirectoryPath . 'locallang_db.{xml,xlf}', GLOB_BRACE);
+        $llDirectoryPath = ExtensionManagementUtility::extPath($extKey) . 'Resources/Private/Language/';
+        $llFilesFrontend = glob($llDirectoryPath . 'locallang.{xml,xlf}', GLOB_BRACE) ?: [];
+        $llFilesBackend = glob($llDirectoryPath . 'locallang_db.{xml,xlf}', GLOB_BRACE) ?: [];
         $llFiles = array_merge($llFilesFrontend, $llFilesBackend);
 
-        if (!is_array($llFiles) || !isset($llFiles[0])
-            || !file_exists($llFiles[0])
-        ) {
+        if (!isset($llFiles[0]) || !file_exists($llFiles[0])) {
             return;
         }
         foreach ($llFiles as $llFile) {
             $parsedLabels = LanguageUtility::parseLanguageLabels($llFile, 'default');
             $labels = [];
 
-            if (!is_array($parsedLabels) || !isset($parsedLabels['default'])
-                || !is_array($parsedLabels['default'])
-            ) {
+            if (!isset($parsedLabels['default'])) {
                 return;
             }
 
@@ -74,9 +81,7 @@ class LabelRepository extends Repository
             }
 
             // remove null labels
-            $labels = array_filter($labels, function ($label) {
-                return !is_null($label);
-            });
+            $labels = array_filter($labels, fn($label) => !is_null($label));
 
             foreach ($labels as $labelKey => $label) {
                 $obj = new Label();
@@ -88,10 +93,9 @@ class LabelRepository extends Repository
                 $obj->setLlFileIndex(strrev(FileUtility::getRelativePathFromAbsolute($llFile, $extKey)));
                 $obj->setLanguage('default');
                 $obj->setModify(0);
-                /** @var Label $indexedLabel */
                 $indexedLabel = $this->getIndexedLabel($obj);
                 try {
-                    if ($indexedLabel) {
+                    if ($indexedLabel instanceof Label) {
                         if (!$indexedLabel->getModify()) {
                             $indexedLabel->setText($obj->getText());
                             $this->update($indexedLabel);
@@ -99,8 +103,7 @@ class LabelRepository extends Repository
                     } else {
                         $this->add($obj);
                     }
-                } catch (IllegalObjectTypeException $e) {
-                } catch (UnknownObjectException $e) {
+                } catch (IllegalObjectTypeException|UnknownObjectException) {
                 }
                 unset($obj);
             }
@@ -108,7 +111,7 @@ class LabelRepository extends Repository
         }
     }
 
-    protected function getIndexedLabel(Label $label): ?object
+    protected function getIndexedLabel(Label $label): ?Label
     {
         $query = $this->createQuery();
 
@@ -124,6 +127,9 @@ class LabelRepository extends Repository
         ))->execute()->getFirst();
     }
 
+    /**
+     * @param array<string, mixed> $values
+     */
     public function updateSelectedRowInAllLanguages(string $key, string $extension, string $path, array $values): void
     {
         GeneralUtility::makeInstance(ConnectionPool::class)
@@ -139,6 +145,9 @@ class LabelRepository extends Repository
             );
     }
 
+    /**
+     * @param array<string, mixed> $values
+     */
     public function updateSelectedRow(int $uid, array $values): void
     {
         GeneralUtility::makeInstance(ConnectionPool::class)
@@ -152,6 +161,9 @@ class LabelRepository extends Repository
             );
     }
 
+    /**
+     * @param array<string, mixed> $defaultLabel
+     */
     public function createLanguageChildFromDefault(
         array $defaultLabel,
         string $translationFromFile,
@@ -170,7 +182,7 @@ class LabelRepository extends Repository
         $label->setTags($defaultLabel['tags']);
         try {
             $this->add($label);
-        } catch (IllegalObjectTypeException $e) {
+        } catch (IllegalObjectTypeException) {
         }
     }
 }

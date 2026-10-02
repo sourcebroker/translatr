@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SourceBroker\Translatr\Command;
@@ -11,8 +12,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ImportConfigurationCommand extends Command
 {
@@ -72,14 +73,14 @@ class ImportConfigurationCommand extends Command
                 ->getConnectionByName(ConnectionPool::DEFAULT_CONNECTION_NAME)
                 ->isConnected()) {
                 if ($input->getOption('fail-on-connection-error')) {
-                    throw new \RuntimeException('No connection to database');
+                    throw new \RuntimeException('No connection to database', 4800510995);
                 }
                 return false;
             }
             return true;
         } catch (\Exception $e) {
             if ($input->getOption('fail-on-connection-error')) {
-                throw new \RuntimeException($e->getMessage());
+                throw new \RuntimeException($e->getMessage(), (int)$e->getCode(), $e);
             }
             return false;
         }

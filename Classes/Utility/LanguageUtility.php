@@ -9,6 +9,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LanguageUtility
 {
+    /**
+     * @return array<string, string>|null
+     */
     public static function getAvailableLanguages(): ?array
     {
         $conf = GeneralUtility::makeInstance(Configurator::class);
@@ -18,6 +21,8 @@ class LanguageUtility
     /**
      * Returns labels in the TYPO3 13 structure for all supported TYPO3 versions:
      * [$language => [$key => [['source' => '...', 'target' => '...']]]]
+     *
+     * @return array<string, mixed>
      */
     public static function parseLanguageLabels(string $file, string $language): array
     {

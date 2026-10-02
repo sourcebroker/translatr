@@ -2,9 +2,9 @@
 
 namespace SourceBroker\Translatr\Service;
 
-use SourceBroker\Translatr\Utility\FileUtility;
 use SourceBroker\Translatr\Database\Database;
 use SourceBroker\Translatr\Utility\ExceptionUtility;
+use SourceBroker\Translatr\Utility\FileUtility;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Service\OpcodeCacheService;
@@ -13,7 +13,6 @@ use TYPO3\CMS\Core\Utility\StringUtility;
 
 class GenerateLanguageFiles
 {
-
     protected const LOADER_FILE_NAME = 'locallangOverrideLoader.php';
 
     protected string $tempFolderPath;
@@ -21,7 +20,6 @@ class GenerateLanguageFiles
     protected string $overrideFilesLoaderFilePath;
     protected string $overrideFilesBaseDirectoryPath;
     protected string $overrideFilesExtDirectoryPath;
-
 
     public function initialize(): void
     {
@@ -152,8 +150,11 @@ class GenerateLanguageFiles
         foreach ($this->getTranslationOverrideFiles() as $isoCode => $fileDatasets) {
             foreach ($fileDatasets as $fileData) {
                 $code .= $this->getFinalOverrideRow($isoCode, $fileData['overwritten'], $fileData['overwriteWith']);
-                $code .= $this->getFinalOverrideRow($isoCode,
-                    str_replace('EXT:', 'typo3conf/ext/', $fileData['overwritten']), $fileData['overwriteWith']);
+                $code .= $this->getFinalOverrideRow(
+                    $isoCode,
+                    str_replace('EXT:', 'typo3conf/ext/', $fileData['overwritten']),
+                    $fileData['overwriteWith']
+                );
             }
         }
         $tempFilename = $this->overrideFilesLoaderFilePath . '.tmp';
@@ -168,7 +169,7 @@ class GenerateLanguageFiles
         rename($tempFilename, $this->overrideFilesLoaderFilePath);
     }
 
-    protected function getFinalOverrideRow($isoCode, $overwritten, $overwriteWith)
+    protected function getFinalOverrideRow(string $isoCode, string $overwritten, string $overwriteWith): string
     {
         // TYPO3 14 moved SYS/locallangXMLOverride to LANG/resourceOverrides (#107436)
         $overridesPath = (new Typo3Version())->getMajorVersion() >= 14
@@ -215,6 +216,8 @@ class GenerateLanguageFiles
 
     /**
      * @todo check if return of relative path (in element value path) works fine. It will be better to return relative path to avoid problems with some specific server settings
+     *
+     * @return array<string, list<array{overwritten: string, overwriteWith: string}>>
      */
     protected function getTranslationOverrideFiles(): array
     {
@@ -232,7 +235,7 @@ class GenerateLanguageFiles
             $isoCode = explode('/', substr($fullPath, strlen($this->overrideFilesBaseDirectoryPath . '/')))[1];
             $translationOverrideFiles[$isoCode][] = [
                 'overwritten' => $this->transformPathFromLocallangOverridesToLocallang($fullPath),
-                'overwriteWith' => str_replace(Environment::getPublicPath() . '/', '', $this->getPublishedPath($fullPath))
+                'overwriteWith' => str_replace(Environment::getPublicPath() . '/', '', $this->getPublishedPath($fullPath)),
             ];
         }
         return $translationOverrideFiles;
@@ -259,7 +262,7 @@ class GenerateLanguageFiles
 
     protected function transformPathFromLocallangToLocallangOverrides(string $locallangPath, string $isocode): string
     {
-        if (\str_starts_with($locallangPath, 'EXT:')) {
+        if (str_starts_with($locallangPath, 'EXT:')) {
             return str_replace('EXT:', $this->overrideFilesExtDirectoryPath . '/' . $isocode . '/', $locallangPath);
         }
         return $this->overrideFilesBaseDirectoryPath . '/' . $locallangPath;
@@ -267,9 +270,9 @@ class GenerateLanguageFiles
 
     protected function createNotExistingLocallangOverrideFiles(): void
     {
-        if (false === file_exists($this->overrideFilesLoaderFilePath)) {
-            $locallangFiles =
-                GeneralUtility::makeInstance(Database::class)
+        if (file_exists($this->overrideFilesLoaderFilePath) === false) {
+            $locallangFiles
+                = GeneralUtility::makeInstance(Database::class)
                     ->getLocallangFiles();
             if (!$locallangFiles) {
                 return;
@@ -305,7 +308,7 @@ class GenerateLanguageFiles
         $languagesToProcess = $isoCode !== null ? [$isoCode => $groupedLabels[$isoCode] ?? []] : $groupedLabels;
 
         foreach ($languagesToProcess as $currentIsoCode => $labels) {
-            if (empty($labels)) {
+            if ($labels === []) {
                 continue;
             }
 
@@ -316,7 +319,7 @@ class GenerateLanguageFiles
                 $currentIsoCode
             );
             $outputFiles = [
-                $this->prependLocallangFileNameWithIsoCode($defaultLocallangOverrideFile, $currentIsoCode)
+                $this->prependLocallangFileNameWithIsoCode($defaultLocallangOverrideFile, $currentIsoCode),
             ];
             foreach ($outputFiles as $outputFile) {
                 $this->createDirectoryIfNotExists(dirname($outputFile));
@@ -328,6 +331,9 @@ class GenerateLanguageFiles
         }
     }
 
+    /**
+     * @param list<array<string, mixed>> $labels
+     */
     protected function createXlfFileForLabels(array $labels, string $isoCode = 'default'): \DOMDocument
     {
         $xml = new \DOMDocument('1.0', 'utf-8');
@@ -383,11 +389,14 @@ class GenerateLanguageFiles
         return $dirname . '/' . $isoCode . '.' . $fileName;
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     protected function getLabelsByLocallangFile(string $locallangFile): array
     {
         return
             GeneralUtility::makeInstance(Database::class)
-                ->getLabelsByLocallangFile($locallangFile);
+                ->getLabelsByLocallangFile($locallangFile) ?? [];
     }
 
 }

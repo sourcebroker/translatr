@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SourceBroker\Translatr\Middleware;
@@ -12,7 +13,7 @@ class GenerateLanguageFiles implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        (new \SourceBroker\Translatr\Service\GenerateLanguageFiles)->initialize();
+        (new \SourceBroker\Translatr\Service\GenerateLanguageFiles())->initialize();
         return $handler->handle($request);
     }
 

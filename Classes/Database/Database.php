@@ -12,7 +12,10 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Database implements DatabaseInterface
 {
-    public function delete($table, array $condition): void
+    /**
+     * @param array<string, mixed> $condition
+     */
+    public function delete(string $table, array $condition): void
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
@@ -25,7 +28,11 @@ class Database implements DatabaseInterface
         $queryBuilder->executeStatement();
     }
 
-    public function update($table, array $set, array $condition): void
+    /**
+     * @param array<string, mixed> $set
+     * @param array<string, mixed> $condition
+     */
+    public function update(string $table, array $set, array $condition): void
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
@@ -52,10 +59,15 @@ class Database implements DatabaseInterface
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
         return $queryBuilder
             ->select('uid')
-            ->from('pages')->where($queryBuilder->expr()->eq('pid', 0),
-                $queryBuilder->expr()->eq('deleted', 0))->executeQuery()->fetchOne();
+            ->from('pages')->where(
+                $queryBuilder->expr()->eq('pid', 0),
+                $queryBuilder->expr()->eq('deleted', 0)
+            )->executeQuery()->fetchOne();
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function findDemandedForBe(BeLabelDemand $demand): array
     {
         if (!$demand->isValid()) {
@@ -65,8 +77,10 @@ class Database implements DatabaseInterface
         if ($demand->getKeys()) {
             $keyWhere = ' AND label.ukey IN (' . implode(',', $this->wrapArrayByQuote($demand->getKeys())) . ') ';
         }
-        $languages = implode(',',
-            $this->wrapArrayByQuote($demand->getLanguages() ? $demand->getLanguages() : ['default']));
+        $languages = implode(
+            ',',
+            $this->wrapArrayByQuote($demand->getLanguages() ?: ['default'])
+        );
         $query = <<<SQL
 /* select labels from default language */
 (
@@ -111,7 +125,7 @@ SQL;
             $query,
             [
                 $demand->getExtension(),
-                $demand->getExtension()
+                $demand->getExtension(),
             ],
             [
                 ParameterType::STRING,
@@ -146,7 +160,10 @@ SQL;
         return $processedResults;
     }
 
-    public function getLabelsByLocallangFile($locallangFile): ?array
+    /**
+     * @return list<array<string, mixed>>|null
+     */
+    public function getLabelsByLocallangFile(string $locallangFile): ?array
     {
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_translatr_domain_model_label');
@@ -164,30 +181,37 @@ SQL;
         $stmt = $connection->executeQuery(
             $query,
             [
-                $locallangFile
+                $locallangFile,
             ],
             [
                 ParameterType::STRING,
-                ParameterType::STRING
+                ParameterType::STRING,
             ]
         );
         return $stmt->fetchAllAssociative();
     }
 
+    /**
+     * @return list<array<string, mixed>>|null
+     */
     public function getLocallangFiles(): ?array
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_translatr_domain_model_label');
         return $queryBuilder
             ->select('label.ll_file', 'label.language')
-            ->from('tx_translatr_domain_model_label', 'label')->groupBy('label.ll_file',
-                'label.language')->executeQuery()->fetchAllAssociative();
+            ->from('tx_translatr_domain_model_label', 'label')->groupBy(
+                'label.ll_file',
+                'label.language'
+            )->executeQuery()->fetchAllAssociative();
     }
 
+    /**
+     * @param array<int|string, scalar> $arr
+     * @return array<int|string, string>
+     */
     protected function wrapArrayByQuote(array $arr): array
     {
-        return array_map(function ($k) {
-            return '\'' . $k . '\'';
-        }, $arr);
+        return array_map(fn($k) => '\'' . $k . '\'', $arr);
     }
 }

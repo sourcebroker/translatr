@@ -13,8 +13,7 @@ use TYPO3\CMS\Core\Utility\StringUtility;
 
 class CacheCleaner
 {
-
-    protected $cacheManager;
+    protected CacheManager $cacheManager;
 
     public function __construct()
     {
@@ -47,7 +46,7 @@ class CacheCleaner
         try {
             $cacheFrontend = $this->cacheManager->getCache('l10n');
             $cacheFrontend->flush();
-        } catch (NoSuchCacheException $e) {
+        } catch (NoSuchCacheException) {
         }
     }
 }

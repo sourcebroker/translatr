@@ -2,7 +2,6 @@
 
 namespace SourceBroker\Translatr\Hooks;
 
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use SourceBroker\Translatr\Database\Database;
 use SourceBroker\Translatr\Database\DatabaseInterface;
 use SourceBroker\Translatr\Service\CacheCleaner;
@@ -15,19 +14,31 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class TceMain
 {
+    /**
+     * @param string $command
+     * @param string $table
+     * @param int|string $id
+     * @param mixed $value
+     */
     public function processCmdmap_postProcess(
         $command,
         $table,
         $id,
         $value,
         DataHandler $pObj
-    ) {
+    ): void {
         if ($table === 'tx_translatr_domain_model_label' && $command === 'delete') {
             GeneralUtility::makeInstance(CacheCleaner::class)->flushCache();
             FileUtility::getTempFolderPath();
         }
     }
 
+    /**
+     * @param string $status
+     * @param string $table
+     * @param int|string $id
+     * @param array<string, mixed> $fieldArray
+     */
     public function processDatamap_afterDatabaseOperations(
         $status,
         $table,
@@ -49,7 +60,7 @@ class TceMain
                         ContextualFeedbackSeverity::ERROR,
                         true
                     );
-                    /** @var $flashMessageService FlashMessageService */
+                    /** @var FlashMessageService $flashMessageService */
                     $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
                     $flashMessageService->getMessageQueueByIdentifier()->addMessage($message);
                     $db->delete('tx_translatr_domain_model_label', ['uid' => (int)$id]);

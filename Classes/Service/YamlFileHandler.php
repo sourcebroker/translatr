@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace SourceBroker\Translatr\Service;
@@ -23,6 +24,9 @@ class YamlFileHandler
         $this->yamlFileLoader = GeneralUtility::makeInstance(YamlFileLoader::class);
     }
 
+    /**
+     * @return list<array{extension: string, files?: list<array{fileName: string, path: string, labels: array<string, mixed>}>}>
+     */
     public function getConfiguration(): array
     {
         $configuration = [];
@@ -33,7 +37,7 @@ class YamlFileHandler
                 $configuration[$i]['files'][] = [
                     'fileName' => $fileName,
                     'path' => 'EXT:' . $extensionName . self::LANG_FILE_PATH . $fileName,
-                    'labels' => $labels
+                    'labels' => $labels,
                 ];
             }
             $i++;
@@ -42,6 +46,9 @@ class YamlFileHandler
         return $configuration;
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     */
     protected function getGlobalConfiguration(): array
     {
         $configuration = [];
@@ -49,7 +56,7 @@ class YamlFileHandler
             $fileContent = $this->readSingleFile($file);
             if (isset($fileContent[self::ROOT_NAME])) {
                 foreach ($fileContent[self::ROOT_NAME] as $ext => $files) {
-                    if (!key_exists($ext, $configuration)) {
+                    if (!array_key_exists($ext, $configuration)) {
                         $configuration[$ext] = [];
                     }
                     $this->populateRows($configuration[$ext], $files);
@@ -60,21 +67,25 @@ class YamlFileHandler
         return $configuration;
     }
 
+    /**
+     * @param array<string, mixed> $configuration
+     * @param array<string, mixed> $files
+     */
     protected function populateRows(array &$configuration, array $files): void
     {
         foreach ($files as $langFile => $rows) {
-            if (!key_exists($langFile, $configuration)) {
+            if (!array_key_exists($langFile, $configuration)) {
                 $configuration[$langFile] = [];
             }
             if (!is_array($rows)) {
                 continue;
             }
             foreach ($rows as $key => $properties) {
-                if (!key_exists($key, $configuration[$langFile])) {
+                if (!array_key_exists($key, $configuration[$langFile])) {
                     $configuration[$langFile][$key] = [];
                 }
                 foreach ($properties as $property => $values) {
-                    if (!key_exists($property, $configuration[$langFile][$key])) {
+                    if (!array_key_exists($property, $configuration[$langFile][$key])) {
                         $configuration[$langFile][$key][$property] = $values;
                     } else {
                         $configuration[$langFile][$key][$property] = array_unique(
@@ -86,11 +97,17 @@ class YamlFileHandler
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function readSingleFile(string $file): array
     {
         return $this->yamlFileLoader->load($file, 0);
     }
 
+    /**
+     * @return list<string>
+     */
     protected function getYamlFilesFromPackages(): array
     {
         $files = [];

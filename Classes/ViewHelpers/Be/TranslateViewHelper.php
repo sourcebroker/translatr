@@ -2,9 +2,8 @@
 
 namespace SourceBroker\Translatr\ViewHelpers\Be;
 
-use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
-use TYPO3\CMS\Core\Localization\LanguageService;
 use SourceBroker\Translatr\Utility\LanguageUtility;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 class TranslateViewHelper extends AbstractViewHelper
 {

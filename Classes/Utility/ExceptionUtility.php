@@ -7,10 +7,13 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ExceptionUtility
 {
+    /**
+     * @param class-string<\Throwable> $exceptionClassName
+     */
     public static function throwException(
-        $exceptionClassName,
-        $errorMessage,
-        $errorCode
+        string $exceptionClassName,
+        string $errorMessage,
+        int $errorCode
     ): void {
         if (Environment::getContext()->isProduction()) {
             // @todo add to TYPO3 logs for production context to not break down the site
@@ -21,15 +24,7 @@ class ExceptionUtility
                 $errorCode
             );
 
-            if ($exception instanceof \Throwable) {
-                throw $exception;
-            } else {
-                throw new \RuntimeException(
-                    $exceptionClassName
-                    . ' is not the instanceof \Exception or \Throwable',
-                    9023740239
-                );
-            }
+            throw $exception;
         }
     }
 }

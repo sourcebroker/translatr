@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 return [
     'ctrl' => [
         'title' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label',
@@ -92,14 +95,14 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.ll_file',
             'config' => [
                 'type' => 'user',
-                'renderType' => 'fieldHidden'
+                'renderType' => 'fieldHidden',
             ],
         ],
         'll_file_index' => [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.ll_file_index',
             'config' => [
                 'type' => 'user',
-                'renderType' => 'fieldHidden'
+                'renderType' => 'fieldHidden',
             ],
         ],
         'language' => [
@@ -107,7 +110,7 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.language',
             'config' => [
                 'type' => 'user',
-                'renderType' => 'fieldHidden'
+                'renderType' => 'fieldHidden',
             ],
         ],
         'tags' => [
@@ -115,7 +118,7 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.tags',
             'config' => [
                 'type' => 'user',
-                'renderType' => 'fieldHidden'
+                'renderType' => 'fieldHidden',
             ],
         ],
         'modify' => [
@@ -123,7 +126,7 @@ return [
             'label' => 'LLL:EXT:translatr/Resources/Private/Language/locallang_db.xlf:tx_translatr_domain_model_label.modify',
             'config' => [
                 'type' => 'user',
-                'renderType' => 'fieldHidden'
+                'renderType' => 'fieldHidden',
             ],
         ],
     ],

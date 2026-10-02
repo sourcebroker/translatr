@@ -3,12 +3,18 @@
 namespace SourceBroker\Translatr\Backend\FormDataProvider;
 
 use TYPO3\CMS\Backend\Form\FormDataProviderInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LabelRowInitializeNew implements FormDataProviderInterface
 {
+    /**
+     * @var array<string, mixed>
+     */
     private array $data = [];
 
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
     public function addData(array $data): array
     {
         $this->setData($data);
@@ -24,19 +30,22 @@ class LabelRowInitializeNew implements FormDataProviderInterface
         return $this->data;
     }
 
-    private function setData(array $data)
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function setData(array $data): void
     {
         $this->data = $data;
     }
 
     private function isNewRecord(): bool
     {
-        return 'new' === $this->data['command'];
+        return $this->data['command'] === 'new';
     }
 
     private function isTranslateLabelTable(): bool
     {
-        return 'tx_translatr_domain_model_label' === $this->data['tableName'];
+        return $this->data['tableName'] === 'tx_translatr_domain_model_label';
     }
 
     private function setDefaultDatabaseRowData(): void

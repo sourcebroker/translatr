@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SourceBroker\Translatr\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 class Label extends AbstractEntity
 {
-
     /**
      * Extension from which the labels comes from
      */
@@ -62,7 +63,7 @@ class Label extends AbstractEntity
         return $this->text;
     }
 
-    public function setText(string $text)
+    public function setText(string $text): void
     {
         $this->text = $text;
     }
@@ -72,7 +73,7 @@ class Label extends AbstractEntity
         return $this->description;
     }
 
-    public function setDescription(string $description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -82,7 +83,7 @@ class Label extends AbstractEntity
         return $this->llFile;
     }
 
-    public function setLlFile(string $llFile)
+    public function setLlFile(string $llFile): void
     {
         $this->llFile = $llFile;
     }
@@ -92,7 +93,7 @@ class Label extends AbstractEntity
         return $this->llFileIndex;
     }
 
-    public function setLlFileIndex(string $llFileIndex)
+    public function setLlFileIndex(string $llFileIndex): void
     {
         $this->llFileIndex = $llFileIndex;
     }
@@ -102,7 +103,7 @@ class Label extends AbstractEntity
         return $this->language;
     }
 
-    public function setLanguage(string $language)
+    public function setLanguage(string $language): void
     {
         $this->language = $language;
     }
@@ -112,7 +113,7 @@ class Label extends AbstractEntity
         return $this->tags;
     }
 
-    public function setTags(string $tags)
+    public function setTags(string $tags): void
     {
         $this->tags = $tags;
     }
@@ -122,7 +123,7 @@ class Label extends AbstractEntity
         return $this->modify;
     }
 
-    public function setModify(?int $modify)
+    public function setModify(?int $modify): void
     {
         $this->modify = $modify;
     }

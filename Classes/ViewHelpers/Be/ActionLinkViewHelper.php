@@ -2,22 +2,21 @@
 
 namespace SourceBroker\Translatr\ViewHelpers\Be;
 
-use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
-use TYPO3Fluid\Fluid\Core\ViewHelper\Exception;
 use TYPO3\CMS\Backend\RecordList\DatabaseRecordList;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentValueException;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+use TYPO3Fluid\Fluid\Core\ViewHelper\Exception;
 
 class ActionLinkViewHelper extends AbstractViewHelper
 {
-    const TABLE = 'tx_translatr_domain_model_label';
-    const MODULE_NAME = 'translatr';
+    public const TABLE = 'tx_translatr_domain_model_label';
+    public const MODULE_NAME = 'translatr';
 
     /**
      * @throws Exception
-     *
      */
     public function initializeArguments(): void
     {
@@ -41,31 +40,28 @@ class ActionLinkViewHelper extends AbstractViewHelper
 
     /**
      * @throws InvalidArgumentValueException
-     *
      */
     public function render(): string
     {
-        if (!isset($this->arguments['options'])) {
-            $this->arguments['options'] = [];
-        }
+        $this->arguments['options'] ??= [];
 
-        switch ($this->arguments['type']) {
-            case 'new':
-                return $this->renderNewLink($this->arguments['options']);
-            case 'edit':
-                return $this->renderEditLink(
-                    $this->arguments['label'],
-                    $this->arguments['options']
-                );
-            default:
-                throw new InvalidArgumentValueException(
-                    'Unknown action type `'
-                    . $this->arguments['type'] . '`.',
-                    1982739543
-                );
-        }
+        return match ($this->arguments['type']) {
+            'new' => $this->renderNewLink($this->arguments['options']),
+            'edit' => $this->renderEditLink(
+                $this->arguments['label'],
+                $this->arguments['options']
+            ),
+            default => throw new InvalidArgumentValueException(
+                'Unknown action type `'
+                . $this->arguments['type'] . '`.',
+                1982739543
+            ),
+        };
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function renderNewLink(array $options): string
     {
         $pid = 0;
@@ -84,6 +80,10 @@ class ActionLinkViewHelper extends AbstractViewHelper
         return self::getModuleUrl('record_edit', $uriParameters);
     }
 
+    /**
+     * @param array<string, mixed> $label
+     * @param array<string, mixed> $options
+     */
     public function renderEditLink(array $label, array $options = []): string
     {
         $uriParameters = [
@@ -108,14 +108,21 @@ class ActionLinkViewHelper extends AbstractViewHelper
         return self::getThisModuleUrl(self::getCurrentParameters());
     }
 
-    public static function getThisModuleUrl($urlParameters = []): string
+    /**
+     * @param array<string, mixed> $urlParameters
+     */
+    public static function getThisModuleUrl(array $urlParameters = []): string
     {
         return self::getModuleUrl(self::MODULE_NAME, $urlParameters);
     }
 
-    public static function getCurrentParameters($getParameters = []): array
+    /**
+     * @param array<string, mixed> $getParameters
+     * @return array<string, mixed>
+     */
+    public static function getCurrentParameters(array $getParameters = []): array
     {
-        if (empty($getParameters)) {
+        if ($getParameters === []) {
             $getParameters = $GLOBALS['TYPO3_REQUEST']->getQueryParams();
         }
         $parameters = [];
@@ -123,25 +130,26 @@ class ActionLinkViewHelper extends AbstractViewHelper
             'M',
             'moduleToken',
         ];
-        if (is_array($getParameters)) {
-            foreach ($getParameters as $key => $value) {
-                if (in_array($key, $ignoreKeys)) {
-                    continue;
-                }
-                $parameters[$key] = $value;
+        foreach ($getParameters as $key => $value) {
+            if (in_array($key, $ignoreKeys)) {
+                continue;
             }
+            $parameters[$key] = $value;
         }
 
         return $parameters;
     }
 
-    public static function getModuleUrl($moduleName, $urlParameters = [])
+    /**
+     * @param array<string, mixed> $urlParameters
+     */
+    public static function getModuleUrl(string $moduleName, array $urlParameters = []): string
     {
         $uri = '';
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
         try {
             $uri = (string)$uriBuilder->buildUriFromRoute($moduleName, $urlParameters);
-        } catch (RouteNotFoundException $e) {
+        } catch (RouteNotFoundException) {
         }
         return (string)$uri;
     }

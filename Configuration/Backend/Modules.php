@@ -1,5 +1,6 @@
 <?php
 
+use SourceBroker\Translatr\Controller\LabelController;
 use TYPO3\CMS\Core\Information\Typo3Version;
 
 return [
@@ -13,7 +14,7 @@ return [
         'inheritNavigationComponentFromMainModule' => false,
         'extensionName' => 'Translatr',
         'controllerActions' => [
-            SourceBroker\Translatr\Controller\LabelController::class => [
+            LabelController::class => [
                 'index',
                 'list',
             ],

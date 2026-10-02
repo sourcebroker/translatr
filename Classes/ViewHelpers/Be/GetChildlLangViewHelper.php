@@ -6,8 +6,8 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 class GetChildlLangViewHelper extends AbstractViewHelper
 {
-    const TABLE = 'tx_translatr_domain_model_label';
-    const MODULE_NAME = 'translatr';
+    public const TABLE = 'tx_translatr_domain_model_label';
+    public const MODULE_NAME = 'translatr';
 
     public function initializeArguments(): void
     {
@@ -25,13 +25,13 @@ class GetChildlLangViewHelper extends AbstractViewHelper
         );
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function render(): ?array
     {
         $label = $this->arguments['label'];
         $language = $this->arguments['language'];
-        if (isset($label['language_childs'][$language])) {
-            return $label['language_childs'][$language];
-        }
-        return null;
+        return $label['language_childs'][$language] ?? null;
     }
 }

@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
+use SourceBroker\Translatr\Middleware\GenerateLanguageFiles;
+
 return [
     'frontend' => [
         'sourcebroker/translator/init' => [
-            'target' => \SourceBroker\Translatr\Middleware\GenerateLanguageFiles::class,
+            'target' => GenerateLanguageFiles::class,
             'after' => [
                 'typo3/cms-frontend/site',
             ],
