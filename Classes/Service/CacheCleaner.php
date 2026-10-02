@@ -23,19 +23,26 @@ class CacheCleaner
 
     public function flushCache(): void
     {
-        $directory = FileUtility::getTempFolderPath();
-        if (is_link($directory)) {
-            // Avoid attempting to rename the symlink see #87367
-            $directory = realpath($directory);
-        }
-        if (is_dir($directory)) {
-            $temporaryDirectory = rtrim($directory, '/') . '.' . StringUtility::getUniqueId('remove');
-            if (rename($directory, $temporaryDirectory)) {
-                GeneralUtility::makeInstance(OpcodeCacheService::class)->clearAllActive($directory);
-                GeneralUtility::mkdir($directory);
-                clearstatcache();
-                GeneralUtility::rmdir($temporaryDirectory, true);
+        // Same lock as GenerateLanguageFiles, so the folder is not removed while the files are being generated
+        $locker = GeneralUtility::makeInstance(Locker::class);
+        $locker->acquire();
+        try {
+            $directory = FileUtility::getTempFolderPath();
+            if (is_link($directory)) {
+                // Avoid attempting to rename the symlink see #87367
+                $directory = realpath($directory);
             }
+            if (is_dir($directory)) {
+                $temporaryDirectory = rtrim($directory, '/') . '.' . StringUtility::getUniqueId('remove');
+                if (rename($directory, $temporaryDirectory)) {
+                    GeneralUtility::makeInstance(OpcodeCacheService::class)->clearAllActive($directory);
+                    GeneralUtility::mkdir($directory);
+                    clearstatcache();
+                    GeneralUtility::rmdir($temporaryDirectory, true);
+                }
+            }
+        } finally {
+            $locker->release();
         }
         try {
             $cacheFrontend = $this->cacheManager->getCache('l10n');

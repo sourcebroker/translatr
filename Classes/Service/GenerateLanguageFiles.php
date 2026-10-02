@@ -3,20 +3,21 @@
 namespace SourceBroker\Translatr\Service;
 
 use SourceBroker\Translatr\Utility\FileUtility;
-use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use SourceBroker\Translatr\Database\Database;
 use SourceBroker\Translatr\Utility\ExceptionUtility;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Information\Typo3Version;
-use TYPO3\CMS\Core\Locking\Exception\LockAcquireWouldBlockException;
-use TYPO3\CMS\Core\Locking\LockFactory;
-use TYPO3\CMS\Core\Locking\LockingStrategyInterface;
+use TYPO3\CMS\Core\Service\OpcodeCacheService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\StringUtility;
 
 class GenerateLanguageFiles
 {
 
-    protected array $locks = [];
+    protected const LOADER_FILE_NAME = 'locallangOverrideLoader.php';
+
+    protected string $tempFolderPath;
+    protected string $stagingFolderPath;
     protected string $overrideFilesLoaderFilePath;
     protected string $overrideFilesBaseDirectoryPath;
     protected string $overrideFilesExtDirectoryPath;
@@ -24,39 +25,103 @@ class GenerateLanguageFiles
 
     public function initialize(): void
     {
-        $this->setOverrideFilesLoaderFilePath();
-        if (!file_exists($this->overrideFilesLoaderFilePath)) {
-            $this->acquireLock('tx_translatr', 'tx_translatr_key');
-            if (!file_exists($this->overrideFilesLoaderFilePath)) {
-                $this->setOverrideFilesBaseDirectoryPath();
-                $this->setOverrideFilesExtDirectoryPath();
-                $this->createNotExistingLocallangOverrideFiles();
-                $this->createOverrideFilesLoaderFileIfNotExists();
-                if (!$this->overrideFilesLoaderFileExists()) {
-                    ExceptionUtility::throwException(
-                        \RuntimeException::class,
-                        'Could not create locallang XML Override file in path '
-                        . $this->overrideFilesLoaderFilePath . ' due to unknown reason.',
-                        82347523
-                    );
-                    $this->releaseLock('tx_translatr');
-                    return;
-                }
-            }
-            $this->releaseLock('tx_translatr');
+        $this->tempFolderPath = FileUtility::getTempFolderPath();
+        if (is_link($this->tempFolderPath)) {
+            // Publish into the symlink target, renaming the symlink itself would replace it with a folder
+            $this->tempFolderPath = realpath($this->tempFolderPath);
         }
-        include $this->overrideFilesLoaderFilePath;
+        $loaderFilePath = $this->tempFolderPath . '/' . self::LOADER_FILE_NAME;
+
+        // Fast path without lock. A flush (see CacheCleaner) can remove the file right after the check,
+        // so the include is silenced and in case of failure the files are generated under the lock.
+        if (file_exists($loaderFilePath) && (@include $loaderFilePath) !== false) {
+            return;
+        }
+
+        $locker = GeneralUtility::makeInstance(Locker::class);
+        $locker->acquire();
+        try {
+            if (!file_exists($loaderFilePath)) {
+                $this->generate();
+            }
+            include $loaderFilePath;
+        } finally {
+            $locker->release();
+        }
+    }
+
+    /**
+     * Generates all files in a staging folder and publishes it with one rename, so other processes never
+     * see a partially generated folder.
+     */
+    protected function generate(): void
+    {
+        $this->stagingFolderPath = $this->tempFolderPath . '.' . StringUtility::getUniqueId('build');
+        try {
+            $this->setOverrideFilesLoaderFilePath();
+            $this->setOverrideFilesBaseDirectoryPath();
+            $this->setOverrideFilesExtDirectoryPath();
+            $this->createNotExistingLocallangOverrideFiles();
+            $this->createOverrideFilesLoaderFileIfNotExists();
+            if (!$this->overrideFilesLoaderFileExists()) {
+                ExceptionUtility::throwException(
+                    \RuntimeException::class,
+                    'Could not create locallang XML Override file in path '
+                    . $this->overrideFilesLoaderFilePath . ' due to unknown reason.',
+                    82347523
+                );
+            }
+            $this->publishStagingFolder();
+        } finally {
+            if (is_dir($this->stagingFolderPath)) {
+                GeneralUtility::rmdir($this->stagingFolderPath, true);
+            }
+        }
+    }
+
+    protected function publishStagingFolder(): void
+    {
+        // The temp folder has no loader file here (e.g. it is empty after a flush) - move it away to free the name
+        $removeFolderPath = $this->tempFolderPath . '.' . StringUtility::getUniqueId('remove');
+        if (is_dir($this->tempFolderPath) && !rename($this->tempFolderPath, $removeFolderPath)) {
+            ExceptionUtility::throwException(
+                \RuntimeException::class,
+                'Could not move folder ' . $this->tempFolderPath . ' to ' . $removeFolderPath,
+                1791021301
+            );
+        }
+        // A concurrent FileUtility::getTempFolderPath() may have recreated the folder meanwhile, but it is empty
+        // then and rename() replaces an empty target folder.
+        if (!rename($this->stagingFolderPath, $this->tempFolderPath)) {
+            ExceptionUtility::throwException(
+                \RuntimeException::class,
+                'Could not move folder ' . $this->stagingFolderPath . ' to ' . $this->tempFolderPath,
+                1791021302
+            );
+        }
+        GeneralUtility::makeInstance(OpcodeCacheService::class)
+            ->clearAllActive($this->tempFolderPath . '/' . self::LOADER_FILE_NAME);
+        if (is_dir($removeFolderPath)) {
+            GeneralUtility::rmdir($removeFolderPath, true);
+        }
+    }
+
+    /**
+     * Maps a path inside the staging folder to its path after publishing.
+     */
+    protected function getPublishedPath(string $stagingPath): string
+    {
+        return $this->tempFolderPath . substr($stagingPath, strlen($this->stagingFolderPath));
     }
 
     protected function setOverrideFilesLoaderFilePath(): void
     {
-        $this->overrideFilesLoaderFilePath = FileUtility::getTempFolderPath()
-            . '/locallangOverrideLoader.php';
+        $this->overrideFilesLoaderFilePath = $this->stagingFolderPath . '/' . self::LOADER_FILE_NAME;
     }
 
     protected function setOverrideFilesBaseDirectoryPath(): void
     {
-        $this->overrideFilesBaseDirectoryPath = FileUtility::getTempFolderPath() . '/overrides';
+        $this->overrideFilesBaseDirectoryPath = $this->stagingFolderPath . '/overrides';
     }
 
     protected function setOverrideFilesExtDirectoryPath(): void
@@ -167,7 +232,7 @@ class GenerateLanguageFiles
             $isoCode = explode('/', substr($fullPath, strlen($this->overrideFilesBaseDirectoryPath . '/')))[1];
             $translationOverrideFiles[$isoCode][] = [
                 'overwritten' => $this->transformPathFromLocallangOverridesToLocallang($fullPath),
-                'overwriteWith' => str_replace(Environment::getPublicPath() . '/', '', $fullPath)
+                'overwriteWith' => str_replace(Environment::getPublicPath() . '/', '', $this->getPublishedPath($fullPath))
             ];
         }
         return $translationOverrideFiles;
@@ -323,66 +388,6 @@ class GenerateLanguageFiles
         return
             GeneralUtility::makeInstance(Database::class)
                 ->getLabelsByLocallangFile($locallangFile);
-    }
-
-    protected function acquireLock(string $type, string $key)
-    {
-        $lockFactory = GeneralUtility::makeInstance(LockFactory::class);
-        $this->locks[$type]['accessLock'] = $lockFactory->createLocker($type);
-
-        $this->locks[$type]['pageLock'] = $lockFactory->createLocker(
-            $key,
-            LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE | LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK
-        );
-
-        do {
-            if (!$this->locks[$type]['accessLock']->acquire()) {
-                throw new \RuntimeException('Could not acquire access lock for "' . $type . '"".', 1294586098);
-            }
-
-            try {
-                $locked = $this->locks[$type]['pageLock']->acquire(
-                    LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE | LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK
-                );
-            } catch (LockAcquireWouldBlockException $e) {
-                // somebody else has the lock, we keep waiting
-
-                // first release the access lock
-                $this->locks[$type]['accessLock']->release();
-                // now lets make a short break (100ms) until we try again, since
-                // the page generation by the lock owner will take a while anyways
-                usleep(100000);
-                continue;
-            }
-            $this->locks[$type]['accessLock']->release();
-            if ($locked) {
-                break;
-            }
-            throw new \RuntimeException('Could not acquire page lock for ' . $key . '.', 1460975877);
-        } while (true);
-    }
-
-    /**
-     * Release a page specific lock
-     *
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     * @throws NoSuchCacheException
-     */
-    protected function releaseLock(string $type): void
-    {
-        if ($this->locks[$type]['accessLock'] ?? false) {
-            if (!$this->locks[$type]['accessLock']->acquire()) {
-                throw new \RuntimeException('Could not acquire access lock for "' . $type . '"".', 1460975902);
-            }
-
-            $this->locks[$type]['pageLock']->release();
-            $this->locks[$type]['pageLock']->destroy();
-            $this->locks[$type]['pageLock'] = null;
-
-            $this->locks[$type]['accessLock']->release();
-            $this->locks[$type]['accessLock'] = null;
-        }
     }
 
 }
