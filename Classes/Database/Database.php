@@ -2,6 +2,7 @@
 
 namespace SourceBroker\Translatr\Database;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Utility\ArrayUtility;
@@ -73,14 +74,20 @@ class Database implements DatabaseInterface
         if (!$demand->isValid()) {
             return [];
         }
+        $parameters = [
+            'extension' => $demand->getExtension(),
+            'languages' => array_values($demand->getLanguages() ?: ['default']),
+        ];
+        $types = [
+            'extension' => ParameterType::STRING,
+            'languages' => ArrayParameterType::STRING,
+        ];
         $keyWhere = '';
         if ($demand->getKeys()) {
-            $keyWhere = ' AND label.ukey IN (' . implode(',', $this->wrapArrayByQuote($demand->getKeys())) . ') ';
+            $keyWhere = ' AND label.ukey IN (:keys) ';
+            $parameters['keys'] = array_values($demand->getKeys());
+            $types['keys'] = ArrayParameterType::STRING;
         }
-        $languages = implode(
-            ',',
-            $this->wrapArrayByQuote($demand->getLanguages() ?: ['default'])
-        );
         $query = <<<SQL
 /* select labels from default language */
 (
@@ -97,7 +104,7 @@ SELECT
   label.modify
 FROM tx_translatr_domain_model_label AS label
 WHERE label.language = "default"
-  AND label.extension = ?
+  AND label.extension = :extension
   $keyWhere
 ) UNION (
 /* select labels for specified languages */
@@ -115,23 +122,14 @@ SELECT
 FROM tx_translatr_domain_model_label AS label
   LEFT JOIN tx_translatr_domain_model_label AS parent
     ON (parent.language = "default" AND parent.ukey = label.ukey AND parent.ll_file = label.ll_file)
-WHERE label.language IN ($languages)
-  AND parent.extension = ?
+WHERE label.language IN (:languages)
+  AND parent.extension = :extension
+  $keyWhere
 );
 SQL;
         /** @var Connection $connection */
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default');
-        $stmt = $connection->executeQuery(
-            $query,
-            [
-                $demand->getExtension(),
-                $demand->getExtension(),
-            ],
-            [
-                ParameterType::STRING,
-                ParameterType::STRING,
-            ]
-        );
+        $stmt = $connection->executeQuery($query, $parameters, $types);
 
         $resultAssoc = $stmt->fetchAllAssociative();
         $results = ArrayUtility::combineWithSubarrayFieldAsKey(
@@ -204,14 +202,5 @@ SQL;
                 'label.ll_file',
                 'label.language'
             )->executeQuery()->fetchAllAssociative();
-    }
-
-    /**
-     * @param array<int|string, scalar> $arr
-     * @return array<int|string, string>
-     */
-    protected function wrapArrayByQuote(array $arr): array
-    {
-        return array_map(fn($k) => '\'' . $k . '\'', $arr);
     }
 }

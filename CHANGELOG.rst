@@ -12,6 +12,7 @@ Changelog
 6) [TASK] Flush the generated files only for "all" / "system" cache commands and for changed labels, not for every
    record saved with DataHandler. Add database indexes, fetch the labels once per file and parse the language files
    once per language.
+7) [TASK] Refactor SQL of the label filter in the backend module.
 
 7.0.1
 ~~~~~
