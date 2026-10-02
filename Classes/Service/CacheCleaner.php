@@ -20,6 +20,22 @@ class CacheCleaner
         $this->cacheManager = GeneralUtility::makeInstance(CacheManager::class);
     }
 
+    /**
+     * Hook "clearCachePostProc" of DataHandler. It is called for each record of any table whose cache is cleared,
+     * e.g. for every record saved by an import, so the generated files are flushed only for the "all" and "system"
+     * cache commands and for the labels of translatr.
+     *
+     * @param array<string, mixed> $params
+     */
+    public function clearCachePostProc(array $params): void
+    {
+        if (in_array(strtolower((string)($params['cacheCmd'] ?? '')), ['all', 'system'], true)
+            || ($params['table'] ?? null) === 'tx_translatr_domain_model_label'
+        ) {
+            $this->flushCache();
+        }
+    }
+
     public function flushCache(): void
     {
         // Same lock as GenerateLanguageFiles, so the folder is not removed while the files are being generated

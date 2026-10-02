@@ -9,6 +9,9 @@ Changelog
 3) [BUGFIX] Fix the module title.
 4) [BUGFIX] Fix race condition between the cache flush and the generation of the locallang override files.
 5) [TASK] Add PHPStan (level 6), PHP-CS-Fixer and Rector, apply their fixes.
+6) [TASK] Flush the generated files only for "all" / "system" cache commands and for changed labels, not for every
+   record saved with DataHandler. Add database indexes, fetch the labels once per file and parse the language files
+   once per language.
 
 7.0.1
 ~~~~~

@@ -277,24 +277,32 @@ class GenerateLanguageFiles
             if (!$locallangFiles) {
                 return;
             }
+            // Group the languages by file, so the labels of a file are fetched with one query for all its languages
+            $isoCodesByLocallangFile = [];
             foreach ($locallangFiles as $locallangFile) {
-                $this->createLocallangOverrideFileIfNotExist($locallangFile['ll_file'], $locallangFile['language']);
+                if (!$this->locallangOverrideFileExists($locallangFile['ll_file'], $locallangFile['language'])) {
+                    $isoCodesByLocallangFile[$locallangFile['ll_file']][] = $locallangFile['language'];
+                }
+            }
+            foreach ($isoCodesByLocallangFile as $locallangFile => $isoCodes) {
+                $this->createLocallangOverrideFile((string)$locallangFile, $isoCodes);
             }
         }
     }
 
-    protected function createLocallangOverrideFileIfNotExist(string $locallangFile, string $isoCode): void
+    protected function locallangOverrideFileExists(string $locallangFile, string $isoCode): bool
     {
         $locallangOverrideFilePath = $this->transformPathFromLocallangToLocallangOverrides($locallangFile, $isoCode);
         $finalFilePath = $this->prependLocallangFileNameWithIsoCode($locallangOverrideFilePath, $isoCode);
         $finalFilePath = preg_replace('/\.xml$/i', '.xlf', $finalFilePath);
 
-        if (!is_file($finalFilePath)) {
-            $this->createLocallangOverrideFile($locallangFile, $isoCode);
-        }
+        return is_file($finalFilePath);
     }
 
-    protected function createLocallangOverrideFile(string $locallangFile, ?string $isoCode = null): void
+    /**
+     * @param list<string>|null $isoCodes languages to create the file for, all languages of the labels if null
+     */
+    protected function createLocallangOverrideFile(string $locallangFile, ?array $isoCodes = null): void
     {
         $labels = $this->getLabelsByLocallangFile($locallangFile);
         $groupedLabels = [];
@@ -305,7 +313,13 @@ class GenerateLanguageFiles
 
         unset($labels);
 
-        $languagesToProcess = $isoCode !== null ? [$isoCode => $groupedLabels[$isoCode] ?? []] : $groupedLabels;
+        $languagesToProcess = $groupedLabels;
+        if ($isoCodes !== null) {
+            $languagesToProcess = [];
+            foreach ($isoCodes as $isoCode) {
+                $languagesToProcess[$isoCode] = $groupedLabels[$isoCode] ?? [];
+            }
+        }
 
         foreach ($languagesToProcess as $currentIsoCode => $labels) {
             if ($labels === []) {

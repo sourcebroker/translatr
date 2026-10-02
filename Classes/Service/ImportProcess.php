@@ -69,23 +69,31 @@ class ImportProcess
             $demand->setExtension($extension);
             $demand->setKeys(array_keys($keys));
             $demand->setLanguages($allLanguages);
-            foreach ($this->labelRepository->findDemandedForBe($demand) as $label) {
+            $labels = $this->labelRepository->findDemandedForBe($demand);
+            // Parse the file once per language, not for every label
+            $parsedLabelsByLanguage = [];
+            if ($labels !== []) {
                 foreach ($allLanguages as $language) {
-                    $parsedLabels = LanguageUtility::parseLanguageLabels($path, $language);
-                    if (isset($parsedLabels[$language], $parsedLabels[$language][$label['ukey']]) && !empty($parsedLabels[$language][$label['ukey']][0]['target'])) {
+                    $parsedLabelsByLanguage[$language] = LanguageUtility::parseLanguageLabels($path, $language)[$language] ?? [];
+                }
+            }
+            foreach ($labels as $label) {
+                foreach ($allLanguages as $language) {
+                    $translation = $parsedLabelsByLanguage[$language][$label['ukey']][0]['target'] ?? null;
+                    if (!empty($translation)) {
                         if (isset($label['language_childs'][$language])) {
                             if (empty($label['language_childs'][$language]['modify'])) {
                                 $this->labelRepository->updateSelectedRow(
                                     $label['language_childs'][$language]['uid'],
                                     [
-                                        'text' => $parsedLabels[$language][$label['ukey']][0]['target'],
+                                        'text' => $translation,
                                     ]
                                 );
                             }
                         } else {
                             $this->labelRepository->createLanguageChildFromDefault(
                                 $label,
-                                $parsedLabels[$language][$label['ukey']][0]['target'],
+                                $translation,
                                 $language
                             );
                         }

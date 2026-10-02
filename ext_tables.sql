@@ -12,4 +12,6 @@ CREATE TABLE tx_translatr_domain_model_label
 	language      varchar(31)  DEFAULT '' NOT NULL,
 
 	UNIQUE KEY ukey (ukey,language,ll_file_index),
+	KEY ll_file (ll_file,language),
+	KEY extension (extension,language),
 );
