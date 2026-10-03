@@ -172,9 +172,12 @@ class GenerateLanguageFiles
     protected function getFinalOverrideRow(string $isoCode, string $overwritten, string $overwriteWith): string
     {
         // TYPO3 14 moved SYS/locallangXMLOverride to LANG/resourceOverrides (#107436)
-        $overridesPath = (new Typo3Version())->getMajorVersion() >= 14
-            ? '[\'LANG\'][\'resourceOverrides\']'
-            : '[\'SYS\'][\'locallangXMLOverride\']';
+        $overridesPath = '[\'SYS\'][\'locallangXMLOverride\']';
+        if ((new Typo3Version())->getMajorVersion() >= 14) {
+            $overridesPath = '[\'LANG\'][\'resourceOverrides\']';
+            // TYPO3 14 looks up the overrides by the normalized locale name ("zh_CN" => "zh-CN")
+            $isoCode = str_replace('_', '-', $isoCode);
+        }
         return '$GLOBALS[\'TYPO3_CONF_VARS\']' . $overridesPath . '[\'' . $isoCode . '\'][\''
             . $overwritten . '\'][] = \'' . $overwriteWith . '\';' . PHP_EOL;
     }

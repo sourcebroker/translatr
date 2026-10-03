@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+7.1.2
+~~~~~
+
+1) [BUGFIX] Register the locallang overrides under the normalized locale name in TYPO3 14 (e.g. ``zh-CN`` instead of
+   ``zh_CN``), as TYPO3 14 looks them up by ``Locale::getName()``. Labels of languages with a country code were ignored.
+
 7.1.1
 ~~~~~
 
