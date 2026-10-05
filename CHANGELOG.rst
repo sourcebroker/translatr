@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+7.1.3
+~~~~~
+
+1) [BUGFIX] Sort the list of locallang files by ``ll_file`` and ``language`` and use only the first of
+   ``locallang.xlf`` / ``locallang.xml`` labels of the same language, as both go to the same override file. Without
+   ``ORDER BY`` the order differs between database servers (MariaDB sorts the ``GROUP BY`` result, MySQL 8 does not),
+   so a different file was used. Now the ``.xlf`` labels are used on all servers, as on MariaDB.
+
 7.1.2
 ~~~~~
 

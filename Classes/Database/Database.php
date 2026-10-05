@@ -201,6 +201,9 @@ SQL;
             ->from('tx_translatr_domain_model_label', 'label')->groupBy(
                 'label.ll_file',
                 'label.language'
-            )->executeQuery()->fetchAllAssociative();
+            )
+            ->orderBy('label.ll_file')
+            ->addOrderBy('label.language')
+            ->executeQuery()->fetchAllAssociative();
     }
 }

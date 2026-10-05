@@ -282,7 +282,15 @@ class GenerateLanguageFiles
             }
             // Group the languages by file, so the labels of a file are fetched with one query for all its languages
             $isoCodesByLocallangFile = [];
+            $usedOverrideFiles = [];
             foreach ($locallangFiles as $locallangFile) {
+                // "locallang.xml" and "locallang.xlf" go to the same override file, only the first one (by the
+                // order of the query) is used
+                $overrideFile = preg_replace('/\.xml$/i', '.xlf', $locallangFile['ll_file']);
+                if (isset($usedOverrideFiles[$overrideFile][$locallangFile['language']])) {
+                    continue;
+                }
+                $usedOverrideFiles[$overrideFile][$locallangFile['language']] = true;
                 if (!$this->locallangOverrideFileExists($locallangFile['ll_file'], $locallangFile['language'])) {
                     $isoCodesByLocallangFile[$locallangFile['ll_file']][] = $locallangFile['language'];
                 }
