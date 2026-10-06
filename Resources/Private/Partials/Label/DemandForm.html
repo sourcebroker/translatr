@@ -4,6 +4,9 @@
       data-namespace-typo3-fluid="true"
 >
 
+<f:asset.css identifier="translatr-language-filter" href="{f:uri.resource(path: 'Styles/LanguageFilter.css', extensionName: 'Translatr')}"/>
+<f:asset.script identifier="translatr-language-filter" src="{f:uri.resource(path: 'JavaScript/LanguageFilter.js', extensionName: 'Translatr')}" defer="true"/>
+
 <f:form action="index" object="{demand}" class="js-translatr-form" name="demand" method="post">
     <input type="hidden" name="id" value="{id}">
     <f:if condition="{extensions->f:count()} === 0">
@@ -37,18 +40,44 @@ tx_translatr {
                     </div>
                 </div>
                 <div class="col-sm-6">
-                    <div class="form-group">
-                        <label for="field-sys_language_uid" class="control-label">
-                            Language
-                        </label>
-                        <f:form.select property="languages" id="field-sys_language_uid" options="{languages}"
-                                       optionValueField="uid" optionLabelField="title"
-                                       class="form-select form-select-sm"
-                                       size="{languages -> f:count()}"
-                                       multiple="1"
-                                       style="height: 100px;"
-                        />
-                    </div>
+                    <fieldset class="form-group">
+                        <legend class="translatr-language-legend" id="translatr-language-label">
+                            <f:translate key="LLL:EXT:translatr/Resources/Private/Language/locallang_label.xlf:filters.languages"/>
+                        </legend>
+                        <details class="translatr-language-filter" data-language-filter>
+                            <summary class="form-select form-select-sm" aria-labelledby="translatr-language-label translatr-language-selection">
+                                <span id="translatr-language-selection" data-language-summary
+                                      data-empty="{f:translate(key: 'LLL:EXT:translatr/Resources/Private/Language/locallang_label.xlf:filters.chooseLanguages')}">
+                                    <f:translate key="LLL:EXT:translatr/Resources/Private/Language/locallang_label.xlf:filters.chooseLanguages"/>
+                                </span>
+                            </summary>
+                            <div class="translatr-language-menu">
+                                <div class="translatr-language-tools" data-language-tools hidden>
+                                    <label class="visually-hidden" for="translatr-language-search">
+                                        <f:translate key="LLL:EXT:translatr/Resources/Private/Language/locallang_label.xlf:filters.searchLanguages"/>
+                                    </label>
+                                    <input type="search" id="translatr-language-search" class="form-control form-control-sm"
+                                           data-language-search autocomplete="off"
+                                           placeholder="{f:translate(key: 'LLL:EXT:translatr/Resources/Private/Language/locallang_label.xlf:filters.searchLanguages')}"/>
+                                    <button type="button" class="btn btn-default btn-sm" data-language-clear>
+                                        <f:translate key="LLL:EXT:translatr/Resources/Private/Language/locallang_label.xlf:filters.clearLanguages"/>
+                                    </button>
+                                </div>
+                                <div class="translatr-language-options">
+                                    <f:for each="{languages}" as="languageLabel" key="languageCode" iteration="iterator">
+                                        <label class="translatr-language-option" data-language-option>
+                                            <f:form.checkbox property="languages" value="{languageCode}" multiple="1"
+                                                             class="form-check-input" id="translatr-language-{iterator.index}"/>
+                                            <span data-language-name>{languageLabel}</span>
+                                        </label>
+                                    </f:for>
+                                    <p class="text-body-secondary small m-2" data-language-empty role="status" hidden>
+                                        <f:translate key="LLL:EXT:translatr/Resources/Private/Language/locallang_label.xlf:filters.noLanguages"/>
+                                    </p>
+                                </div>
+                            </div>
+                        </details>
+                    </fieldset>
                 </div>
             </div>
 
@@ -57,7 +86,7 @@ tx_translatr {
                     <div class="form-group">
                         <div class="col-sm-8">
                             <f:form.button type="submit" name="operation" value="list" class="btn btn-default">
-                                Submit
+                                <f:translate key="LLL:EXT:translatr/Resources/Private/Language/locallang_label.xlf:filters.apply"/>
                             </f:form.button>
                         </div>
                     </div>
@@ -66,4 +95,3 @@ tx_translatr {
         </f:else>
     </f:if>
 </f:form>
-

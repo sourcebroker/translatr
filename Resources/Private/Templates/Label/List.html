@@ -10,6 +10,22 @@
 
 
     <f:render partial="Label/DemandForm" arguments="{_all}"/>
+    <f:if condition="{showSyncButton}">
+        <f:form action="refresh" method="post" class="mb-3">
+            <f:form.hidden name="extension" value="{demand.extension}"/>
+            <f:form.hidden name="refreshToken" value="{refreshToken}"/>
+            <f:for each="{demand.languages}" as="language" iteration="iterator">
+                <f:form.hidden name="languages[{iterator.index}]" value="{language}"/>
+            </f:for>
+            <f:form.button type="submit" class="btn btn-default" additionalAttributes="{aria-describedby: 'label-sync-description'}">
+                <f:translate key="LLL:EXT:translatr/Resources/Private/Language/locallang_label.xlf:labels.refresh"/>
+            </f:form.button>
+            <p id="label-sync-description" class="text-body-secondary small mt-2 mb-0">
+                <f:translate key="LLL:EXT:translatr/Resources/Private/Language/locallang_label.xlf:labels.syncDescription"
+                             arguments="{0: demand.extension}"/>
+            </p>
+        </f:form>
+    </f:if>
     <f:if condition="{labels}">
         <table class="table table-hover">
             <thead>

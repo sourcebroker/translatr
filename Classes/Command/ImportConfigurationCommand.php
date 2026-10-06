@@ -13,13 +13,16 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ImportConfigurationCommand extends Command
 {
-    protected ImportProcess $importProcessService;
-
-    protected CacheCleaner $cacheCleaner;
+    public function __construct(
+        private readonly ImportProcess $importProcessService,
+        private readonly CacheCleaner $cacheCleaner,
+        private readonly ConnectionPool $connectionPool,
+    ) {
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
@@ -31,8 +34,6 @@ class ImportConfigurationCommand extends Command
             'Instead of exiting this command if database connection problems, throw an error.'
         );
         $this->setDescription('Import configuration for labels for ext:translatr');
-        $this->importProcessService = GeneralUtility::makeInstance(ImportProcess::class);
-        $this->cacheCleaner = GeneralUtility::makeInstance(CacheCleaner::class);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -50,7 +51,7 @@ class ImportConfigurationCommand extends Command
         );
         foreach ($dataToImport as $configuration) {
             $output->writeln('Extension processing: ' . $configuration['extension']);
-            foreach ($configuration['files'] as $file) {
+            foreach ($configuration['files'] ?? [] as $file) {
                 $output->writeln('File processing: ' . $file['path']);
                 $this->importProcessService->importDataFromSingleFile(
                     $configuration['extension'],
@@ -69,14 +70,9 @@ class ImportConfigurationCommand extends Command
     public function isDatabaseConnection(InputInterface $input, OutputInterface $output): bool
     {
         try {
-            if (!GeneralUtility::makeInstance(ConnectionPool::class)
+            $this->connectionPool
                 ->getConnectionByName(ConnectionPool::DEFAULT_CONNECTION_NAME)
-                ->isConnected()) {
-                if ($input->getOption('fail-on-connection-error')) {
-                    throw new \RuntimeException('No connection to database', 4800510995);
-                }
-                return false;
-            }
+                ->executeQuery('SELECT 1')->fetchOne();
             return true;
         } catch (\Exception $e) {
             if ($input->getOption('fail-on-connection-error')) {

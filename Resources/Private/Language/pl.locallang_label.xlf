@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.0">
+    <file source-language="en" target-language="pl" datatype="plaintext" original="messages" product-name="translatr">
+        <body>
+            <trans-unit id="filters.languages" approved="yes"><source>Languages</source><target>Języki</target></trans-unit>
+            <trans-unit id="filters.chooseLanguages" approved="yes"><source>Choose languages</source><target>Wybierz języki</target></trans-unit>
+            <trans-unit id="filters.searchLanguages" approved="yes"><source>Search languages</source><target>Szukaj języków</target></trans-unit>
+            <trans-unit id="filters.clearLanguages" approved="yes"><source>Clear selection</source><target>Wyczyść wybór</target></trans-unit>
+            <trans-unit id="filters.noLanguages" approved="yes"><source>No matching languages</source><target>Brak pasujących języków</target></trans-unit>
+            <trans-unit id="labels.refresh" approved="yes">
+                <source>Synchronize labels from files</source>
+                <target>Synchronizuj etykiety z plików</target>
+            </trans-unit>
+            <trans-unit id="labels.refreshed" approved="yes">
+                <source>Labels synchronized from source files.</source>
+                <target>Etykiety zostały zsynchronizowane z plików źródłowych.</target>
+            </trans-unit>
+            <trans-unit id="labels.syncDescription" approved="yes">
+                <source>Re-reads all source labels for “%s”. Your manual translations are kept.</source>
+                <target>Ponownie wczytuje wszystkie etykiety źródłowe rozszerzenia „%s”. Zachowuje Twoje ręczne tłumaczenia.</target>
+            </trans-unit>
+            <trans-unit id="filters.apply" approved="yes">
+                <source>Apply filters</source>
+                <target>Zastosuj filtry</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

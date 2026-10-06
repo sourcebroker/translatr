@@ -16,7 +16,7 @@ return [
         'controllerActions' => [
             LabelController::class => [
                 'index',
-                'list',
+                'refresh',
             ],
 
         ],

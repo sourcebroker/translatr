@@ -25,6 +25,19 @@ ci: .Build/vendor ## Run all code checks (PHP-CS-Fixer, Rector, PHPStan)
 .PHONY: lint
 lint: ci ## Alias of "ci"
 
+.PHONY: test
+test: ## Run functional checks on TYPO3 13 and 14
+	@set -eu; for version in 13 14; do \
+		cd /var/www/html/v$$version; \
+		php /var/www/translatr/Tests/Functional/LabelIndexer.php; \
+		for context in Production Development; do \
+			php /var/www/translatr/Tests/Functional/GenerateLanguageFiles.php $$context; \
+		done; \
+	done
+
+.PHONY: check
+check: ci test ## Run static analysis and all functional checks
+
 .PHONY: cgl
 cgl: .Build/vendor ## Check the code style (PHP-CS-Fixer, dry run)
 	composer run ci:php:cs-fixer

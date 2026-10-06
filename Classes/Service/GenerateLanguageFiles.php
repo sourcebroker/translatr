@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SourceBroker\Translatr\Service;
 
-use SourceBroker\Translatr\Database\Database;
-use SourceBroker\Translatr\Utility\ExceptionUtility;
+use SourceBroker\Translatr\Database\LabelReader;
+use SourceBroker\Translatr\Domain\Exception\LanguageFileGenerationException;
 use SourceBroker\Translatr\Utility\FileUtility;
 use TYPO3\CMS\Core\Core\Environment;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Service\OpcodeCacheService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
@@ -19,56 +20,84 @@ class GenerateLanguageFiles
     protected string $stagingFolderPath;
     protected string $overrideFilesLoaderFilePath;
     protected string $overrideFilesBaseDirectoryPath;
-    protected string $overrideFilesExtDirectoryPath;
+
+    public function __construct(
+        private readonly LanguageFilePathResolver $pathResolver,
+        private readonly OverrideLoaderContentBuilder $loaderContentBuilder,
+        private readonly XlfBuilder $xlfBuilder,
+        private readonly LabelReader $labelReader,
+        private readonly Locker $locker,
+        private readonly OpcodeCacheService $opcodeCacheService,
+        private readonly GenerationRetry $generationRetry,
+    ) {}
 
     public function initialize(): void
     {
-        $this->tempFolderPath = FileUtility::getTempFolderPath();
-        if (is_link($this->tempFolderPath)) {
-            // Publish into the symlink target, renaming the symlink itself would replace it with a folder
-            $this->tempFolderPath = realpath($this->tempFolderPath);
+        // Fast path without lock. A flush can remove the file right after the check, so a failed include falls
+        // through to generation under the lock.
+        if ($this->loadPublishedFiles()) {
+            return;
         }
-        $loaderFilePath = $this->tempFolderPath . '/' . self::LOADER_FILE_NAME;
-
-        // Fast path without lock. A flush (see CacheCleaner) can remove the file right after the check,
-        // so the include is silenced and in case of failure the files are generated under the lock.
-        if (file_exists($loaderFilePath) && (@include $loaderFilePath) !== false) {
+        $production = Environment::getContext()->isProduction();
+        if ($production && $this->generationRetry->isDeferred()) {
             return;
         }
 
-        $locker = GeneralUtility::makeInstance(Locker::class);
-        $locker->acquire();
+        $this->locker->acquire();
         try {
+            // Another request may have failed while this request was waiting for the lock.
+            if ($this->loadPublishedFiles() || ($production && $this->generationRetry->isDeferred())) {
+                return;
+            }
+            try {
+                $this->tempFolderPath = FileUtility::getTempFolderPath();
+            } catch (\RuntimeException $exception) {
+                throw new LanguageFileGenerationException('Could not create the language file cache folder.', 1791214402, $exception);
+            }
+            if (is_link($this->tempFolderPath)) {
+                $resolvedPath = realpath($this->tempFolderPath);
+                if ($resolvedPath === false) {
+                    throw new LanguageFileGenerationException('Could not resolve the language file cache folder.', 1760540164);
+                }
+                $this->tempFolderPath = $resolvedPath;
+            }
+            $loaderFilePath = $this->tempFolderPath . '/' . self::LOADER_FILE_NAME;
             if (!file_exists($loaderFilePath)) {
                 $this->generate();
             }
-            include $loaderFilePath;
+            if ((@include $loaderFilePath) === false) {
+                throw new LanguageFileGenerationException('Could not load generated language overrides.', 1791214403);
+            }
+            $this->generationRetry->reset();
+        } catch (LanguageFileGenerationException $exception) {
+            if ($production) {
+                $this->generationRetry->defer();
+            }
+            throw $exception;
         } finally {
-            $locker->release();
+            $this->locker->release();
         }
     }
 
+    /** @phpstan-impure */
+    public function loadPublishedFiles(): bool
+    {
+        $loader = FileUtility::getTempFolderPath(false) . '/' . self::LOADER_FILE_NAME;
+        return is_file($loader) && (@include $loader) !== false;
+    }
+
     /**
-     * Generates all files in a staging folder and publishes it with one rename, so other processes never
-     * see a partially generated folder.
+     * Builds a complete set in a staging folder before replacing the published folder under the lock.
      */
     protected function generate(): void
     {
         $this->stagingFolderPath = $this->tempFolderPath . '.' . StringUtility::getUniqueId('build');
+        $this->overrideFilesLoaderFilePath = $this->stagingFolderPath . '/' . self::LOADER_FILE_NAME;
+        $this->overrideFilesBaseDirectoryPath = $this->stagingFolderPath . '/overrides';
         try {
-            $this->setOverrideFilesLoaderFilePath();
-            $this->setOverrideFilesBaseDirectoryPath();
-            $this->setOverrideFilesExtDirectoryPath();
-            $this->createNotExistingLocallangOverrideFiles();
-            $this->createOverrideFilesLoaderFileIfNotExists();
-            if (!$this->overrideFilesLoaderFileExists()) {
-                ExceptionUtility::throwException(
-                    \RuntimeException::class,
-                    'Could not create locallang XML Override file in path '
-                    . $this->overrideFilesLoaderFilePath . ' due to unknown reason.',
-                    82347523
-                );
-            }
+            $this->createDirectoryIfNotExists($this->overrideFilesBaseDirectoryPath);
+            $this->createLocallangOverrideFiles();
+            $this->createOverrideFilesLoaderFile();
             $this->publishStagingFolder();
         } finally {
             if (is_dir($this->stagingFolderPath)) {
@@ -79,137 +108,61 @@ class GenerateLanguageFiles
 
     protected function publishStagingFolder(): void
     {
-        // The temp folder has no loader file here (e.g. it is empty after a flush) - move it away to free the name
         $removeFolderPath = $this->tempFolderPath . '.' . StringUtility::getUniqueId('remove');
-        if (is_dir($this->tempFolderPath) && !rename($this->tempFolderPath, $removeFolderPath)) {
-            ExceptionUtility::throwException(
-                \RuntimeException::class,
+        if (is_dir($this->tempFolderPath) && !@rename($this->tempFolderPath, $removeFolderPath)) {
+            throw new LanguageFileGenerationException(
                 'Could not move folder ' . $this->tempFolderPath . ' to ' . $removeFolderPath,
                 1791021301
             );
         }
-        // A concurrent FileUtility::getTempFolderPath() may have recreated the folder meanwhile, but it is empty
-        // then and rename() replaces an empty target folder.
-        if (!rename($this->stagingFolderPath, $this->tempFolderPath)) {
-            ExceptionUtility::throwException(
-                \RuntimeException::class,
+        if (!@rename($this->stagingFolderPath, $this->tempFolderPath)) {
+            if (is_dir($removeFolderPath) && !@rename($removeFolderPath, $this->tempFolderPath)) {
+                throw new LanguageFileGenerationException(
+                    'Could not publish language files or restore the previous folder. Previous files remain in ' . $removeFolderPath,
+                    1791021303
+                );
+            }
+            throw new LanguageFileGenerationException(
                 'Could not move folder ' . $this->stagingFolderPath . ' to ' . $this->tempFolderPath,
                 1791021302
             );
         }
-        GeneralUtility::makeInstance(OpcodeCacheService::class)
-            ->clearAllActive($this->tempFolderPath . '/' . self::LOADER_FILE_NAME);
+        $this->opcodeCacheService->clearAllActive($this->tempFolderPath . '/' . self::LOADER_FILE_NAME);
         if (is_dir($removeFolderPath)) {
             GeneralUtility::rmdir($removeFolderPath, true);
         }
     }
 
-    /**
-     * Maps a path inside the staging folder to its path after publishing.
-     */
-    protected function getPublishedPath(string $stagingPath): string
-    {
-        return $this->tempFolderPath . substr($stagingPath, strlen($this->stagingFolderPath));
-    }
-
-    protected function setOverrideFilesLoaderFilePath(): void
-    {
-        $this->overrideFilesLoaderFilePath = $this->stagingFolderPath . '/' . self::LOADER_FILE_NAME;
-    }
-
-    protected function setOverrideFilesBaseDirectoryPath(): void
-    {
-        $this->overrideFilesBaseDirectoryPath = $this->stagingFolderPath . '/overrides';
-    }
-
-    protected function setOverrideFilesExtDirectoryPath(): void
-    {
-        $this->overrideFilesExtDirectoryPath = $this->overrideFilesBaseDirectoryPath . '/ext';
-    }
-
-    protected function overrideFilesLoaderFileExists(): bool
-    {
-        return file_exists($this->overrideFilesLoaderFilePath);
-    }
-
-    protected function createOverrideFilesLoaderFileIfNotExists(): void
-    {
-        if ($this->overrideFilesLoaderFileExists()) {
-            return;
-        }
-
-        $this->createOverrideFilesLoaderFile();
-    }
-
     protected function createOverrideFilesLoaderFile(): void
     {
-
-        $this->createOverrideFilesLoaderFileDirectoryIfNotExists();
-        $this->createOverrideFilesDirectories();
-        $code = '<?php' . PHP_EOL;
-        foreach ($this->getTranslationOverrideFiles() as $isoCode => $fileDatasets) {
-            foreach ($fileDatasets as $fileData) {
-                $code .= $this->getFinalOverrideRow($isoCode, $fileData['overwritten'], $fileData['overwriteWith']);
-                $code .= $this->getFinalOverrideRow(
-                    $isoCode,
-                    str_replace('EXT:', 'typo3conf/ext/', $fileData['overwritten']),
-                    $fileData['overwriteWith']
-                );
-            }
-        }
+        $code = $this->loaderContentBuilder->build($this->getTranslationOverrideFiles());
         $tempFilename = $this->overrideFilesLoaderFilePath . '.tmp';
-        if (!file_put_contents($tempFilename, $code)) {
-            ExceptionUtility::throwException(
-                \RuntimeException::class,
+        if (@file_put_contents($tempFilename, $code) !== strlen($code)) {
+            throw new LanguageFileGenerationException(
                 'Could not write file in ' . $tempFilename,
                 390847534
             );
         }
         GeneralUtility::fixPermissions($tempFilename, true);
-        rename($tempFilename, $this->overrideFilesLoaderFilePath);
-    }
-
-    protected function getFinalOverrideRow(string $isoCode, string $overwritten, string $overwriteWith): string
-    {
-        // TYPO3 14 moved SYS/locallangXMLOverride to LANG/resourceOverrides (#107436)
-        $overridesPath = '[\'SYS\'][\'locallangXMLOverride\']';
-        if ((new Typo3Version())->getMajorVersion() >= 14) {
-            $overridesPath = '[\'LANG\'][\'resourceOverrides\']';
-            // TYPO3 14 looks up the overrides by the normalized locale name ("zh_CN" => "zh-CN")
-            $isoCode = str_replace('_', '-', $isoCode);
+        if (!@rename($tempFilename, $this->overrideFilesLoaderFilePath)) {
+            throw new LanguageFileGenerationException(
+                'Could not publish language file loader ' . $this->overrideFilesLoaderFilePath,
+                1760540165
+            );
         }
-        return '$GLOBALS[\'TYPO3_CONF_VARS\']' . $overridesPath . '[\'' . $isoCode . '\'][\''
-            . $overwritten . '\'][] = \'' . $overwriteWith . '\';' . PHP_EOL;
-    }
-
-    protected function createOverrideFilesLoaderFileDirectoryIfNotExists(): void
-    {
-        $this->createDirectoryIfNotExists(dirname($this->overrideFilesLoaderFilePath));
-    }
-
-    protected function createOverrideFilesDirectories(): void
-    {
-        $this->createOverrideFilesBaseDirectoryIfNotExists();
-        $this->createOverrideFilesExtDirectoryIfNotExists();
-    }
-
-    protected function createOverrideFilesBaseDirectoryIfNotExists(): void
-    {
-        $this->createDirectoryIfNotExists($this->overrideFilesExtDirectoryPath);
-    }
-
-    protected function createOverrideFilesExtDirectoryIfNotExists(): void
-    {
-        $this->createDirectoryIfNotExists($this->overrideFilesExtDirectoryPath);
     }
 
     protected function createDirectoryIfNotExists(string $directoryPath): void
     {
+        $this->pathResolver->assertPathIsWithin($directoryPath, $this->stagingFolderPath);
         if (!is_dir($directoryPath)) {
-            GeneralUtility::mkdir_deep($directoryPath);
+            try {
+                GeneralUtility::mkdir_deep($directoryPath);
+            } catch (\RuntimeException $exception) {
+                throw new LanguageFileGenerationException('Could not create directory in ' . $directoryPath, 938457943, $exception);
+            }
             if (!is_dir($directoryPath)) {
-                ExceptionUtility::throwException(
-                    \RuntimeException::class,
+                throw new LanguageFileGenerationException(
                     'Could not create directory in ' . $directoryPath,
                     938457943
                 );
@@ -218,200 +171,106 @@ class GenerateLanguageFiles
     }
 
     /**
-     * @todo check if return of relative path (in element value path) works fine. It will be better to return relative path to avoid problems with some specific server settings
-     *
      * @return array<string, list<array{overwritten: string, overwriteWith: string}>>
      */
     protected function getTranslationOverrideFiles(): array
     {
         $translationOverrideFiles = [];
-
-        $files = new \RegexIterator(
-            new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($this->overrideFilesBaseDirectoryPath)
-            ),
-            '/locallang(|_db)\.xlf|locallang(|_db)\.xml/',
-            \RegexIterator::GET_MATCH
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($this->overrideFilesBaseDirectoryPath)
         );
 
-        foreach ($files as $fullPath => $file) {
-            $isoCode = explode('/', substr($fullPath, strlen($this->overrideFilesBaseDirectoryPath . '/')))[1];
-            $translationOverrideFiles[$isoCode][] = [
-                'overwritten' => $this->transformPathFromLocallangOverridesToLocallang($fullPath),
-                'overwriteWith' => str_replace(Environment::getPublicPath() . '/', '', $this->getPublishedPath($fullPath)),
+        /** @var \SplFileInfo $file */
+        foreach ($files as $file) {
+            if (!$file->isFile()) {
+                continue;
+            }
+            $fileData = $this->pathResolver->resolveGeneratedFile(
+                $file->getPathname(),
+                $this->overrideFilesBaseDirectoryPath,
+            );
+            if ($fileData === null) {
+                continue;
+            }
+            $publishedPath = $this->pathResolver->mapToPublishedPath(
+                $file->getPathname(),
+                $this->stagingFolderPath,
+                $this->tempFolderPath,
+            );
+            $translationOverrideFiles[$fileData['language']][] = [
+                'overwritten' => $fileData['overwritten'],
+                'overwriteWith' => str_replace(Environment::getPublicPath() . '/', '', $publishedPath),
             ];
         }
+
         return $translationOverrideFiles;
     }
 
-    protected function transformPathFromLocallangOverridesToLocallang(string $fullPath): string
+    protected function createLocallangOverrideFiles(): void
     {
-        $replacements = [
-            $this->overrideFilesExtDirectoryPath => 'EXT:',
-            $this->overrideFilesBaseDirectoryPath => '',
-        ];
-        $pathInfo = pathinfo(explode(':', str_replace(array_keys($replacements), $replacements, $fullPath))[1]);
-        $dirnameExploded = explode(DIRECTORY_SEPARATOR, $pathInfo['dirname']);
-        array_shift($dirnameExploded);
-        array_shift($dirnameExploded);
-        $pathNoIso = implode(DIRECTORY_SEPARATOR, $dirnameExploded);
-
-        $nameExploded = explode('.', $pathInfo['basename']);
-        array_shift($nameExploded);
-        $nameNoIso = implode('.', $nameExploded);
-
-        return 'EXT:' . $pathNoIso . '/' . $nameNoIso;
-    }
-
-    protected function transformPathFromLocallangToLocallangOverrides(string $locallangPath, string $isocode): string
-    {
-        if (str_starts_with($locallangPath, 'EXT:')) {
-            return str_replace('EXT:', $this->overrideFilesExtDirectoryPath . '/' . $isocode . '/', $locallangPath);
+        $locallangFiles = $this->labelReader->getLocallangFiles();
+        if ($locallangFiles === []) {
+            return;
         }
-        return $this->overrideFilesBaseDirectoryPath . '/' . $locallangPath;
-    }
 
-    protected function createNotExistingLocallangOverrideFiles(): void
-    {
-        if (file_exists($this->overrideFilesLoaderFilePath) === false) {
-            $locallangFiles
-                = GeneralUtility::makeInstance(Database::class)
-                    ->getLocallangFiles();
-            if (!$locallangFiles) {
-                return;
+        $isoCodesByLocallangFile = [];
+        $usedOverrideFiles = [];
+        foreach ($locallangFiles as $locallangFile) {
+            $llFile = (string)($locallangFile['ll_file'] ?? '');
+            $language = (string)($locallangFile['language'] ?? '');
+            if (!$this->pathResolver->isValidLocallangPath($llFile)
+                || !$this->pathResolver->isValidLanguageCode($language)
+            ) {
+                continue;
             }
-            // Group the languages by file, so the labels of a file are fetched with one query for all its languages
-            $isoCodesByLocallangFile = [];
-            $usedOverrideFiles = [];
-            foreach ($locallangFiles as $locallangFile) {
-                // "locallang.xml" and "locallang.xlf" go to the same override file, only the first one (by the
-                // order of the query) is used
-                $overrideFile = preg_replace('/\.xml$/i', '.xlf', $locallangFile['ll_file']);
-                if (isset($usedOverrideFiles[$overrideFile][$locallangFile['language']])) {
-                    continue;
-                }
-                $usedOverrideFiles[$overrideFile][$locallangFile['language']] = true;
-                if (!$this->locallangOverrideFileExists($locallangFile['ll_file'], $locallangFile['language'])) {
-                    $isoCodesByLocallangFile[$locallangFile['ll_file']][] = $locallangFile['language'];
-                }
+            $overrideFile = (string)preg_replace('/\.xml$/i', '.xlf', $llFile);
+            if (isset($usedOverrideFiles[$overrideFile][$language])) {
+                continue;
             }
-            foreach ($isoCodesByLocallangFile as $locallangFile => $isoCodes) {
-                $this->createLocallangOverrideFile((string)$locallangFile, $isoCodes);
-            }
+            $usedOverrideFiles[$overrideFile][$language] = true;
+            $isoCodesByLocallangFile[$llFile][] = $language;
         }
-    }
 
-    protected function locallangOverrideFileExists(string $locallangFile, string $isoCode): bool
-    {
-        $locallangOverrideFilePath = $this->transformPathFromLocallangToLocallangOverrides($locallangFile, $isoCode);
-        $finalFilePath = $this->prependLocallangFileNameWithIsoCode($locallangOverrideFilePath, $isoCode);
-        $finalFilePath = preg_replace('/\.xml$/i', '.xlf', $finalFilePath);
-
-        return is_file($finalFilePath);
+        foreach ($isoCodesByLocallangFile as $locallangFile => $isoCodes) {
+            $this->createLocallangOverrideFile((string)$locallangFile, $isoCodes);
+        }
     }
 
     /**
-     * @param list<string>|null $isoCodes languages to create the file for, all languages of the labels if null
+     * @param list<string> $isoCodes
      */
-    protected function createLocallangOverrideFile(string $locallangFile, ?array $isoCodes = null): void
+    protected function createLocallangOverrideFile(string $locallangFile, array $isoCodes): void
     {
-        $labels = $this->getLabelsByLocallangFile($locallangFile);
         $groupedLabels = [];
-
-        foreach ($labels as $label) {
-            $groupedLabels[$label['isocode']][] = $label;
-        }
-
-        unset($labels);
-
-        $languagesToProcess = $groupedLabels;
-        if ($isoCodes !== null) {
-            $languagesToProcess = [];
-            foreach ($isoCodes as $isoCode) {
-                $languagesToProcess[$isoCode] = $groupedLabels[$isoCode] ?? [];
+        foreach ($this->getLabelsByLocallangFile($locallangFile) as $label) {
+            $languageCode = (string)($label['isocode'] ?? '');
+            if ($this->pathResolver->isValidLanguageCode($languageCode)) {
+                $groupedLabels[$languageCode][] = $label;
             }
         }
 
-        foreach ($languagesToProcess as $currentIsoCode => $labels) {
+        foreach ($isoCodes as $languageCode) {
+            $labels = $groupedLabels[$languageCode] ?? [];
             if ($labels === []) {
                 continue;
             }
 
-            $xml = $this->createXlfFileForLabels($labels, $currentIsoCode);
-            $xml->formatOutput = true;
-            $defaultLocallangOverrideFile = $this->transformPathFromLocallangToLocallangOverrides(
+            $outputFile = $this->pathResolver->getTargetFilePath(
                 $locallangFile,
-                $currentIsoCode
+                $languageCode,
+                $this->overrideFilesBaseDirectoryPath,
             );
-            $outputFiles = [
-                $this->prependLocallangFileNameWithIsoCode($defaultLocallangOverrideFile, $currentIsoCode),
-            ];
-            foreach ($outputFiles as $outputFile) {
-                $this->createDirectoryIfNotExists(dirname($outputFile));
-                file_put_contents($outputFile, $xml->saveXML());
-                $pathParts = pathinfo($outputFile);
-                GeneralUtility::fixPermissions($outputFile, true);
-                rename($outputFile, $pathParts['dirname'] . '/' . $pathParts['filename'] . '.xlf');
-            }
-        }
-    }
-
-    /**
-     * @param list<array<string, mixed>> $labels
-     */
-    protected function createXlfFileForLabels(array $labels, string $isoCode = 'default'): \DOMDocument
-    {
-        $xml = new \DOMDocument('1.0', 'utf-8');
-        $root = $xml->createElement('xliff');
-        $xml->appendChild($root);
-        $root->setAttribute('version', '1.0');
-
-        $file = $xml->createElement('file');
-        $root->appendChild($file);
-        $file->setAttribute('source-language', 'en');
-        if ($isoCode !== 'default') {
-            // TYPO3 14 reads <target> only from files with a "target-language" attribute, <source> otherwise
-            $file->setAttribute('target-language', $isoCode);
-        }
-        $file->setAttribute('datatype', 'plaintext');
-        $file->setAttribute('original', 'messages');
-        $file->setAttribute('date', (new \DateTime())->format('c'));
-        $file->setAttribute('product', ''); // @todo enter $labels[{n}]['extension'] here
-
-        $fileHeader = $xml->createElement('header');
-        $file->appendChild($fileHeader);
-
-        $fileBody = $xml->createElement('body');
-        $file->appendChild($fileBody);
-
-        foreach ($labels as $label) {
-            $transUnit = $xml->createElement('trans-unit');
-            $transUnit->setAttribute('id', $label['ukey']);
-
-            if ($label['isocode'] == 'default') {
-                $source = $xml->createElement('source');
-                $transUnit->appendChild($source);
-                $source->appendChild(
-                    $xml->createCDATASection($label['text'])
-                );
-            } else {
-                $target = $xml->createElement('target');
-                $transUnit->appendChild($target);
-                $target->appendChild(
-                    $xml->createCDATASection($label['text'])
+            $this->createDirectoryIfNotExists(dirname($outputFile));
+            $xml = $this->xlfBuilder->build($labels, $languageCode);
+            $xmlContent = $xml->saveXML();
+            if ($xmlContent === false || @file_put_contents($outputFile, $xmlContent) !== strlen($xmlContent)) {
+                throw new LanguageFileGenerationException(
+                    'Could not write language file ' . $outputFile,
+                    1760540166
                 );
             }
-            $fileBody->appendChild($transUnit);
+            GeneralUtility::fixPermissions($outputFile, true);
         }
-
-        return $xml;
-    }
-
-    protected function prependLocallangFileNameWithIsoCode(string $filePath, string $isoCode): string
-    {
-        $fileName = basename($filePath);
-        $dirname = dirname($filePath);
-        return $dirname . '/' . $isoCode . '.' . $fileName;
     }
 
     /**
@@ -419,9 +278,6 @@ class GenerateLanguageFiles
      */
     protected function getLabelsByLocallangFile(string $locallangFile): array
     {
-        return
-            GeneralUtility::makeInstance(Database::class)
-                ->getLabelsByLocallangFile($locallangFile) ?? [];
+        return $this->labelReader->getLabelsByLocallangFile($locallangFile);
     }
-
 }

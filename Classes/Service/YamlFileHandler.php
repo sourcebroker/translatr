@@ -6,7 +6,6 @@ namespace SourceBroker\Translatr\Service;
 
 use TYPO3\CMS\Core\Configuration\Loader\YamlFileLoader;
 use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class YamlFileHandler
 {
@@ -14,15 +13,10 @@ class YamlFileHandler
     public const ROOT_NAME = 'ext';
     public const FILENAME = 'Configuration.yaml';
 
-    protected YamlFileLoader $yamlFileLoader;
-
-    protected PackageManager $packageManager;
-
-    public function __construct()
-    {
-        $this->packageManager = GeneralUtility::makeInstance(PackageManager::class);
-        $this->yamlFileLoader = GeneralUtility::makeInstance(YamlFileLoader::class);
-    }
+    public function __construct(
+        private readonly YamlFileLoader $yamlFileLoader,
+        private readonly PackageManager $packageManager,
+    ) {}
 
     /**
      * @return list<array{extension: string, files?: list<array{fileName: string, path: string, labels: array<string, mixed>}>}>
@@ -113,7 +107,7 @@ class YamlFileHandler
         $files = [];
         foreach ($this->packageManager->getActivePackages() as $package) {
             $yamlFile = $package->getPackagePath() . 'Configuration/Translation/' . self::FILENAME;
-            if (@is_file($yamlFile)) {
+            if (is_file($yamlFile)) {
                 $files[] = $yamlFile;
             }
         }

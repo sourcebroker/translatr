@@ -7,7 +7,6 @@ namespace SourceBroker\Translatr\Service;
 use TYPO3\CMS\Core\Locking\Exception\LockAcquireWouldBlockException;
 use TYPO3\CMS\Core\Locking\LockFactory;
 use TYPO3\CMS\Core\Locking\LockingStrategyInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Exclusive lock shared by the generation of the locallang override files and the flush of them,
@@ -21,12 +20,15 @@ class Locker
     protected ?LockingStrategyInterface $accessLock = null;
     protected ?LockingStrategyInterface $lock = null;
 
+    public function __construct(
+        private readonly LockFactory $lockFactory,
+    ) {}
+
     public function acquire(): void
     {
-        $lockFactory = GeneralUtility::makeInstance(LockFactory::class);
-        $this->accessLock = $lockFactory->createLocker(self::TYPE);
+        $this->accessLock = $this->lockFactory->createLocker(self::TYPE);
 
-        $this->lock = $lockFactory->createLocker(
+        $this->lock = $this->lockFactory->createLocker(
             self::KEY,
             LockingStrategyInterface::LOCK_CAPABILITY_EXCLUSIVE | LockingStrategyInterface::LOCK_CAPABILITY_NOBLOCK
         );

@@ -1,75 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SourceBroker\Translatr\Database;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
-use SourceBroker\Translatr\Utility\ArrayUtility;
+use SourceBroker\Translatr\Domain\Repository\LabelRepository;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class Database implements DatabaseInterface
+final readonly class LabelReader
 {
-    /**
-     * @param array<string, mixed> $condition
-     */
-    public function delete(string $table, array $condition): void
-    {
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $queryBuilder->delete($table);
-        foreach ($condition as $key => $value) {
-            $queryBuilder
-                ->andWhere(sprintf('%s = :%s', $key, $key))
-                ->setParameter($key, $value);
-        }
-        $queryBuilder->executeStatement();
-    }
-
-    /**
-     * @param array<string, mixed> $set
-     * @param array<string, mixed> $condition
-     */
-    public function update(string $table, array $set, array $condition): void
-    {
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-        $queryBuilder
-            ->update($table);
-
-        foreach ($set as $key => $value) {
-            $queryBuilder
-                ->set($key, $value);
-        }
-
-        foreach ($condition as $key => $value) {
-            $queryBuilder
-                ->andWhere(sprintf('%s = :%s', $key, $key))
-                ->setParameter($key, $value);
-        }
-
-        $queryBuilder->executeStatement();
-    }
-
-    public function getRootPage(): int
-    {
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
-        return $queryBuilder
-            ->select('uid')
-            ->from('pages')->where(
-                $queryBuilder->expr()->eq('pid', 0),
-                $queryBuilder->expr()->eq('deleted', 0)
-            )->executeQuery()->fetchOne();
-    }
+    public function __construct(private ConnectionPool $connectionPool) {}
 
     /**
      * @return array<int, array<string, mixed>>
      */
-    public function findDemandedForBe(BeLabelDemand $demand): array
+    public function findDemandedForBe(BeLabelDemand $demand, ?string $locallangFile = null): array
     {
         if (!$demand->isValid()) {
             return [];
@@ -83,8 +33,13 @@ class Database implements DatabaseInterface
             'languages' => ArrayParameterType::STRING,
         ];
         $keyWhere = '';
+        if ($locallangFile !== null) {
+            $keyWhere = ' AND label.ll_file = :file ';
+            $parameters['file'] = $locallangFile;
+            $types['file'] = ParameterType::STRING;
+        }
         if ($demand->getKeys()) {
-            $keyWhere = ' AND label.ukey IN (:keys) ';
+            $keyWhere .= ' AND label.ukey IN (:keys) ';
             $parameters['keys'] = array_values($demand->getKeys());
             $types['keys'] = ArrayParameterType::STRING;
         }
@@ -97,6 +52,7 @@ SELECT
   label.ukey,
   0 AS parent_uid,
   label.text,
+  label.description,
   label.ll_file,
   label.ll_file_index,
   label.tags,
@@ -114,6 +70,7 @@ SELECT
   label.ukey,
   parent.uid AS parent_uid,
   label.text,
+  label.description,
   label.ll_file,
   label.ll_file_index,
   label.tags,
@@ -128,30 +85,27 @@ WHERE label.language IN (:languages)
 );
 SQL;
         /** @var Connection $connection */
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default');
+        $connection = $this->connectionPool->getConnectionForTable(LabelRepository::TABLE);
         $stmt = $connection->executeQuery($query, $parameters, $types);
 
-        $resultAssoc = $stmt->fetchAllAssociative();
-        $results = ArrayUtility::combineWithSubarrayFieldAsKey(
-            $resultAssoc,
-            'uid'
-        );
-
+        $results = $stmt->fetchAllAssociative();
         $processedResults = [];
 
-        foreach ($results as &$result) {
+        foreach ($results as $result) {
             $uid = (int)$result['uid'];
-            $parentUid = (int)$result['parent_uid'];
-            $language = $result['language'];
-
-            if ($language === 'default') {
+            if ($result['language'] === 'default') {
                 // record in default language are treated as parents
                 $processedResults[$uid] = $result;
                 $processedResults[$uid]['language_childs'] = [];
-            } elseif ($parentUid > 0) {
+            }
+        }
+
+        foreach ($results as $result) {
+            $parentUid = (int)$result['parent_uid'];
+            $language = (string)$result['language'];
+            if ($language !== 'default' && isset($processedResults[$parentUid])) {
                 // add as a child to parent record
-                $processedResults[$parentUid]['language_childs'][$language]
-                    = $result;
+                $processedResults[$parentUid]['language_childs'][$language] = $result;
             }
         }
 
@@ -159,12 +113,12 @@ SQL;
     }
 
     /**
-     * @return list<array<string, mixed>>|null
+     * @return list<array<string, mixed>>
      */
-    public function getLabelsByLocallangFile(string $locallangFile): ?array
+    public function getLabelsByLocallangFile(string $locallangFile): array
     {
         /** @var Connection $connection */
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_translatr_domain_model_label');
+        $connection = $this->connectionPool->getConnectionForTable('tx_translatr_domain_model_label');
         $query = <<<SQL
 /* select labels from default language */
 SELECT
@@ -183,19 +137,18 @@ SQL;
             ],
             [
                 ParameterType::STRING,
-                ParameterType::STRING,
             ]
         );
         return $stmt->fetchAllAssociative();
     }
 
     /**
-     * @return list<array<string, mixed>>|null
+     * @return list<array<string, mixed>>
      */
-    public function getLocallangFiles(): ?array
+    public function getLocallangFiles(): array
     {
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_translatr_domain_model_label');
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_translatr_domain_model_label');
         return $queryBuilder
             ->select('label.ll_file', 'label.language')
             ->from('tx_translatr_domain_model_label', 'label')->groupBy(

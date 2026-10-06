@@ -4,25 +4,23 @@ declare(strict_types=1);
 
 namespace SourceBroker\Translatr\Service;
 
+use SourceBroker\Translatr\Database\LabelReader;
+use SourceBroker\Translatr\Database\LabelWriter;
 use SourceBroker\Translatr\Domain\Model\Dto\BeLabelDemand;
 use SourceBroker\Translatr\Domain\Repository\LabelRepository;
-use SourceBroker\Translatr\Utility\LanguageUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+use TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface;
 
 class ImportProcess
 {
-    public const ALLOWED_PROPERTIES = ['tags'];
-
-    protected YamlFileHandler $yamlFileHandler;
-
-    protected LabelRepository $labelRepository;
-
-    public function __construct()
-    {
-        $this->yamlFileHandler = GeneralUtility::makeInstance(YamlFileHandler::class);
-        $this->labelRepository = GeneralUtility::makeInstance(LabelRepository::class);
-    }
+    public function __construct(
+        private readonly YamlFileHandler $yamlFileHandler,
+        private readonly LabelRepository $labelRepository,
+        private readonly LabelReader $labelReader,
+        private readonly LabelWriter $labelWriter,
+        private readonly LabelIndexer $labelIndexer,
+        private readonly LanguageService $languageService,
+        private readonly PersistenceManagerInterface $persistenceManager,
+    ) {}
 
     /**
      * @return list<array{extension: string, files?: list<array{fileName: string, path: string, labels: array<string, mixed>}>}>
@@ -37,21 +35,15 @@ class ImportProcess
      */
     public function importDataFromSingleFile(string $extension, array $file): void
     {
-        $this->labelRepository->indexExtensionLabels($extension);
+        $this->labelIndexer->index($extension);
         $this->pushMissingKeyTranslationsToDatabase($extension, $file['labels'], $file['path']);
         foreach ($file['labels'] as $key => $properties) {
-            $values = [];
-            foreach ($properties as $propertyName => $property) {
-                if (in_array($propertyName, self::ALLOWED_PROPERTIES)) {
-                    $values[$propertyName] = implode(',', array_map(trim(...), $property));
-                }
-            }
-            if (count($values)) {
-                $this->labelRepository->updateSelectedRowInAllLanguages(
+            if (isset($properties['tags'])) {
+                $this->labelWriter->updateTags(
                     $key,
                     $extension,
                     $file['path'],
-                    $values
+                    implode(',', array_map(trim(...), $properties['tags']))
                 );
             }
         }
@@ -62,19 +54,22 @@ class ImportProcess
      */
     protected function pushMissingKeyTranslationsToDatabase(string $extension, array $keys, string $path): void
     {
-        $availableLanguages = LanguageUtility::getAvailableLanguages();
+        if ($keys === []) {
+            return;
+        }
+        $availableLanguages = $this->languageService->getAvailableLanguages();
         if (is_array($availableLanguages)) {
             $allLanguages = array_keys($availableLanguages);
-            $demand = GeneralUtility::makeInstance(BeLabelDemand::class);
+            $demand = new BeLabelDemand();
             $demand->setExtension($extension);
             $demand->setKeys(array_keys($keys));
             $demand->setLanguages($allLanguages);
-            $labels = $this->labelRepository->findDemandedForBe($demand);
+            $labels = $this->labelReader->findDemandedForBe($demand, $path);
             // Parse the file once per language, not for every label
             $parsedLabelsByLanguage = [];
             if ($labels !== []) {
                 foreach ($allLanguages as $language) {
-                    $parsedLabelsByLanguage[$language] = LanguageUtility::parseLanguageLabels($path, $language)[$language] ?? [];
+                    $parsedLabelsByLanguage[$language] = $this->languageService->parseLanguageLabels($path, $language)[$language] ?? [];
                 }
             }
             foreach ($labels as $label) {
@@ -83,11 +78,9 @@ class ImportProcess
                     if (!empty($translation)) {
                         if (isset($label['language_childs'][$language])) {
                             if (empty($label['language_childs'][$language]['modify'])) {
-                                $this->labelRepository->updateSelectedRow(
-                                    $label['language_childs'][$language]['uid'],
-                                    [
-                                        'text' => $translation,
-                                    ]
+                                $this->labelWriter->updateTranslation(
+                                    (int)$label['language_childs'][$language]['uid'],
+                                    $translation
                                 );
                             }
                         } else {
@@ -100,7 +93,7 @@ class ImportProcess
                     }
                 }
             }
-            GeneralUtility::makeInstance(PersistenceManager::class)->persistAll();
+            $this->persistenceManager->persistAll();
         }
     }
 }

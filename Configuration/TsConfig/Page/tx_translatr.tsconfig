@@ -1,4 +1,7 @@
 tx_translatr {
+  # Enable manual synchronization in the backend; deployment indexing uses the CLI command.
+  showSyncButton = 0
+
   languages {
 #    af = Afrikaans
 #    ar = Arabic

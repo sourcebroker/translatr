@@ -49,6 +49,9 @@ class TcaFieldHidden extends AbstractFormElement
     protected function prepareInput(string $value, string $displayValue, string $baseName): string
     {
         $labelHtml = $this->renderLabel(StringUtility::getUniqueId('translatr-hidden-field-input-'));
+        $value = htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $displayValue = htmlspecialchars($displayValue, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $baseName = htmlspecialchars($baseName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         return <<<HTML
 {$labelHtml}

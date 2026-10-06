@@ -6,6 +6,16 @@ use TYPO3\CMS\Backend\Form\FormDataProviderInterface;
 
 class LabelRowInitializeNew implements FormDataProviderInterface
 {
+    private const ALLOWED_DEFAULT_FIELDS = [
+        'extension',
+        'language',
+        'll_file',
+        'll_file_index',
+        'tags',
+        'text',
+        'ukey',
+    ];
+
     /**
      * @var array<string, mixed>
      */
@@ -51,7 +61,6 @@ class LabelRowInitializeNew implements FormDataProviderInterface
     private function setDefaultDatabaseRowData(): void
     {
         $defaultTcaData = $this->getDefaultTcaData();
-        $defaultTcaData = is_array($defaultTcaData) ? $defaultTcaData : [];
 
         $this->data['databaseRow'] = array_replace_recursive(
             $this->data['databaseRow'],
@@ -59,8 +68,15 @@ class LabelRowInitializeNew implements FormDataProviderInterface
         );
     }
 
-    private function getDefaultTcaData(): mixed
+    /**
+     * @return array<string, mixed>
+     */
+    private function getDefaultTcaData(): array
     {
-        return $GLOBALS['TYPO3_REQUEST']->getQueryParams()['translatr_tcadefault'] ?? [];
+        $defaultData = $GLOBALS['TYPO3_REQUEST']->getQueryParams()['translatr_tcadefault'] ?? [];
+        if (!is_array($defaultData)) {
+            return [];
+        }
+        return array_intersect_key($defaultData, array_flip(self::ALLOWED_DEFAULT_FIELDS));
     }
 }

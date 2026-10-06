@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SourceBroker\Translatr\Configuration;
 
-use SourceBroker\Translatr\Database\Database;
+use SourceBroker\Translatr\Database\RootPageProvider;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Configurator
 {
@@ -13,23 +14,22 @@ class Configurator
      * @var array<string, mixed>|null
      */
     protected ?array $config = null;
+    private bool $loaded = false;
 
-    /**
-     * @param array<string, mixed>|null $config
-     */
-    public function __construct(?array $config = null)
+    public function __construct(
+        private readonly RootPageProvider $rootPageProvider,
+        private readonly TypoScriptService $typoScriptService,
+    ) {}
+
+    private function load(): void
     {
-        if ($config !== null) {
-            $this->setConfig($config);
-        } else {
-            $rootPageForTsConfig
-                = GeneralUtility::makeInstance(Database::class)->getRootPage();
-            $serviceConfig = GeneralUtility::makeInstance(TypoScriptService::class)
-                ->convertTypoScriptArrayToPlainArray(BackendUtility::getPagesTSconfig($rootPageForTsConfig));
-            if (isset($serviceConfig['tx_translatr'])) {
-                $this->setConfig($serviceConfig['tx_translatr']);
-            }
+        $serviceConfig = $this->typoScriptService->convertTypoScriptArrayToPlainArray(
+            BackendUtility::getPagesTSconfig($this->rootPageProvider->getRootPage())
+        );
+        if (isset($serviceConfig['tx_translatr'])) {
+            $this->setConfig($serviceConfig['tx_translatr']);
         }
+        $this->loaded = true;
     }
 
     /**
@@ -38,6 +38,12 @@ class Configurator
     public function setConfig(?array $config): void
     {
         $this->config = $config;
+        $this->loaded = true;
+    }
+
+    public function isManualSynchronizationEnabled(): bool
+    {
+        return $this->getOption('showSyncButton') === '1';
     }
 
     /**
@@ -50,6 +56,9 @@ class Configurator
     {
         $config = null;
         if (is_string($name)) {
+            if ($overwriteConfig === null && !$this->loaded) {
+                $this->load();
+            }
             $config = $overwriteConfig ?? $this->config;
             foreach (explode('.', $name) as $piece) {
                 if (!is_array($config) || !array_key_exists($piece, $config)) {

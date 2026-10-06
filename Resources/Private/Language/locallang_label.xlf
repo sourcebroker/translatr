@@ -4,6 +4,23 @@
           product-name="translatr">
         <header/>
         <body>
+            <trans-unit id="filters.languages"><source>Languages</source></trans-unit>
+            <trans-unit id="filters.chooseLanguages"><source>Choose languages</source></trans-unit>
+            <trans-unit id="filters.searchLanguages"><source>Search languages</source></trans-unit>
+            <trans-unit id="filters.clearLanguages"><source>Clear selection</source></trans-unit>
+            <trans-unit id="filters.noLanguages"><source>No matching languages</source></trans-unit>
+            <trans-unit id="labels.refresh">
+                <source>Synchronize labels from files</source>
+            </trans-unit>
+            <trans-unit id="labels.refreshed">
+                <source>Labels synchronized from source files.</source>
+            </trans-unit>
+            <trans-unit id="labels.syncDescription">
+                <source>Re-reads all source labels for “%s”. Your manual translations are kept.</source>
+            </trans-unit>
+            <trans-unit id="filters.apply">
+                <source>Apply filters</source>
+            </trans-unit>
             <trans-unit id="mlang_tabs_tab">
                 <source>Translate</source>
             </trans-unit>

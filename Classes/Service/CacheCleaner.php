@@ -13,12 +13,12 @@ use TYPO3\CMS\Core\Utility\StringUtility;
 
 class CacheCleaner
 {
-    protected CacheManager $cacheManager;
-
-    public function __construct()
-    {
-        $this->cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-    }
+    public function __construct(
+        private readonly CacheManager $cacheManager,
+        private readonly Locker $locker,
+        private readonly OpcodeCacheService $opcodeCacheService,
+        private readonly GenerationRetry $generationRetry,
+    ) {}
 
     /**
      * Hook "clearCachePostProc" of DataHandler. It is called for each record of any table whose cache is cleared,
@@ -39,25 +39,29 @@ class CacheCleaner
     public function flushCache(): void
     {
         // Same lock as GenerateLanguageFiles, so the folder is not removed while the files are being generated
-        $locker = GeneralUtility::makeInstance(Locker::class);
-        $locker->acquire();
+        $this->locker->acquire();
         try {
+            $this->generationRetry->reset();
             $directory = FileUtility::getTempFolderPath();
             if (is_link($directory)) {
                 // Avoid attempting to rename the symlink see #87367
-                $directory = realpath($directory);
+                $resolvedDirectory = realpath($directory);
+                if ($resolvedDirectory === false) {
+                    throw new \RuntimeException('Could not resolve the language file cache folder.', 1791214282);
+                }
+                $directory = $resolvedDirectory;
             }
             if (is_dir($directory)) {
                 $temporaryDirectory = rtrim($directory, '/') . '.' . StringUtility::getUniqueId('remove');
                 if (rename($directory, $temporaryDirectory)) {
-                    GeneralUtility::makeInstance(OpcodeCacheService::class)->clearAllActive($directory);
+                    $this->opcodeCacheService->clearAllActive($directory);
                     GeneralUtility::mkdir($directory);
                     clearstatcache();
                     GeneralUtility::rmdir($temporaryDirectory, true);
                 }
             }
         } finally {
-            $locker->release();
+            $this->locker->release();
         }
         try {
             $cacheFrontend = $this->cacheManager->getCache('l10n');

@@ -14,3 +14,32 @@ services:
         command: 'translatr:import:configuration'
         description: 'Import configuration for labels for ext:translatr'
 
+  SourceBroker\Translatr\Hooks\TceMain:
+    public: true
+
+  SourceBroker\Translatr\Command\IndexLabelsCommand:
+    tags:
+      - name: 'console.command'
+        command: 'translatr:labels:index'
+        description: 'Index changed source labels of configured extensions'
+
+  SourceBroker\Translatr\Service\CacheCleaner:
+    public: true
+
+  cache.translatr_index:
+    class: TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
+    factory: ['@TYPO3\CMS\Core\Cache\CacheManager', 'getCache']
+    arguments: ['translatr_index']
+
+  SourceBroker\Translatr\Service\LabelIndexer:
+    arguments:
+      $indexCache: '@cache.translatr_index'
+
+  cache.translatr_retry:
+    class: TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
+    factory: ['@TYPO3\CMS\Core\Cache\CacheManager', 'getCache']
+    arguments: ['hash']
+
+  SourceBroker\Translatr\Service\GenerationRetry:
+    arguments:
+      $cache: '@cache.translatr_retry'
